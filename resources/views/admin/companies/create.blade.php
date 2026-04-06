@@ -9,7 +9,7 @@
 <body class="bg-gray-100 p-6 font-sans">
     <div class="max-w-3xl mx-auto">
         <div class="mb-6 flex justify-between items-center">
-            <a href="/" class="text-orange-600 font-bold hover:underline">← Retour à l'accueil</a>
+            <a href="{{ route('home') }}" class="text-orange-600 font-bold hover:underline">← Retour à l'accueil</a>
             <a href="{{ route('companies.index') }}" class="text-emerald-600 font-bold hover:underline">Gérer les entreprises →</a>
         </div>
 
