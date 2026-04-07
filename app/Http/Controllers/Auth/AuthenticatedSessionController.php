@@ -28,7 +28,8 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
-        return redirect()->intended(route('dashboard', absolute: false));
+        // CORRECTION : On redirige vers la liste des entreprises au lieu de 'dashboard'
+        return redirect()->intended(route('companies.index', absolute: false));
     }
 
     /**
