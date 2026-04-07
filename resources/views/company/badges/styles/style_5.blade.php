@@ -1,8 +1,8 @@
 @php $mainColor = $employee->badge_color ?? '#059669'; @endphp
-<div class="badge-fixed-container relative bg-white flex flex-col overflow-hidden w-full h-full border border-gray-100">
+<div class="badge-fixed-container relative bg-white flex flex-col items-center overflow-hidden w-full h-full border border-gray-100">
     
     {{-- Background Design SVG --}}
-    <div class="absolute inset-0 opacity-40 pointer-events-none">
+    <div class="absolute inset-0 opacity-30 pointer-events-none">
         <svg width="100%" height="100%" viewBox="0 0 100 120" preserveAspectRatio="none" fill="none" stroke="{{ $mainColor }}" stroke-width="0.3">
             <path d="M5 15 L5 5 L15 5 M5 10 L10 10" />
             <circle cx="15" cy="5" r="0.8" fill="{{ $mainColor }}" />
@@ -15,22 +15,22 @@
         </svg>
     </div>
 
-    {{-- 1. HEADER : Logo (Fixe en haut) --}}
-    <div class="w-full pt-8 flex-none flex justify-center z-10 px-6">
+    {{-- 1. HEADER : Logo --}}
+    <div class="w-full pt-6 flex-none flex justify-center z-10 px-6">
         @if($employee->company && $employee->company->logo)
-            <img src="{{ $getPath($employee->company->logo) }}" class="h-9 w-auto object-contain">
+            <img src="{{ $getPath($employee->company->logo) }}" class="h-8 w-auto object-contain">
         @endif
     </div>
 
-    {{-- 2. CORPS : Zone centrale (S'étire mais garde sa distance) --}}
-    <div class="flex-grow flex flex-col items-center justify-center w-full px-6 text-center z-10 mt-6 mb-8">
-        {{-- PHOTO --}}
-        <div class="w-52 h-60 rounded-3xl overflow-hidden border-[3px] border-white shadow-2xl mb-6 bg-gray-50 flex-none relative">
+    {{-- 2. CORPS : Zone centrale --}}
+    <div class="flex-grow flex flex-col items-center justify-start w-full px-6 text-center z-10 mt-4">
+        {{-- PHOTO : Ajustée à h-56 pour laisser respirer le texte --}}
+        <div class="w-52 h-56 rounded-3xl overflow-hidden border-[3px] border-white shadow-xl mb-4 bg-gray-50 flex-none relative">
             <img src="{{ $getPath($employee->photo) }}" class="w-full h-full object-cover scale-105">
         </div>
 
         {{-- Identité --}}
-        <div class="mb-3">
+        <div class="mb-2">
             <h1 class="text-xl font-black uppercase tracking-tight text-gray-900 leading-none">
                 {{ $employee->last_name }}
             </h1>
@@ -39,33 +39,33 @@
             </h1>
         </div>
         
-        <div class="h-[2.5px] w-10 my-3 rounded-full mx-auto" style="background-color: {{ $mainColor }}"></div>
+        <div class="h-[2px] w-8 my-2 rounded-full mx-auto" style="background-color: {{ $mainColor }}"></div>
         
-        {{-- Fonction et Département --}}
-        <div class="space-y-1">
-            <p class="text-[12px] font-black text-gray-700 uppercase tracking-widest leading-tight">
+        {{-- Fonction et Département (Remontés) --}}
+        <div class="pb-4">
+            <p class="text-[12px] font-black text-gray-700 uppercase tracking-widest leading-none">
                 {{ $employee->function }}
             </p>
-            <p class="text-[9px] font-extrabold uppercase opacity-80" style="color: {{ $mainColor }}">
+            <p class="text-[9px] font-extrabold uppercase mt-1" style="color: {{ $mainColor }}">
                 {{ $employee->department ?? 'DÉPARTEMENT' }}
             </p>
         </div>
     </div>
 
-    {{-- 3. FOOTER : Zone biseautée (Fixe en bas) --}}
-    <div class="w-full h-24 flex-none relative mt-auto">
-        {{-- Fond coloré biseauté --}}
-        <div class="absolute inset-0 z-0" style="background-color: {{ $mainColor }}; clip-path: polygon(0 40%, 100% 0, 100% 100%, 0% 100%);"></div>
+    {{-- 3. FOOTER : Affiné pour ne pas couvrir le texte --}}
+    <div class="w-full h-20 flex-none relative mt-auto">
+        {{-- Fond coloré avec biseau beaucoup plus bas --}}
+        <div class="absolute inset-0 z-0" style="background-color: {{ $mainColor }}; clip-path: polygon(0 15%, 100% 0, 100% 100%, 0% 100%);"></div>
         
-        <div class="relative z-10 h-full w-full px-6 flex justify-between items-center pt-8">
-            {{-- QR Code --}}
-            <div class="bg-white p-1.5 rounded-xl shadow-lg border border-gray-100/50">
-                <img src="{{ $getPath($employee->qr_code) }}" class="w-10 h-10">
+        <div class="relative z-10 h-full w-full px-6 flex justify-between items-center pt-4">
+            {{-- QR Code légèrement plus petit --}}
+            <div class="bg-white p-1 rounded-lg shadow-md">
+                <img src="{{ $getPath($employee->qr_code) }}" class="w-8 h-8">
             </div>
             {{-- Matricule --}}
-            <div class="text-right flex flex-col leading-tight pt-1">
-                <span class="text-[7px] font-bold text-white/80 uppercase tracking-widest">Matricule Officiel</span>
-                <span class="text-[12px] font-mono font-black text-white uppercase tracking-tighter">{{ $employee->badge_number }}</span>
+            <div class="text-right flex flex-col leading-none">
+                <span class="text-[6px] font-bold text-white/80 uppercase tracking-widest">Matricule</span>
+                <span class="text-[11px] font-mono font-black text-white uppercase tracking-tighter">{{ $employee->badge_number }}</span>
             </div>
         </div>
     </div>
