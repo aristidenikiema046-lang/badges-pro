@@ -8,60 +8,44 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     
     <style>
-        /* CONFIGURATION IMPRESSION */
+        /* CONFIGURATION IMPRESSION PROFESSIONNELLE */
         @media print {
+            @page {
+                size: 85.6mm 54mm; /* Taille physique CR80 */
+                margin: 0;
+            }
+            body { background: white; margin: 0; padding: 0; }
             .no-print { display: none !important; }
             .print-only { display: block !important; }
-            body { background: white; margin: 0; padding: 0; }
+            
+            .badge-selected { 
+                width: 85.6mm !important; 
+                height: 54mm !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                overflow: hidden;
+            }
             
             * {
                 -webkit-print-color-adjust: exact !important;
                 print-color-adjust: exact !important;
             }
-
-            .badge-selected { 
-                width: 85.6mm; 
-                height: 54mm;
-                margin: 0 auto;
-                page-break-after: always;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-            }
         }
 
         /* STYLE ÉCRAN */
         .badge-card {
-            width: 125mm;
-            height: 85.6mm;
+            width: 85.6mm;
+            height: 54mm;
             cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.3s ease;
             position: relative;
             background: white;
+            overflow: hidden; /* Important pour html2canvas */
         }
 
         .badge-card:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.3);
-        }
-
-        .badge-card::after {
-            content: 'Aperçu Impression';
-            position: absolute;
-            inset: 0;
-            background: rgba(0,0,0,0.1);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: bold;
-            opacity: 0;
-            transition: opacity 0.3s;
-            border-radius: 2.5rem;
-        }
-
-        .badge-card:hover::after {
-            opacity: 1;
+            transform: scale(1.02);
+            box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1);
         }
     </style>
 </head>
@@ -83,88 +67,63 @@
 
         <div class="grid grid-cols-1 xl:grid-cols-2 gap-16 justify-items-center">
             @foreach(range(1, 6) as $styleIndex)
-                <div class="flex flex-col items-center w-full max-w-[125mm]">
-                    <div class="flex justify-between w-full mb-4 px-2">
+                <div class="flex flex-col items-center w-full">
+                    <div class="flex justify-between w-[85.6mm] mb-4 px-2">
                         <span class="font-black text-slate-400 uppercase text-xs tracking-[0.2em]">Modèle #0{{ $styleIndex }}</span>
                     </div>
                     
                     <div id="badge-capture-{{ $styleIndex }}" 
-                         class="badge-card shadow-2xl rounded-[2.5rem] overflow-hidden border-4 border-transparent hover:border-emerald-500"
+                         class="badge-card shadow-2xl rounded-xl"
                          onclick="printThisStyle({{ $styleIndex }})">
                         @include('company.badges.styles.style_' . $styleIndex, ['employee' => $employee])
                     </div>
 
-                    <div class="mt-6 flex flex-col items-center gap-3 w-full">
-                        <div class="flex gap-3">
-                            <button onclick="printThisStyle({{ $styleIndex }})" 
-                                    class="bg-emerald-500 hover:bg-emerald-600 text-white px-6 py-2 rounded-full font-bold text-sm shadow-md transition">
-                                Imprimer
+                    <div class="mt-6 flex gap-3">
+                        <button onclick="printThisStyle({{ $styleIndex }})" 
+                                class="bg-emerald-500 hover:bg-emerald-600 text-white px-6 py-2 rounded-full font-bold text-sm shadow-md transition">
+                            Imprimer
+                        </button>
+                        
+                        <div class="flex bg-white rounded-full shadow-md border overflow-hidden">
+                            <a href="{{ route('badge.export.single', ['id' => $employee->id, 'style' => $styleIndex, 'format' => 'pdf']) }}" 
+                               class="px-4 py-2 hover:bg-slate-50 border-r text-sm font-bold text-slate-600 transition">
+                                PDF
+                            </a>
+                            <button onclick="downloadPNG({{ $styleIndex }}, '{{ $employee->last_name }}')" 
+                                    class="px-4 py-2 hover:bg-slate-50 text-sm font-bold text-slate-600 transition">
+                                PNG
                             </button>
-                            
-                            <div class="flex bg-white rounded-full shadow-md border overflow-hidden">
-                                <a href="{{ route('badge.export.single', ['id' => $employee->id, 'style' => $styleIndex, 'format' => 'pdf']) }}" 
-                                   class="px-4 py-2 hover:bg-slate-50 border-r text-sm font-bold text-slate-600 transition">
-                                   PDF
-                                </a>
-                                <button onclick="downloadPNG({{ $styleIndex }}, '{{ $employee->last_name }}')" 
-                                        class="px-4 py-2 hover:bg-slate-50 text-sm font-bold text-slate-600 transition">
-                                   PNG
-                                </button>
-                            </div>
                         </div>
                     </div>
                 </div>
             @endforeach
         </div>
-
-        <footer class="mt-20 py-10 border-t border-slate-200 text-center text-slate-400 text-sm">
-            Format standard : 85.6mm x 54mm (CR80)
-        </footer>
     </div>
 
-    <div id="print-zone" class="hidden print-only">
-        @foreach(range(1, 6) as $styleIndex)
-            <div class="badge-selected">
-                @include('company.badges.styles.style_' . $styleIndex, ['employee' => $employee])
-            </div>
-        @endforeach
-    </div>
+    <div id="print-zone" class="hidden print-only"></div>
 
     <script>
-        /**
-         * Impression d'un style unique
-         */
         function printThisStyle(index) {
             const printZone = document.getElementById('print-zone');
-            const badges = document.querySelectorAll('.badge-card');
-            const selectedContent = badges[index - 1].innerHTML;
+            const badgeContent = document.querySelector('#badge-capture-' + index).innerHTML;
             
-            const originalContent = printZone.innerHTML;
-            printZone.innerHTML = `<div class="badge-selected">${selectedContent}</div>`;
-            
+            printZone.innerHTML = `<div class="badge-selected">${badgeContent}</div>`;
             window.print();
-
-            setTimeout(() => {
-                printZone.innerHTML = originalContent;
-            }, 1000);
         }
 
-        /**
-         * Export PNG via html2canvas (Côté client)
-         */
         function downloadPNG(index, lastName) {
-            const element = document.getElementById('badge-capture-' + index);
+            const element = document.querySelector('#badge-capture-' + index + ' > div');
             
-            // On utilise html2canvas pour transformer le HTML en image
             html2canvas(element, {
-                scale: 3, // Améliore la résolution
-                useCORS: true, // Autorise les images venant de ton serveur
+                scale: 4,
+                useCORS: true,
                 backgroundColor: null,
-                logging: false,
+                width: 323, // Correspond à 85.6mm
+                height: 204  // Correspond à 54mm
             }).then(canvas => {
                 const link = document.createElement('a');
                 link.download = `badge-${lastName}-style${index}.png`;
-                link.href = canvas.toDataURL("image/png");
+                link.href = canvas.toDataURL("image/png", 1.0);
                 link.click();
             });
         }
