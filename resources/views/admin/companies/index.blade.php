@@ -1,4 +1,4 @@
-@extends('layouts.app') {{-- Assure-toi que ce layout existe, sinon utilise celui que tu as pour l'admin --}}
+extends('layouts.admin') {{-- Assure-toi que ce layout existe, sinon utilise celui que tu as pour l'admin --}}
 
 @section('content')
 <div class="min-h-screen bg-gray-100">
