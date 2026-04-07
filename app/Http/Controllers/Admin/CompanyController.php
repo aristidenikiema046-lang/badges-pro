@@ -8,9 +8,19 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 
 class CompanyController extends Controller
 {
+    /**
+     * Liste des entreprises pour le Super-Admin (Vue Noire).
+     */
+    public function index()
+    {
+        $companies = Company::all();
+        return view('admin.companies.index', compact('companies'));
+    }
+
     /**
      * Affiche le formulaire de création (Vue Orange).
      */
@@ -20,11 +30,10 @@ class CompanyController extends Controller
     }
 
     /**
-     * Enregistre l'entreprise et l'utilisateur sans déconnecter l'admin.
+     * Enregistre l'entreprise et l'utilisateur.
      */
     public function store(Request $request)
     {
-        // 1. Validation des données
         $request->validate([
             'name'         => 'required|string|max:255',
             'email'        => 'required|email|unique:companies,email|unique:users,email',
@@ -33,16 +42,13 @@ class CompanyController extends Controller
             'logo'         => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
         ]);
 
-        // 2. Génération du Slug unique
         $slug = Str::slug($request->name) . '-' . rand(1000, 9999);
 
-        // 3. Gestion du téléchargement du Logo
         $logoPath = null;
         if ($request->hasFile('logo')) {
             $logoPath = $request->file('logo')->store('logos', 'public');
         }
 
-        // 4. Création de l'entité Entreprise
         $company = Company::create([
             'name'         => $request->name,
             'email'        => $request->email,
@@ -53,7 +59,6 @@ class CompanyController extends Controller
             'is_active'    => true,
         ]);
 
-        // 5. Création du compte Utilisateur lié (Role client)
         User::create([
             'name'       => $request->manager_name,
             'email'      => $request->email,
@@ -62,7 +67,6 @@ class CompanyController extends Controller
             'company_id' => $company->id,
         ]);
 
-        // 6. REDIRECTION vers la même page avec les données en session
         return redirect()->back()->with([
             'success'        => "L'entreprise {$request->name} a été enregistrée avec succès !",
             'generated_slug' => $slug,
@@ -71,11 +75,62 @@ class CompanyController extends Controller
     }
 
     /**
-     * Liste des entreprises pour le Super-Admin (Vue Noire).
+     * Affiche le formulaire de modification (RÉSOUT TON ERREUR)
      */
-    public function index()
+    public function edit(Company $company)
     {
-        $companies = Company::all();
-        return view('admin.companies.index', compact('companies'));
+        return view('admin.companies.edit', compact('company'));
+    }
+
+    /**
+     * Met à jour les informations de l'entreprise
+     */
+    public function update(Request $request, Company $company)
+    {
+        $request->validate([
+            'name'         => 'required|string|max:255',
+            'email'        => 'required|email|unique:companies,email,' . $company->id,
+            'manager_name' => 'required|string|max:255',
+        ]);
+
+        $data = $request->only(['name', 'email', 'manager_name', 'phone']);
+
+        if ($request->hasFile('logo')) {
+            // Supprimer l'ancien logo s'il existe
+            if ($company->logo) {
+                Storage::disk('public')->delete($company->logo);
+            }
+            $data['logo'] = $request->file('logo')->store('logos', 'public');
+        }
+
+        $company->update($data);
+
+        return redirect()->route('companies.index')->with('success', 'Entreprise mise à jour !');
+    }
+
+    /**
+     * Active ou Désactive l'entreprise (Action des flèches)
+     */
+    public function toggleStatus(Company $company)
+    {
+        $company->update([
+            'is_active' => !$company->is_active
+        ]);
+
+        return redirect()->back()->with('success', 'Statut mis à jour avec succès.');
+    }
+
+    /**
+     * Supprime une entreprise
+     */
+    public function destroy(Company $company)
+    {
+        if ($company->logo) {
+            Storage::disk('public')->delete($company->logo);
+        }
+        
+        $company->delete();
+
+        return redirect()->route('companies.index')->with('success', 'Entreprise supprimée.');
     }
 }
