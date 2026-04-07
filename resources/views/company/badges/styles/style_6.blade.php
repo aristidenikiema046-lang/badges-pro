@@ -1,178 +1,113 @@
 @php 
     $mainColor = $employee->badge_color ?? '#16a34a'; 
     
+    // Conversion systématique en Base64 pour le PDF et le PNG
     $getPath = function($path) {
-        if (!$path) return null;
+        if (!$path) return '';
         $fullPath = public_path('storage/' . $path);
-        if (!file_exists($fullPath)) return null;
+        if (!file_exists($fullPath)) return '';
         $type = pathinfo($fullPath, PATHINFO_EXTENSION);
         $data = file_get_contents($fullPath);
         return 'data:image/' . $type . ';base64,' . base64_encode($data);
     };
 
-    $photoUrl = $getPath($employee->photo);
-    $logoUrl = $getPath($employee->company->logo ?? null);
-    $qrCodeUrl = $getPath($employee->qr_code);
+    $photo = $getPath($employee->photo);
+    $logo = $getPath($employee->company->logo ?? '');
+    $qr = $getPath($employee->qr_code);
 @endphp
 
 <style>
-    /* Supprime les marges physiques de la page PDF */
-    @page { 
-        margin: 0; 
-    }
-    
-    body { 
-        margin: 0; 
-        padding: 0; 
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 100%;
-        background-color: #ffffff; 
-    }
-
-    /* Conteneur du badge : défini pour être propre et centré */
-    .badge-card {
-        width: 86mm;
+    /* Dimensions CR80 strictes */
+    .badge-fixed-container {
+        width: 85.6mm;
         height: 54mm;
-        border: 0.2mm solid #dddddd;
-        border-radius: 5px;
-        background: white;
         position: relative;
+        background-color: white;
+        margin: 0;
+        padding: 0;
         overflow: hidden;
-        margin: auto; /* Centre le badge sur la page A6 */
+        font-family: 'Helvetica', 'Arial', sans-serif;
+        box-sizing: border-box;
     }
 
-    .header-bar {
-        height: 4mm;
-        background-color: {{ $mainColor }};
-        width: 100%;
-    }
-
-    .top-section {
-        padding: 10px 15px;
-        height: 10mm;
-    }
-
-    .logo-img {
-        height: 25px;
-        float: left;
-    }
-
-    .badge-label {
-        float: right;
-        font-size: 7pt; 
-        color: #999; 
-        font-weight: bold; 
-        text-transform: uppercase;
-        margin-top: 5px;
-    }
-
-    .content-body {
-        padding: 0 15px;
-        clear: both;
-    }
-
-    .photo-box {
-        width: 28mm;
-        height: 35mm;
-        border-radius: 3px;
-        border: 0.1mm solid #eeeeee;
-        overflow: hidden;
-        float: left;
-    }
-
-    .info-box {
-        margin-left: 33mm;
-        padding-top: 2mm;
-    }
-
-    .name-text {
-        font-size: 16pt; 
-        margin: 0; 
-        text-transform: uppercase;
-        font-weight: 800;
-        color: #1a1a1a;
-    }
-
-    .firstname-text {
-        font-size: 11pt; 
-        margin: 0; 
-        color: #444;
-        font-weight: 500;
-    }
-
-    .job-title {
-        margin-top: 4mm;
-    }
-
-    .label-small {
-        font-size: 5pt; 
-        color: #aaaaaa; 
-        text-transform: uppercase;
-        font-weight: bold;
-    }
-
-    .value-bold {
-        font-size: 9pt; 
-        font-weight: bold; 
-        color: {{ $mainColor }};
-        text-transform: uppercase;
-    }
-
-    .footer-right {
+    /* Barre décorative verte à gauche */
+    .side-bar {
         position: absolute;
-        bottom: 8px;
-        right: 15px;
+        left: 0; top: 0; bottom: 0;
+        width: 3mm;
+        background-color: {{ $mainColor }};
+        z-index: 5;
+    }
+
+    /* Cadre photo */
+    .photo-frame {
+        position: absolute;
+        left: 8mm;
+        top: 9mm;
+        width: 30mm;
+        height: 36mm;
+        border: 0.5mm solid #eee;
+        border-radius: 2mm;
+        overflow: hidden;
+        background: #fafafa;
+    }
+    .photo-frame img { width: 100%; height: 100%; object-fit: cover; }
+
+    /* Section informations à droite */
+    .info-section {
+        position: absolute;
+        left: 42mm;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        padding: 5mm;
+    }
+
+    .comp-logo { height: 7mm; width: auto; max-width: 30mm; margin-bottom: 3mm; object-fit: contain; }
+    
+    .emp-name { font-size: 14pt; font-weight: 900; color: #111; text-transform: uppercase; margin: 0; line-height: 1.1; }
+    .emp-fn { font-size: 11pt; color: #444; text-transform: uppercase; margin: 0; margin-bottom: 2mm; }
+    
+    .role-label { font-size: 5pt; color: #aaa; text-transform: uppercase; font-weight: bold; margin: 0; }
+    .emp-role { font-size: 9pt; font-weight: bold; color: {{ $mainColor }}; text-transform: uppercase; margin: 0; }
+    
+    /* Zone QR Code */
+    .qr-zone {
+        position: absolute;
+        bottom: 4mm;
+        right: 5mm;
         text-align: center;
     }
-
-    .qr-code {
-        width: 14mm; 
-        height: 14mm;
-    }
-
-    .matricule {
-        font-size: 5pt; 
-        font-family: monospace;
-        color: #333;
-        margin-top: 2px;
-    }
+    .qr-zone img { width: 13mm; height: 13mm; }
+    .matricule-text { font-size: 5.5pt; font-family: monospace; margin-top: 1mm; color: #333; font-weight: bold; }
 </style>
 
-<div class="badge-card">
-    <div class="header-bar"></div>
+<div class="badge-fixed-container">
+    <div class="side-bar"></div>
     
-    <div class="top-section">
-        @if($logoUrl)
-            <img src="{{ $logoUrl }}" class="logo-img">
-        @endif
-        <span class="badge-label">Badge Professionnel</span>
+    <div class="photo-frame">
+        @if($photo) <img src="{{ $photo }}"> @endif
     </div>
 
-    <div class="content-body">
-        <div class="photo-box">
-            @if($photoUrl)
-                <img src="{{ $photoUrl }}" style="width: 100%; height: 100%; object-fit: cover;">
-            @endif
-        </div>
-
-        <div class="info-box">
-            <h1 class="name-text">{{ $employee->last_name }}</h1>
-            <h2 class="firstname-text">{{ $employee->first_name }}</h2>
+    <div class="info-section">
+        @if($logo)
+            <img src="{{ $logo }}" class="comp-logo">
+        @else
+            <div style="height: 7mm;"></div>
+        @endif
+        
+        <div style="margin-top: 2mm;">
+            <p class="emp-name">{{ $employee->last_name }}</p>
+            <p class="emp-fn">{{ $employee->first_name }}</p>
             
-            <div class="job-title">
-                <div class="label-small">Fonction</div>
-                <div class="value-bold">{{ $employee->function }}</div>
-                <div style="font-size: 7pt; color: #666;">{{ $employee->department ?? 'Informatique' }}</div>
-            </div>
+            <p class="role-label">Fonction</p>
+            <p class="emp-role">{{ $employee->function }}</p>
+            <p style="font-size: 7pt; color: #666; margin: 0;">{{ $employee->department ?? 'SERVICE INFORMATIQUE' }}</p>
         </div>
-    </div>
 
-    <div class="footer-right">
-        @if($qrCodeUrl)
-            <img src="{{ $qrCodeUrl }}" class="qr-code">
-        @endif
-        <div class="matricule">{{ $employee->badge_number }}</div>
+        <div class="qr-zone">
+            @if($qr) <img src="{{ $qr }}"> @endif
+            <div class="matricule-text">{{ $employee->badge_number }}</div>
+        </div>
     </div>
 </div>

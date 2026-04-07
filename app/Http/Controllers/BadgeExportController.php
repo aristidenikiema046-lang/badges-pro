@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\Employee;
-use Illuminate\Http\Request;
 use Barryvdh\DomPDF\Facade\Pdf;
 
 class BadgeExportController extends Controller
@@ -11,24 +10,22 @@ class BadgeExportController extends Controller
     public function exportSingle($id, $style, $format)
     {
         $employee = Employee::with('company')->findOrFail($id);
-        $data = ['employee' => $employee, 'isPdf' => true];
+        
+        // On passe 'isPdf' pour forcer le CSS spécifique si besoin
+        $pdf = Pdf::loadView('company.badges.styles.style_' . $style, [
+            'employee' => $employee, 
+            'isPdf' => true
+        ]);
+        
+        // Taille CR80 exacte (85.6mm x 54mm) convertie en points
+        // On utilise 'landscape' car le badge est horizontal
+        $pdf->setPaper([0, 0, 242.65, 153.07], 'landscape'); 
+        
+        $pdf->setOptions([
+            'isHtml5ParserEnabled' => true,
+            'isRemoteEnabled' => true, // Important pour charger les ressources si besoin
+        ]);
 
-        if ($format === 'pdf') {
-            $pdf = Pdf::loadView('company.badges.styles.style_' . $style, $data);
-            
-            // On utilise le format A6 en paysage pour donner de l'espace.
-            // Cela évite que le moteur de rendu ne tronque le badge si un élément dépasse.
-            $pdf->setPaper('a6', 'landscape'); 
-            
-            $pdf->setOptions([
-                'isRemoteEnabled' => true,
-                'isHtml5ParserEnabled' => true,
-                'defaultFont' => 'sans-serif',
-            ]);
-
-            return $pdf->download("badge-{$employee->last_name}.pdf");
-        }
-
-        return view('company.badges.styles.style_' . $style, array_merge($data, ['isPdf' => false]));
+        return $pdf->download("badge-{$employee->last_name}.pdf");
     }
 }
