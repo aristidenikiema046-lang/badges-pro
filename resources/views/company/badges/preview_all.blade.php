@@ -11,7 +11,6 @@
         $is_export = isset($isPdf) && $isPdf;
         $getPath = function($path) use ($is_export) {
             if (empty($path)) return '';
-            // Nettoyage pour éviter les doublons de /storage/ dans l'URL
             $cleanPath = str_replace('storage/', '', $path);
             return $is_export ? public_path('storage/' . $cleanPath) : asset('storage/' . $cleanPath);
         };
@@ -28,27 +27,16 @@
             transition: all 0.3s ease;
         }
 
-        /* Format Portrait (Styles 1, 2, 3, 5) */
-        .portrait-card {
-            width: 85mm;
-            height: 125mm;
-        }
+        .portrait-card { width: 85mm; height: 125mm; }
+        .landscape-card { width: 125mm; height: 80mm; padding: 0; }
 
-        /* Format Paysage (Styles 4, 6) */
-        .landscape-card {
-            width: 125mm; 
-            height: 80mm;
-            padding: 0;
-        }
-
-        .badge-card:hover {
-            transform: scale(1.02);
-        }
+        .badge-card:hover { transform: scale(1.02); }
 
         @media print {
-            .no-print { display: none !important; }
-            body { background: white; padding: 0; }
-            .badge-card { box-shadow: none; border: 1px solid #eee; margin: 0; }
+            .no-print, .other-badges-hidden { display: none !important; }
+            body { background: white; padding: 0; margin: 0; display: flex; justify-content: center; }
+            .badge-card { box-shadow: none; border: none; margin: 0; }
+            .print-active { display: flex !important; }
         }
     </style>
 </head>
@@ -70,15 +58,14 @@
 
     <div class="flex flex-wrap justify-center gap-12">
         @foreach(range(1, 6) as $styleIndex)
-            <div class="flex flex-col items-center">
-                <span class="mb-4 font-bold text-slate-400 uppercase tracking-widest text-xs">
+            <div class="flex flex-col items-center badge-wrapper" id="wrapper-{{ $styleIndex }}">
+                <span class="mb-4 font-bold text-slate-400 uppercase tracking-widest text-xs no-print">
                     Design Option #0{{ $styleIndex }}
                 </span>
                 
-                <div id="badge-container-{{ $styleIndex }}" 
+                <div id="badge-{{ $styleIndex }}" 
                      class="badge-card {{ in_array($styleIndex, [4, 6]) ? 'landscape-card' : 'portrait-card' }}">
                     
-                    {{-- INCLUSION DU STYLE AVEC INJECTION DE LA FONCTION GETPATH --}}
                     @include('company.badges.styles.style_' . $styleIndex, [
                         'employee' => $employee,
                         'getPath' => $getPath
@@ -86,11 +73,13 @@
                 </div>
 
                 <div class="mt-6 flex gap-3 no-print">
-                    <button onclick="window.print()" class="bg-emerald-600 text-white px-6 py-2 rounded-xl font-bold hover:bg-emerald-700 transition shadow-lg shadow-emerald-100">
+                    {{-- Bouton Imprimer Solo --}}
+                    <button onclick="printSingle({{ $styleIndex }})" class="bg-emerald-600 text-white px-6 py-2 rounded-xl font-bold hover:bg-emerald-700 transition shadow-lg shadow-emerald-100">
                         Imprimer
                     </button>
                     
-                    <a href="#" class="bg-white border border-slate-200 px-6 py-2 rounded-xl font-bold text-slate-600 hover:bg-slate-50 transition">
+                    {{-- Lien de téléchargement (Utilise ta route backend existante) --}}
+                    <a href="{{ route('badges.download', ['id' => $employee->id, 'style' => $styleIndex]) }}" class="bg-white border border-slate-200 px-6 py-2 rounded-xl font-bold text-slate-600 hover:bg-slate-50 transition">
                         Télécharger
                     </a>
                 </div>
@@ -98,5 +87,28 @@
         @endforeach
     </div>
 
+    <script>
+        function printSingle(index) {
+            // 1. On cache tous les autres wrappers de badges
+            document.querySelectorAll('.badge-wrapper').forEach(el => {
+                el.classList.add('other-badges-hidden');
+            });
+            
+            // 2. On s'assure que celui qu'on veut est visible et seul
+            const activeWrapper = document.getElementById('wrapper-' + index);
+            activeWrapper.classList.remove('other-badges-hidden');
+            activeWrapper.classList.add('print-active');
+
+            // 3. On lance l'impression
+            window.print();
+
+            // 4. On remet tout à la normale après l'impression
+            setTimeout(() => {
+                document.querySelectorAll('.badge-wrapper').forEach(el => {
+                    el.classList.remove('other-badges-hidden', 'print-active');
+                });
+            }, 500);
+        }
+    </script>
 </body>
 </html>
