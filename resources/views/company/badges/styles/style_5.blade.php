@@ -1,6 +1,7 @@
 @php $mainColor = $employee->badge_color ?? '#059669'; @endphp
 <div class="badge-fixed-container relative bg-white flex flex-col items-center overflow-hidden w-full h-full border border-gray-100">
     
+    {{-- Background Design SVG --}}
     <div class="absolute inset-0 opacity-40 pointer-events-none">
         <svg width="100%" height="100%" viewBox="0 0 100 120" preserveAspectRatio="none" fill="none" stroke="{{ $mainColor }}" stroke-width="0.3">
             <path d="M5 15 L5 5 L15 5 M5 10 L10 10" />
@@ -14,42 +15,52 @@
         </svg>
     </div>
 
-    <div class="w-full pt-8 flex-none flex justify-center z-10 px-6">
+    {{-- Header Logo --}}
+    <div class="w-full pt-6 flex-none flex justify-center z-10 px-6">
         @if($employee->company && $employee->company->logo)
-            <img src="{{ $getPath($employee->company->logo) }}" class="h-10 w-auto object-contain">
+            <img src="{{ $getPath($employee->company->logo) }}" class="h-9 w-auto object-contain">
         @endif
     </div>
 
     <div class="flex-grow flex flex-col items-center justify-center w-full px-6 text-center z-10">
-        <div class="w-32 h-36 rounded-2xl overflow-hidden border-2 border-gray-50 shadow-xl mb-4 bg-gray-100">
-            <img src="{{ $getPath($employee->photo) }}" class="w-full h-full object-cover">
+        {{-- PHOTO ULTRA TAILLE : w-52 h-60 (Format Portrait plus grand) --}}
+        <div class="w-52 h-60 rounded-3xl overflow-hidden border-[3px] border-white shadow-2xl mb-4 bg-gray-50 flex-none relative">
+            <img src="{{ $getPath($employee->photo) }}" class="w-full h-full object-cover scale-105">
         </div>
 
-        <h1 class="text-xl font-black uppercase tracking-tighter text-gray-800 leading-tight">
-            {{ $employee->first_name }} <br> {{ $employee->last_name }}
-        </h1>
+        {{-- Identité --}}
+        <div class="mb-2">
+            <h1 class="text-xl font-black uppercase tracking-tight text-gray-900 leading-none">
+                {{ $employee->last_name }}
+            </h1>
+            <h1 class="text-lg font-bold uppercase leading-tight" style="color: {{ $mainColor }}">
+                {{ $employee->first_name }}
+            </h1>
+        </div>
         
-        <div class="h-[2px] w-8 my-2 rounded-full mx-auto" style="background-color: {{ $mainColor }}"></div>
+        <div class="h-[2.5px] w-10 my-2 rounded-full mx-auto" style="background-color: {{ $mainColor }}"></div>
         
-        <p class="text-[11px] font-bold text-gray-600 uppercase tracking-widest">
-            {{ $employee->function }}
-        </p>
-        
-        <p class="text-[9px] font-extrabold mt-1 uppercase" style="color: {{ $mainColor }}">
-            {{ $employee->department ?? 'DÉPARTEMENT' }}
-        </p>
+        <div class="space-y-0.5">
+            <p class="text-[12px] font-black text-gray-700 uppercase tracking-widest">
+                {{ $employee->function }}
+            </p>
+            <p class="text-[9px] font-extrabold uppercase opacity-80" style="color: {{ $mainColor }}">
+                {{ $employee->department ?? 'DÉPARTEMENT' }}
+            </p>
+        </div>
     </div>
 
+    {{-- Footer avec clip-path (Biseau) --}}
     <div class="w-full h-24 flex-none relative mt-auto">
-        <div class="absolute inset-0 z-0" style="background-color: {{ $mainColor }}; clip-path: polygon(0 25%, 100% 0, 100% 100%, 0% 100%);"></div>
+        <div class="absolute inset-0 z-0" style="background-color: {{ $mainColor }}; clip-path: polygon(0 35%, 100% 0, 100% 100%, 0% 100%);"></div>
         
-        <div class="relative z-10 h-full w-full px-5 flex justify-between items-center pt-4">
-            <div class="bg-white p-1 rounded-lg shadow-md">
+        <div class="relative z-10 h-full w-full px-6 flex justify-between items-center pt-6">
+            <div class="bg-white p-1.5 rounded-xl shadow-lg">
                 <img src="{{ $getPath($employee->qr_code) }}" class="w-10 h-10">
             </div>
-            <div class="text-right flex flex-col">
-                <span class="text-[7px] font-bold text-white/70 uppercase tracking-widest">Matricule Officiel</span>
-                <span class="text-[11px] font-mono font-black text-white uppercase">{{ $employee->badge_number }}</span>
+            <div class="text-right flex flex-col leading-tight">
+                <span class="text-[7px] font-bold text-white/80 uppercase tracking-widest">Matricule Officiel</span>
+                <span class="text-[12px] font-mono font-black text-white uppercase tracking-tighter">{{ $employee->badge_number }}</span>
             </div>
         </div>
     </div>
