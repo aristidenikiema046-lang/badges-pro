@@ -8,16 +8,11 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     
     <style>
-        /* CONFIGURATION IMPRESSION PHYSIQUE (CR80) */
         @media print {
-            @page {
-                size: 85.6mm 54mm;
-                margin: 0;
-            }
+            @page { size: 85.6mm 54mm; margin: 0; }
             body { background: white; margin: 0; padding: 0; }
             .no-print { display: none !important; }
             .print-only { display: block !important; }
-            
             .badge-selected { 
                 width: 85.6mm !important; 
                 height: 54mm !important;
@@ -25,14 +20,9 @@
                 margin: 0 !important;
                 overflow: hidden;
             }
-            
-            * {
-                -webkit-print-color-adjust: exact !important;
-                print-color-adjust: exact !important;
-            }
+            * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
         }
 
-        /* STYLE ÉCRAN (DASHBOARD) */
         .badge-card {
             width: 85.6mm;
             height: 54mm;
@@ -58,7 +48,7 @@
             </p>
             
             <div class="flex justify-center gap-4 mt-8">
-                <a href="{{ route('company.dashboard') }}" class="bg-white text-slate-600 px-6 py-3 rounded-2xl font-bold shadow-sm hover:bg-slate-50 transition border">
+                <a href="{{ url('/company/dashboard') }}" class="bg-white text-slate-600 px-6 py-3 rounded-2xl font-bold shadow-sm hover:bg-slate-50 transition border">
                     ← Retour Dashboard
                 </a>
                 <button onclick="window.print()" class="bg-slate-900 text-white px-8 py-3 rounded-2xl font-bold shadow-xl hover:bg-slate-800 transition flex items-center gap-2">
@@ -87,11 +77,12 @@
                         </button>
                         
                         <div class="flex bg-white rounded-full shadow-md border overflow-hidden">
+                            {{-- CORRECTION ICI : Suppression de toute virgule traînante dans la route --}}
                             <a href="{{ route('badge.export.single', ['id' => $employee->id, 'style' => $styleIndex, 'format' => 'pdf']) }}" 
                                class="px-4 py-2 hover:bg-slate-50 border-r text-sm font-bold text-slate-600 transition">
                                 PDF
                             </a>
-                            <button onclick="downloadPNG({{ $styleIndex }}, '{{ $employee->last_name }}')" 
+                            <button onclick="downloadPNG({{ $styleIndex }}, '{{ addslashes($employee->last_name) }}')" 
                                     class="px-4 py-2 hover:bg-slate-50 text-sm font-bold text-slate-600 transition">
                                 PNG
                             </button>
@@ -105,21 +96,14 @@
     <div id="print-zone" class="hidden print-only"></div>
 
     <script>
-        /** * IMPRESSION : Copie le contenu HTML dans une zone propre à l'impression
-         */
         function printThisStyle(index) {
             const printZone = document.getElementById('print-zone');
             const badgeContent = document.querySelector('#badge-capture-' + index).innerHTML;
-            
-            // On enveloppe avec la classe .badge-selected pour forcer les dimensions CR80 en impression
             printZone.innerHTML = `<div class="badge-selected">${badgeContent}</div>`;
             window.print();
         }
 
-        /** * EXPORT PNG : Capture le badge avec html2canvas
-         */
         function downloadPNG(index, lastName) {
-            // On cible l'élément interne (le .badge-fixed-container généré par le @include)
             const element = document.querySelector('#badge-capture-' + index + ' .badge-fixed-container');
             
             if(!element) {
@@ -128,11 +112,11 @@
             }
 
             html2canvas(element, {
-                scale: 4,               // Qualité 300 DPI pour impression
-                useCORS: true,          // Autorise les images distantes/storage
+                scale: 4,
+                useCORS: true,
                 backgroundColor: null,
-                width: 323,             // Largeur pixel équivalente à 85.6mm
-                height: 204             // Hauteur pixel équivalente à 54mm
+                width: 323,
+                height: 204
             }).then(canvas => {
                 const link = document.createElement('a');
                 link.download = `badge-${lastName}-style${index}.png`;
