@@ -10,11 +10,11 @@
         </div>
         <h1 class="text-lg font-black uppercase text-gray-900 break-words leading-tight">{{ $employee->last_name }} {{ $employee->first_name }}</h1>
         <p class="text-[9px] font-bold text-gray-500 uppercase mt-1 tracking-tighter">
-            {{ $employee->function }} @if($employee->department) • {{ $employee->department }} @endif
+            {{ $employee->function }} • {{ $employee->department ?? '' }}
         </p>
         <div class="h-1 w-10 my-3 rounded-full mx-auto" style="background-color: {{ $mainColor }}"></div>
     </div>
-    <div class="w-full p-4 flex justify-between items-center px-6 flex-none bg-gray-50">
+    <div class="w-full p-4 flex justify-between items-center px-6 flex-none bg-gray-50 border-t">
         <span class="text-[9px] font-black text-gray-300 tracking-widest uppercase">ID: {{ $employee->badge_number }}</span>
         <img src="{{ $getPath($employee->qr_code) }}" class="w-8 h-8 mix-blend-multiply opacity-70">
     </div>

@@ -10,7 +10,7 @@
         <h1 class="text-xl font-black uppercase text-gray-900 leading-none break-words">
             {{ $employee->last_name }} <br> <span style="color: {{ $mainColor }}">{{ $employee->first_name }}</span>
         </h1>
-        <p class="mt-1 text-[10px] font-bold text-gray-500 uppercase">{{ $employee->function }} @if($employee->department) | {{ $employee->department }} @endif</p>
+        <p class="mt-1 text-[10px] font-bold text-gray-500 uppercase">{{ $employee->function }} | {{ $employee->department ?? '' }}</p>
         <div class="mt-4 pt-3 border-t flex justify-between items-center">
              <img src="{{ $getPath($employee->qr_code) }}" class="w-8 h-8 opacity-80">
              <span class="text-[9px] font-mono text-gray-400 font-bold uppercase tracking-tighter">ID: {{ $employee->badge_number }}</span>

@@ -12,7 +12,7 @@
         <div class="px-3 py-0.5 rounded text-[9px] font-bold text-white uppercase mt-1 inline-block" style="background-color: {{ $mainColor }}">
             {{ $employee->function }}
         </div>
-        <p class="text-[8px] text-gray-400 mt-2 italic uppercase">{{ $employee->department }}</p>
+        <p class="text-[8px] text-gray-400 mt-2 italic uppercase">{{ $employee->department ?? '' }}</p>
     </div>
     <div class="p-4 flex-none">
         <img src="{{ $getPath($employee->qr_code) }}" class="w-12 h-12">

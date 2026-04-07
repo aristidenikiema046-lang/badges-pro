@@ -11,9 +11,7 @@
             {{ $employee->first_name }} <br> {{ $employee->last_name }}
         </h1>
         <p class="text-[9px] font-bold text-gray-500 uppercase tracking-widest">{{ $employee->function }}</p>
-        @if($employee->department)
-            <span class="text-[8px] bg-gray-200 px-2 py-0.5 rounded-full mt-1 text-gray-600 uppercase">{{ $employee->department }}</span>
-        @endif
+        <span class="text-[8px] bg-gray-200 px-2 py-0.5 rounded-full mt-1 text-gray-600 uppercase">{{ $employee->department ?? '' }}</span>
     </div>
     <div class="w-full p-4 flex justify-end flex-none">
         <img src="{{ $getPath($employee->qr_code) }}" class="w-10 h-10 border p-1 bg-white rounded-lg">

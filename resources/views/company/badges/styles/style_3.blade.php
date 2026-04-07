@@ -14,6 +14,6 @@
         <p class="text-[8px] text-gray-400 font-mono mt-1 uppercase">{{ $employee->department ?? '' }}</p>
     </div>
     <div class="w-full h-12 flex items-center justify-center flex-none mt-auto" style="background-color: {{ $mainColor }};">
-        <span class="text-[10px] font-bold text-white uppercase tracking-widest">MATRICULE : {{ $employee->badge_number }}</span>
+        <span class="text-[10px] font-bold text-white uppercase tracking-widest">ID: {{ $employee->badge_number }}</span>
     </div>
 </div>

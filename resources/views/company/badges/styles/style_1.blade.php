@@ -1,12 +1,4 @@
-@php 
-    $mainColor = $employee->badge_color ?? '#059669'; 
-    $is_export = isset($isPdf) && $isPdf;
-    $getPath = function($path) use ($is_export) {
-        if (empty($path)) return '';
-        return $is_export ? public_path('storage/' . $path) : asset('storage/' . $path);
-    };
-@endphp
-
+@php $mainColor = $employee->badge_color ?? '#059669'; @endphp
 <div class="badge-fixed-container relative bg-white flex flex-col items-center overflow-hidden w-full h-full border border-gray-100">
     <div class="w-full h-2 flex-none" style="background-color: {{ $mainColor }}"></div>
     <div class="w-full pt-4 flex justify-center flex-none px-4">
@@ -22,9 +14,7 @@
             {{ $employee->first_name }} <br> {{ $employee->last_name }}
         </h1>
         <p class="text-[10px] font-bold text-gray-600 uppercase mt-1">{{ $employee->function }}</p>
-        @if($employee->department)
-            <p class="text-[8px] font-medium text-gray-400 uppercase italic">{{ $employee->department }}</p>
-        @endif
+        <p class="text-[8px] font-medium text-gray-400 uppercase italic">{{ $employee->department ?? '' }}</p>
     </div>
     <div class="w-full p-3 flex justify-between items-end flex-none border-t border-gray-50 bg-gray-50/50">
         <div class="text-[9px] font-bold text-gray-400 uppercase">ID: {{ $employee->badge_number }}</div>
