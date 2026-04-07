@@ -24,7 +24,7 @@
 
     {{-- 2. CORPS : Zone centrale --}}
     <div class="flex-grow flex flex-col items-center justify-start w-full px-6 text-center z-10 mt-4">
-        {{-- PHOTO : Ajustée à h-56 pour laisser respirer le texte --}}
+        {{-- PHOTO --}}
         <div class="w-52 h-56 rounded-3xl overflow-hidden border-[3px] border-white shadow-xl mb-4 bg-gray-50 flex-none relative">
             <img src="{{ $getPath($employee->photo) }}" class="w-full h-full object-cover scale-105">
         </div>
@@ -41,8 +41,8 @@
         
         <div class="h-[2px] w-8 my-2 rounded-full mx-auto" style="background-color: {{ $mainColor }}"></div>
         
-        {{-- Fonction et Département (Remontés) --}}
-        <div class="pb-4">
+        {{-- Fonction et Département --}}
+        <div class="pb-2">
             <p class="text-[12px] font-black text-gray-700 uppercase tracking-widest leading-none">
                 {{ $employee->function }}
             </p>
@@ -52,19 +52,20 @@
         </div>
     </div>
 
-    {{-- 3. FOOTER : Affiné pour ne pas couvrir le texte --}}
-    <div class="w-full h-20 flex-none relative mt-auto">
-        {{-- Fond coloré avec biseau beaucoup plus bas --}}
-        <div class="absolute inset-0 z-0" style="background-color: {{ $mainColor }}; clip-path: polygon(0 15%, 100% 0, 100% 100%, 0% 100%);"></div>
+    {{-- 3. FOOTER : REMONTÉ POUR VISIBILITÉ --}}
+    <div class="w-full h-28 flex-none relative mt-auto">
+        {{-- Bande colorée plus haute (h-28) et biseau ajusté --}}
+        <div class="absolute inset-0 z-0" style="background-color: {{ $mainColor }}; clip-path: polygon(0 20%, 100% 0, 100% 100%, 0% 100%);"></div>
         
-        <div class="relative z-10 h-full w-full px-6 flex justify-between items-center pt-4">
-            {{-- QR Code légèrement plus petit --}}
+        {{-- Contenu aligné vers le haut (items-start) avec un padding-top généreux (pt-8) --}}
+        <div class="relative z-10 h-full w-full px-6 flex justify-between items-start pt-10">
+            {{-- QR Code --}}
             <div class="bg-white p-1 rounded-lg shadow-md">
-                <img src="{{ $getPath($employee->qr_code) }}" class="w-8 h-8">
+                <img src="{{ $getPath($employee->qr_code) }}" class="w-9 h-9">
             </div>
             {{-- Matricule --}}
-            <div class="text-right flex flex-col leading-none">
-                <span class="text-[6px] font-bold text-white/80 uppercase tracking-widest">Matricule</span>
+            <div class="text-right flex flex-col leading-none pt-1">
+                <span class="text-[7px] font-bold text-white/80 uppercase tracking-widest">Matricule</span>
                 <span class="text-[11px] font-mono font-black text-white uppercase tracking-tighter">{{ $employee->badge_number }}</span>
             </div>
         </div>
