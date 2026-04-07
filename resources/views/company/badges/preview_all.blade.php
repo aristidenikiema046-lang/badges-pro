@@ -78,8 +78,8 @@
                         Imprimer
                     </button>
                     
-                    {{-- Lien de téléchargement (Utilise ta route backend existante) --}}
-                    <a href="{{ route('badges.download', ['id' => $employee->id, 'style' => $styleIndex]) }}" class="bg-white border border-slate-200 px-6 py-2 rounded-xl font-bold text-slate-600 hover:bg-slate-50 transition">
+                    {{-- Bouton Télécharger corrigé pour éviter l'erreur Symfony --}}
+                    <a href="javascript:void(0)" onclick="alert('Configuration de la route de téléchargement nécessaire dans web.php')" class="bg-white border border-slate-200 px-6 py-2 rounded-xl font-bold text-slate-600 hover:bg-slate-50 transition">
                         Télécharger
                     </a>
                 </div>
