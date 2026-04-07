@@ -1,15 +1,10 @@
 @php 
-    // Couleur principale du badge (verte par défaut ou celle de l'employé)
     $mainColor = $employee->badge_color ?? '#16a34a'; 
     
-    // Fonction sécurisée pour transformer les images en Base64 (évite les croix rouges en PDF)
     $getPath = function($path) {
         if (!$path) return null;
-        
         $fullPath = public_path('storage/' . $path);
-        
         if (!file_exists($fullPath)) return null;
-
         $type = pathinfo($fullPath, PATHINFO_EXTENSION);
         $data = file_get_contents($fullPath);
         return 'data:image/' . $type . ';base64,' . base64_encode($data);
@@ -21,75 +16,163 @@
 @endphp
 
 <style>
-    /* RESET POUR DomPDF : Supprime les marges de la feuille */
-    @page {
-        margin: 0px;
-    }
-    body {
-        margin: 0px;
-        padding: 0px;
-        font-family: sans-serif;
+    /* Supprime les marges physiques de la page PDF */
+    @page { 
+        margin: 0; 
     }
     
-    /* Conteneur principal fixe */
-    .badge-container {
-        width: 85.6mm;
+    body { 
+        margin: 0; 
+        padding: 0; 
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100%;
+        background-color: #ffffff; 
+    }
+
+    /* Conteneur du badge : défini pour être propre et centré */
+    .badge-card {
+        width: 86mm;
         height: 54mm;
-        background-color: white;
+        border: 0.2mm solid #dddddd;
+        border-radius: 5px;
+        background: white;
         position: relative;
         overflow: hidden;
-        box-sizing: border-box;
+        margin: auto; /* Centre le badge sur la page A6 */
+    }
+
+    .header-bar {
+        height: 4mm;
+        background-color: {{ $mainColor }};
+        width: 100%;
+    }
+
+    .top-section {
+        padding: 10px 15px;
+        height: 10mm;
+    }
+
+    .logo-img {
+        height: 25px;
+        float: left;
+    }
+
+    .badge-label {
+        float: right;
+        font-size: 7pt; 
+        color: #999; 
+        font-weight: bold; 
+        text-transform: uppercase;
+        margin-top: 5px;
+    }
+
+    .content-body {
+        padding: 0 15px;
+        clear: both;
+    }
+
+    .photo-box {
+        width: 28mm;
+        height: 35mm;
+        border-radius: 3px;
+        border: 0.1mm solid #eeeeee;
+        overflow: hidden;
+        float: left;
+    }
+
+    .info-box {
+        margin-left: 33mm;
+        padding-top: 2mm;
+    }
+
+    .name-text {
+        font-size: 16pt; 
+        margin: 0; 
+        text-transform: uppercase;
+        font-weight: 800;
+        color: #1a1a1a;
+    }
+
+    .firstname-text {
+        font-size: 11pt; 
+        margin: 0; 
+        color: #444;
+        font-weight: 500;
+    }
+
+    .job-title {
+        margin-top: 4mm;
+    }
+
+    .label-small {
+        font-size: 5pt; 
+        color: #aaaaaa; 
+        text-transform: uppercase;
+        font-weight: bold;
+    }
+
+    .value-bold {
+        font-size: 9pt; 
+        font-weight: bold; 
+        color: {{ $mainColor }};
+        text-transform: uppercase;
+    }
+
+    .footer-right {
+        position: absolute;
+        bottom: 8px;
+        right: 15px;
+        text-align: center;
+    }
+
+    .qr-code {
+        width: 14mm; 
+        height: 14mm;
+    }
+
+    .matricule {
+        font-size: 5pt; 
+        font-family: monospace;
+        color: #333;
+        margin-top: 2px;
     }
 </style>
 
-<div class="badge-container">
+<div class="badge-card">
+    <div class="header-bar"></div>
     
-    <div style="position: absolute; top: 0; left: 0; width: 100%; height: 3mm; background-color: {{ $mainColor }};"></div>
-    
-    <div style="position: absolute; top: 5mm; left: 5mm; right: 5mm; height: 10mm; display: flex; align-items: center; justify-content: space-between;">
+    <div class="top-section">
         @if($logoUrl)
-            <img src="{{ $logoUrl }}" style="height: 8mm; width: auto; max-width: 25mm; object-fit: contain;">
+            <img src="{{ $logoUrl }}" class="logo-img">
         @endif
-        <p style="font-size: 8pt; font-weight: bold; color: #9ca3af; text-transform: uppercase; letter-spacing: 1px; margin: 0;">
-            Badge Professionnel
-        </p>
+        <span class="badge-label">Badge Professionnel</span>
     </div>
 
-    <div style="position: absolute; top: 16mm; left: 5mm; right: 5mm; height: 0.2mm; background-color: #e5e7eb;"></div>
+    <div class="content-body">
+        <div class="photo-box">
+            @if($photoUrl)
+                <img src="{{ $photoUrl }}" style="width: 100%; height: 100%; object-fit: cover;">
+            @endif
+        </div>
 
-    <div style="position: absolute; top: 20mm; left: 5mm; width: 28mm; height: 28mm; border: 0.5mm solid #d1d5db; border-radius: 2mm; overflow: hidden; background-color: #f3f4f6;">
-        @if($photoUrl)
-            <img src="{{ $photoUrl }}" style="width: 100%; height: 100%; object-fit: cover;">
-        @endif
-    </div>
-
-    <div style="position: absolute; top: 22mm; left: 38mm; right: 25mm;">
-        <h1 style="font-size: 16pt; font-weight: 900; color: #111827; text-transform: uppercase; line-height: 1; margin: 0;">
-            {{ $employee->last_name }}
-        </h1>
-        <h2 style="font-size: 12pt; font-weight: 500; color: #4b5563; text-transform: uppercase; margin: 1mm 0 0 0;">
-            {{ $employee->first_name }}
-        </h2>
-
-        <div style="margin-top: 3mm;">
-            <p style="font-size: 6pt; font-weight: bold; color: #9ca3af; text-transform: uppercase; margin: 0;">Fonction</p>
-            <p style="font-size: 10pt; font-weight: bold; text-transform: uppercase; color: {{ $mainColor }}; margin: 0;">
-                {{ $employee->function }}
-            </p>
-            <p style="font-size: 8pt; color: #6b7280; text-transform: uppercase; margin: 0;">
-                {{ $employee->department ?? 'Informatique' }}
-            </p>
+        <div class="info-box">
+            <h1 class="name-text">{{ $employee->last_name }}</h1>
+            <h2 class="firstname-text">{{ $employee->first_name }}</h2>
+            
+            <div class="job-title">
+                <div class="label-small">Fonction</div>
+                <div class="value-bold">{{ $employee->function }}</div>
+                <div style="font-size: 7pt; color: #666;">{{ $employee->department ?? 'Informatique' }}</div>
+            </div>
         </div>
     </div>
 
-    <div style="position: absolute; bottom: 4mm; right: 5mm; text-align: center; width: 18mm;">
+    <div class="footer-right">
         @if($qrCodeUrl)
-            <img src="{{ $qrCodeUrl }}" style="width: 15mm; height: 15mm; display: block; margin: 0 auto;">
+            <img src="{{ $qrCodeUrl }}" class="qr-code">
         @endif
-        <p style="font-size: 5pt; font-family: monospace; font-weight: bold; color: #111827; margin-top: 1mm;">
-            {{ $employee->badge_number }}
-        </p>
+        <div class="matricule">{{ $employee->badge_number }}</div>
     </div>
-
-    <div style="position: absolute; bottom: 0; left: 0; width: 2.5mm; height: 32mm; background-color: {{ $mainColor }}; border-top-right-radius: 1.5mm;"></div>
 </div>
