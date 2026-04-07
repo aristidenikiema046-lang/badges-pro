@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Employee;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Facades\Storage;
 
 class BadgeExportController extends Controller
 {
@@ -11,21 +12,35 @@ class BadgeExportController extends Controller
     {
         $employee = Employee::with('company')->findOrFail($id);
         
-        // On passe 'isPdf' pour forcer le CSS spécifique si besoin
-        $pdf = Pdf::loadView('company.badges.styles.style_' . $style, [
+        // Helper pour les images en mode PDF (chemins locaux impératifs pour DomPDF)
+        $getPath = function($path) {
+            if (!$path) return null;
+            return public_path($path); 
+        };
+
+        $viewData = [
             'employee' => $employee, 
-            'isPdf' => true
-        ]);
+            'isPdf' => true,
+            'getPath' => $getPath
+        ];
+
+        $pdf = Pdf::loadView('company.badges.styles.style_' . $style, $viewData);
         
-        // Taille CR80 exacte (85.6mm x 54mm) convertie en points
-        // On utilise 'landscape' car le badge est horizontal
-        $pdf->setPaper([0, 0, 242.65, 153.07], 'landscape'); 
+        // --- LOGIQUE DE FORMAT ---
+        // Styles 4, 5 sont en Portrait (Vertical)
+        // Style 6 est en Landscape (Horizontal)
+        if ($style == 6) {
+            $pdf->setPaper([0, 0, 242.65, 153.07], 'landscape'); // Format CR80 Horizontal
+        } else {
+            $pdf->setPaper([0, 0, 153.07, 242.65], 'portrait');  // Format CR80 Vertical
+        }
         
         $pdf->setOptions([
             'isHtml5ParserEnabled' => true,
-            'isRemoteEnabled' => true, // Important pour charger les ressources si besoin
+            'isRemoteEnabled' => true, 
+            'defaultFont' => 'sans-serif'
         ]);
 
-        return $pdf->download("badge-{$employee->last_name}.pdf");
+        return $pdf->download("badge-{$employee->last_name}-style{$style}.pdf");
     }
 }
