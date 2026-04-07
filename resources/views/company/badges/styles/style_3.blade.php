@@ -1,28 +1,19 @@
-@php 
-    $mainColor = $employee->badge_color ?? '#1e293b'; 
-    $is_export = isset($isPdf) && $isPdf;
-    $getPath = function($path) use ($is_export) {
-        if (empty($path)) return '';
-        return $is_export ? public_path('storage/' . $path) : asset('storage/' . $path);
-    };
-@endphp
-
+@php $mainColor = $employee->badge_color ?? '#059669'; @endphp
 <div class="badge-fixed-container relative bg-white flex flex-col items-center overflow-hidden w-full h-full border">
-    <div class="w-full pt-6 flex-none flex justify-center">
+    <div class="w-full pt-4 flex-none flex justify-center px-4">
         <img src="{{ $getPath($employee->company->logo) }}" class="h-8 w-auto object-contain">
     </div>
-
-    <div class="flex-grow flex flex-col items-center justify-center w-full px-4">
-        <div class="w-32 h-36 rounded-xl overflow-hidden shadow-md border border-slate-100 mb-4 flex-none">
+    <div class="flex-grow flex flex-col items-center justify-center w-full px-4 text-center">
+        <div class="w-32 h-32 rounded-full overflow-hidden shadow-md border-4 border-gray-50 mb-3 flex-none">
             <img src="{{ $getPath($employee->photo) }}" class="w-full h-full object-cover">
         </div>
-        <h1 class="text-lg font-black uppercase text-slate-800 text-center break-words w-full leading-tight">
+        <h1 class="text-md font-black uppercase text-gray-800 break-words leading-tight">
             {{ $employee->first_name }} {{ $employee->last_name }}
         </h1>
-        <p class="text-xs font-medium text-slate-500 uppercase tracking-wide">{{ $employee->function }}</p>
+        <p class="text-[10px] font-bold uppercase" style="color: {{ $mainColor }}">{{ $employee->function }}</p>
+        <p class="text-[8px] text-gray-400 font-mono mt-1 uppercase">{{ $employee->department ?? '' }}</p>
     </div>
-
-    <div class="w-full h-10 flex items-center justify-center flex-none" style="background-color: {{ $mainColor }};">
-        <span class="text-[10px] font-bold text-white uppercase tracking-[0.2em]">MATRICULE : {{ $employee->badge_number }}</span>
+    <div class="w-full h-12 flex items-center justify-center flex-none mt-auto" style="background-color: {{ $mainColor }};">
+        <span class="text-[10px] font-bold text-white uppercase tracking-widest">MATRICULE : {{ $employee->badge_number }}</span>
     </div>
 </div>
