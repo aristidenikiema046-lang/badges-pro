@@ -8,10 +8,10 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     
     <style>
-        /* CONFIGURATION IMPRESSION VERTICALE CR80 */
+        /* CONFIGURATION IMPRESSION */
         @media print {
             @page { 
-                size: 54mm 85.6mm; 
+                size: auto; /* Laissé en auto pour gérer le mix portrait/paysage */
                 margin: 0; 
             }
             body { background: white; margin: 0; padding: 0; }
@@ -19,24 +19,37 @@
             .print-only { display: block !important; }
             
             .badge-selected { 
-                width: 54mm !important; 
-                height: 85.6mm !important;
-                padding: 0 !important;
-                margin: 0 !important;
-                overflow: hidden;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                height: 100vh;
+                width: 100vw;
             }
             * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
         }
 
-        /* STYLE DES CARTES DE PRÉVISUALISATION (PORTRAIT) */
+        /* STYLE DES CARTES DE PRÉVISUALISATION */
         .badge-card {
-            width: 54mm;
-            height: 85.6mm;
             cursor: pointer;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             position: relative;
             background: white;
             border-radius: 1rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Ajustement spécifique pour les styles verticaux */
+        .portrait-card {
+            width: 54mm;
+            height: 85.6mm;
+        }
+
+        /* Ajustement spécifique pour le style 4 (Paysage) */
+        .landscape-card {
+            width: 85.6mm;
+            height: 54mm;
         }
 
         .badge-card:hover {
@@ -44,7 +57,6 @@
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
         }
 
-        /* Scrollbar pour la grille si nécessaire */
         .grid-container {
             perspective: 1000px;
         }
@@ -69,20 +81,23 @@
             </div>
         </header>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12 justify-items-center grid-container">
-            @foreach(range(1, 3) as $styleIndex)
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-16 justify-items-center grid-container">
+            @foreach(range(1, 6) as $styleIndex)
                 <div class="flex flex-col items-center w-full">
-                    <div class="flex justify-between w-[54mm] mb-4 px-2">
+                    <div class="flex justify-between w-full max-w-[54mm] mb-4 px-2">
                         <span class="font-black text-slate-400 uppercase text-xs tracking-[0.2em]">Style #0{{ $styleIndex }}</span>
+                        @if($styleIndex == 4)
+                            <span class="text-[10px] bg-blue-100 text-blue-600 px-2 py-0.5 rounded font-bold uppercase">Paysage</span>
+                        @endif
                     </div>
                     
                     <div id="badge-capture-{{ $styleIndex }}" 
-                         class="badge-card shadow-xl overflow-hidden"
+                         class="badge-card shadow-xl overflow-hidden {{ $styleIndex == 4 ? 'landscape-card' : 'portrait-card' }}"
                          onclick="printThisStyle({{ $styleIndex }})">
                         @include('company.badges.styles.style_' . $styleIndex, ['employee' => $employee])
                     </div>
 
-                    <div class="mt-6 flex flex-col gap-3 w-[54mm]">
+                    <div class="mt-6 flex flex-col gap-3 w-full max-w-[54mm]">
                         <button onclick="printThisStyle({{ $styleIndex }})" 
                                 class="w-full bg-emerald-500 hover:bg-emerald-600 text-white px-6 py-2 rounded-xl font-bold text-sm shadow-md transition">
                             Imprimer ce style
@@ -109,14 +124,12 @@
     <script>
         function printThisStyle(index) {
             const printZone = document.getElementById('print-zone');
-            // On récupère le contenu HTML du badge spécifique
             const badgeContent = document.querySelector('#badge-capture-' + index).innerHTML;
             printZone.innerHTML = `<div class="badge-selected">${badgeContent}</div>`;
             window.print();
         }
 
         function downloadPNG(index, lastName) {
-            // Ciblage du conteneur fixe défini dans les fichiers styles
             const element = document.querySelector('#badge-capture-' + index + ' .badge-fixed-container');
             
             if(!element) {
@@ -124,13 +137,15 @@
                 return;
             }
 
+            // Détection automatique des dimensions pour html2canvas
+            const isLandscape = index === 4;
+            
             html2canvas(element, {
-                scale: 4, // Haute résolution
+                scale: 4, 
                 useCORS: true,
                 backgroundColor: null,
-                // Dimensions en pixels pour du 54mm x 85.6mm (environ)
-                width: 204, 
-                height: 323
+                logging: false,
+                // On laisse html2canvas prendre la taille du container badge-fixed-container
             }).then(canvas => {
                 const link = document.createElement('a');
                 link.download = `badge-${lastName}-style${index}.png`;

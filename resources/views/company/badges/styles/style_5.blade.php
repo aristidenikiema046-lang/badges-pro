@@ -1,30 +1,32 @@
-@php 
-    $mainColor = $employee->badge_color ?? '#f59e0b'; 
-    $is_export = isset($isPdf) && $isPdf;
-    $getPath = function($path) use ($is_export) {
-        return $is_export ? public_path('storage/' . $path) : asset('storage/' . $path);
-    };
-@endphp
-<div class="relative w-full h-full bg-white flex overflow-hidden font-sans" style="--main-color: {{ $mainColor }};">
-    <div class="absolute top-0 left-0 w-full h-24 origin-top-left -rotate-6 z-0 opacity-20" style="background-color: var(--main-color);"></div>
-    <div class="w-[45%] h-full relative z-10 flex items-center justify-center pl-6">
-        <div class="w-48 h-56 rounded-2xl overflow-hidden shadow-2xl border-4 border-white">
-            <img src="{{ $getPath($employee->photo) }}" class="w-full h-full object-cover">
+@php $mainColor = $employee->badge_color ?? '#0066ff'; $is_export = isset($isPdf) && $isPdf; $getPath = function($path) use ($is_export) { if (empty($path)) return ''; return $is_export ? public_path('storage/' . $path) : asset('storage/' . $path); }; @endphp
+
+<div class="badge-fixed-container relative bg-white flex flex-col items-center overflow-hidden font-sans" 
+     style="width: 54mm; height: 85.6mm; min-width: 54mm; min-height: 85.6mm; box-sizing: border-box;">
+    
+    <div class="absolute inset-0 opacity-[0.06]" style="pointer-events: none;">
+        <svg width="100%" height="100%" viewBox="0 0 100 100" preserveAspectRatio="none"><path d="M10 0 L10 10 L0 20 M90 0 L90 10 L100 20 M10 100 L10 90 L0 80 M90 100 L90 90 L100 80" stroke="{{ $mainColor }}" fill="none" stroke-width="0.5"/></svg>
+    </div>
+
+    <div class="w-full pt-10 px-6 flex justify-center z-10">
+        @if($employee->company && $employee->company->logo)
+            <img src="{{ $getPath($employee->company->logo) }}" class="h-10 w-auto object-contain">
+        @endif
+    </div>
+
+    <div class="mt-8 relative z-10">
+        <div class="w-36 h-40 rounded-xl overflow-hidden border bg-slate-50 border-slate-100 shadow-lg">
+            @if($employee->photo)
+                <img src="{{ $getPath($employee->photo) }}" class="w-full h-full object-cover">
+            @endif
         </div>
     </div>
-    <div class="w-[55%] h-full flex flex-col justify-center items-start pl-12 pr-8 relative z-10">
-        @if($employee->company && $employee->company->logo)
-            <img src="{{ $getPath($employee->company->logo) }}" class="absolute top-6 right-6 h-10 opacity-30 grayscale">
-        @endif
-        <div class="mb-4">
-            <span class="px-2 py-0.5 text-[10px] font-black text-white uppercase rounded-md" style="background-color: var(--main-color);">{{ $employee->department ?? 'Team' }}</span>
-            <h1 class="text-4xl font-black text-slate-900 uppercase leading-none mt-2">{{ $employee->first_name }}</h1>
-            <h2 class="text-4xl font-bold opacity-60 uppercase leading-none" style="color: var(--main-color);">{{ $employee->last_name }}</h2>
-        </div>
-        <p class="text-lg font-bold text-slate-700 italic border-l-4 pl-3" style="border-color: var(--main-color);">{{ $employee->function }}</p>
-        <div class="mt-6 flex items-center gap-4">
-            <img src="{{ $getPath($employee->qr_code) }}" class="w-12 h-12 border p-1 bg-white">
-            <span class="text-[9px] font-mono text-slate-400 uppercase">Ref: {{ $employee->badge_number }}</span>
-        </div>
+
+    <div class="mt-8 px-4 text-center z-10">
+        <h1 class="text-2xl font-black uppercase tracking-tight text-slate-900 leading-tight">
+            {{ $employee->first_name }} <br> {{ $employee->last_name }}
+        </h1>
+        <p class="mt-2 text-sm font-semibold text-slate-500">
+            {{ $employee->function }}
+        </p>
     </div>
 </div>
