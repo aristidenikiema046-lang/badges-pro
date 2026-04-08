@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Http\Controllers\Admin; // <--- CORRECTION ICI
+namespace App\Http\Controllers\Admin;
 
-use App\Http\Controllers\Controller; // <--- IMPORT DU PARENT
+use App\Http\Controllers\Controller;
 use App\Models\Company;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -12,19 +12,21 @@ class CompanyController extends Controller
 {
     /**
      * Affiche la liste des entreprises.
+     * Vue : resources/views/admin/companies/index.blade.php
      */
     public function index()
     {
         $companies = Company::latest()->get();
-        return view('companies.index', compact('companies'));
+        return view('admin.companies.index', compact('companies'));
     }
 
     /**
      * Formulaire de création d'une entreprise.
+     * Vue : resources/views/admin/companies/create.blade.php
      */
     public function create()
     {
-        return view('companies.create');
+        return view('admin.companies.create');
     }
 
     /**
@@ -51,6 +53,7 @@ class CompanyController extends Controller
 
         $company = Company::create($validated);
 
+        // Redirection vers la page de création avec succès
         return redirect()->route('companies.create')
             ->with('success', 'Entreprise créée !')
             ->with('generated_slug', $company->slug)
@@ -59,11 +62,12 @@ class CompanyController extends Controller
 
     /**
      * Formulaire de modification d'une entreprise.
+     * Vue : resources/views/admin/companies/edit.blade.php
      */
     public function edit($id)
     {
         $company = Company::findOrFail($id);
-        return view('companies.edit', compact('company'));
+        return view('admin.companies.edit', compact('company'));
     }
 
     /**
