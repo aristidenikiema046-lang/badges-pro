@@ -4,9 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Employee extends Model
 {
+    use HasFactory;
+
     protected $fillable = [
         // Identité de base
         'first_name', 
@@ -23,7 +26,7 @@ class Employee extends Model
         'company_id', 
         'matricule', 
         'badge_color', 
-        'badge_style', // <-- Nouveau champ ajouté ici
+        'badge_style', 
         'function',      
         'department', 
         'level_class', 
@@ -41,14 +44,6 @@ class Employee extends Model
     ];
 
     /**
-     * Un employé appartient à une entreprise.
-     */
-    public function company(): BelongsTo
-    {
-        return $this->belongsTo(Company::class);
-    }
-    
-    /**
      * Casts pour transformer les types automatiquement
      */
     protected $casts = [
@@ -56,4 +51,12 @@ class Employee extends Model
         'birth_date' => 'date',
         'expiration_date' => 'date',
     ];
+
+    /**
+     * RELATION : Un employé appartient à une entreprise.
+     */
+    public function company(): BelongsTo
+    {
+        return $this->belongsTo(Company::class);
+    }
 }

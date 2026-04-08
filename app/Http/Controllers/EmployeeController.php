@@ -11,81 +11,75 @@ class EmployeeController extends Controller
 {
     /**
      * Affiche le formulaire d'inscription pour l'employé via le lien de l'entreprise.
-     * URL : /register/{slug}
      */
     public function registerForm($slug)
     {
-        // On cherche l'entreprise par son slug unique
         $company = Company::where('slug', $slug)->firstOrFail();
-
-        // CORRECTION : Ta vue s'appelle 'inscription.blade.php' à la racine de views
         return view('inscription', compact('company'));
     }
 
     /**
-     * Enregistre l'employé en héritant du style de badge de l'entreprise.
+     * Enregistre l'employé et génère son badge selon le style de l'entreprise.
      */
     public function store(Request $request)
     {
-        // 1. Validation des données de l'employé
+        // 1. Validation : On retire 'photo' (car supprimé du HTML) 
+        // et on ajoute 'email' et 'matricule'.
         $validated = $request->validate([
             'first_name' => 'required|string|max:255',
             'last_name'  => 'required|string|max:255',
+            'email'      => 'required|email|max:255',
+            'matricule'  => 'required|string|max:255',
             'function'   => 'required|string|max:255',
-            'photo'      => 'required|image|mimes:jpeg,png,jpg|max:2048',
+            'department' => 'nullable|string|max:255',
             'company_id' => 'required|exists:companies,id',
         ]);
 
-        // 2. On récupère l'entreprise pour copier ses réglages de badge
+        // 2. Récupération de l'entreprise pour hériter du style
         $company = Company::findOrFail($request->company_id);
 
-        // 3. Gestion de la photo de l'employé
-        $photoPath = $request->file('photo')->store('photos_employes', 'public');
-
-        // 4. Création de l'employé avec héritage du design
+        // 3. Création de l'employé avec les styles de l'entreprise
         $employee = Employee::create([
             'first_name'   => $validated['first_name'],
             'last_name'    => $validated['last_name'],
+            'email'        => $validated['email'],
+            'matricule'    => $validated['matricule'],
             'function'     => $validated['function'],
-            'photo'        => $photoPath,
+            'department'   => $validated['department'] ?? 'Général',
             'company_id'   => $company->id,
             
-            // L'employé hérite des choix de l'admin configurés dans 'companies'
+            // HERITAGE AUTOMATIQUE : On prend ce que l'admin a configuré
             'badge_style'  => $company->badge_style, 
             'badge_color'  => $company->badge_color,
             
-            'matricule'    => 'MAT-' . strtoupper(substr($company->name, 0, 2)) . '-' . rand(1000, 9999),
             'is_validated' => true,
         ]);
 
-        // 5. Redirection vers la prévisualisation du badge
+        // 4. Redirection vers l'aperçu du badge
         return redirect()->route('badge.preview', $employee->id)
-                         ->with('success', 'Votre profil a été enregistré avec succès !');
+                         ->with('success', 'Votre badge a été généré avec succès !');
     }
 
     /**
-     * Affiche l'aperçu du badge après inscription.
+     * Affiche l'aperçu du badge.
      */
     public function preview($id)
     {
         $employee = Employee::with('company')->findOrFail($id);
-        
-        // CORRECTION : Selon ton image, le fichier est dans company/badges/preview_all.blade.php
         return view('company.badges.preview_all', compact('employee'));
     }
 
     /**
-     * Liste des employés (pour l'administration).
+     * Liste des employés.
      */
     public function index()
     {
         $employees = Employee::with('company')->orderBy('created_at', 'desc')->get();
-        // CORRECTION : Selon ton image, le fichier est dans employees/index.blade.php
         return view('employees.index', compact('employees'));
     }
 
     /**
-     * Suppression d'un employé.
+     * Suppression.
      */
     public function destroy(Employee $employee)
     {
