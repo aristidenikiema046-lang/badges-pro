@@ -9,13 +9,16 @@ use App\Http\Controllers\BadgeExportController;
 // 1. ACCUEIL
 Route::get('/', function () { return view('welcome'); })->name('home');
 
-// 2. INSCRIPTION ENTREPRISE (ADMIN)
+// 2. CONFIGURATION ENTREPRISE (ADMIN)
 Route::get('/inscription-partenaire', [CompanyController::class, 'create'])->name('companies.create');
 Route::post('/inscription-partenaire', [CompanyController::class, 'store'])->name('companies.store');
 
-// 3. INSCRIPTION EMPLOYÉS (VIA SLUG UNIQUE)
+// 3. INSCRIPTION EMPLOYÉS (L'URL que l'employé utilise)
+// Cette route AFFICHE le formulaire (GET)
 Route::get('/register/{slug}', [EmployeeController::class, 'registerForm'])->name('inscription.tenant');
-Route::post('/inscription-employe', [EmployeeController::class, 'store'])->name('employee.store');
+
+// Cette route TRAITE le formulaire (POST)
+Route::post('/register/save', [EmployeeController::class, 'store'])->name('employee.store');
 
 // 4. APERÇU ET EXPORT DU BADGE
 Route::get('/badge/preview/{id}', [EmployeeController::class, 'preview'])->name('badge.preview');
