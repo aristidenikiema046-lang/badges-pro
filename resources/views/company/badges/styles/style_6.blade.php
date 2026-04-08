@@ -4,48 +4,58 @@
 
 <div class="relative bg-white flex flex-row items-center overflow-hidden w-full h-full font-sans border border-gray-100">
     
-    <!-- Décoration d'angle (Haut-Droit) -->
-    <div class="absolute top-0 right-0 w-32 h-32 opacity-10 rounded-bl-full pointer-events-none" 
+    <!-- Décoration d'angle (Plus discrète pour laisser de la place) -->
+    <div class="absolute top-0 right-0 w-40 h-40 opacity-5 rounded-bl-full pointer-events-none" 
          style="background-color: {{ $mainColor }}"></div>
 
-    <!-- Section Gauche : Identité (65% de la largeur) -->
-    <div class="w-[65%] pl-10 pr-4 z-10 flex flex-col justify-center h-full">
-        <!-- Logo -->
-        <div class="mb-6">
+    <!-- Section Gauche : Identité (Élargie à 70% pour les noms longs) -->
+    <div class="w-[70%] pl-8 pr-4 z-10 flex flex-col justify-center h-full">
+        <!-- Logo de l'entreprise -->
+        <div class="mb-4">
             @if($employee->company && $employee->company->logo)
-                <img src="{{ $getPath($employee->company->logo) }}" class="h-10 w-auto object-contain">
+                <img src="{{ $getPath($employee->company->logo) }}" class="h-12 w-auto max-w-[200px] object-contain">
+            @else
+                 <span class="text-[10px] font-black uppercase tracking-widest text-gray-300">{{ $employee->company->name }}</span>
             @endif
         </div>
 
-        <!-- Nom et Prénom -->
-        <div class="mb-5">
-            <h1 class="text-4xl font-black uppercase text-gray-900 leading-none tracking-tighter truncate">
+        <!-- Bloc Nom/Prénom : Taille adaptative -->
+        <div class="mb-4">
+            {{-- Le nom s'adapte : text-4xl par défaut, descend à 3xl si trop long --}}
+            <h1 class="font-black uppercase text-gray-900 leading-[0.9] tracking-tighter {{ strlen($employee->last_name) > 12 ? 'text-3xl' : 'text-4xl' }}">
                 {{ $employee->last_name }}
             </h1>
-            <h2 class="text-xl font-bold uppercase mt-1 truncate" style="color: {{ $mainColor }}">
+            <h2 class="text-xl font-bold uppercase mt-1 opacity-90" style="color: {{ $mainColor }}">
                 {{ $employee->first_name }}
             </h2>
         </div>
         
-        <!-- Fonction et Matricule -->
-        <div class="flex items-center gap-3">
-            <div class="px-3 py-1.5 rounded-lg bg-gray-900 text-white text-[10px] font-black uppercase tracking-widest truncate max-w-[180px]">
-                {{ $employee->function }}
+        <!-- Fonction et Département -->
+        <div class="flex flex-col gap-2">
+            <div class="flex items-center gap-3">
+                <span class="px-3 py-1 rounded-md bg-gray-900 text-white text-[10px] font-bold uppercase tracking-wider">
+                    {{ $employee->function }}
+                </span>
+                <span class="text-[10px] font-mono text-gray-400 font-bold border-l pl-3 border-gray-200">
+                    {{ $employee->matricule }}
+                </span>
             </div>
-            <span class="text-[10px] font-mono text-gray-400 font-bold tracking-widest border-l pl-3 border-gray-200">
-                {{ $employee->matricule }}
-            </span>
+            {{-- Ajout du département si disponible pour remplir l'espace --}}
+            @if($employee->department)
+                <p class="text-[9px] font-bold text-gray-400 uppercase tracking-widest">{{ $employee->department }}</p>
+            @endif
         </div>
     </div>
 
-    <!-- Section Droite : QR Code (35% de la largeur) -->
-    <div class="w-[35%] flex justify-center items-center pr-10 z-10 h-full">
-        <div class="bg-white p-3 rounded-2xl shadow-xl border-2 transform rotate-2" style="border-color: {{ $mainColor }}">
-            {!! QrCode::size(115)->margin(1)->generate($employee->matricule) !!}
+    <!-- Section Droite : QR Code (30%) -->
+    <div class="w-[30%] flex justify-center items-center pr-8 z-10 h-full">
+        <div class="bg-white p-3 rounded-2xl shadow-2xl border-2" style="border-color: {{ $mainColor }}">
+            {{-- Taille ajustée pour ne pas étouffer le texte --}}
+            {!! QrCode::size(120)->margin(1)->generate($employee->matricule) !!}
         </div>
     </div>
 
-    <!-- Ligne d'accentuation (Bas-Gauche) -->
-    <div class="absolute bottom-0 left-10 w-40 h-1.5 rounded-t-full pointer-events-none" 
-         style="background-color: {{ $mainColor }}"></div>
+    <!-- Barre de pied de badge décorative -->
+    <div class="absolute bottom-0 left-0 w-full h-1.5 opacity-20" style="background-color: {{ $mainColor }}"></div>
+    <div class="absolute bottom-0 left-8 w-32 h-1.5 rounded-t-full" style="background-color: {{ $mainColor }}"></div>
 </div>
