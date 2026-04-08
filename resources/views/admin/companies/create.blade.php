@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Configuration Entreprise - YA Consulting</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-100 p-6 font-sans">
     <div class="max-w-3xl mx-auto">
@@ -15,7 +16,7 @@
 
         {{-- BLOC ERREURS --}}
         @if ($errors->any())
-            <div class="mb-6 bg-red-100 border-l-4 border-red-500 p-4 text-red-700 shadow-sm">
+            <div class="mb-6 bg-red-100 border-l-4 border-red-500 p-4 text-red-700 shadow-sm rounded-r-lg">
                 <p class="font-bold">Oups ! Il y a des erreurs :</p>
                 <ul class="list-disc ml-5 text-sm">
                     @foreach ($errors->all() as $error)
@@ -57,19 +58,19 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                         <label class="block text-sm font-bold text-gray-700 mb-1">Nom de l'entreprise *</label>
-                        <input type="text" name="name" value="{{ old('name') }}" required placeholder="Ex: AgroNova SA" class="w-full border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-orange-500">
+                        <input type="text" name="name" value="{{ old('name') }}" required placeholder="Ex: AgroNova SA" class="w-full border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-orange-500 outline-none border">
                     </div>
                     <div>
                         <label class="block text-sm font-bold text-gray-700 mb-1">Email Professionnel *</label>
-                        <input type="email" name="email" value="{{ old('email') }}" required placeholder="contact@entreprise.com" class="w-full border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-orange-500">
+                        <input type="email" name="email" value="{{ old('email') }}" required placeholder="contact@entreprise.com" class="w-full border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-orange-500 outline-none border">
                     </div>
                     <div>
                         <label class="block text-sm font-bold text-gray-700 mb-1">Responsable</label>
-                        <input type="text" name="manager_name" value="{{ old('manager_name') }}" placeholder="Nom du gérant" class="w-full border-gray-300 rounded-lg p-2.5">
+                        <input type="text" name="manager_name" value="{{ old('manager_name') }}" placeholder="Nom du gérant" class="w-full border-gray-300 rounded-lg p-2.5 outline-none border">
                     </div>
                     <div>
                         <label class="block text-sm font-bold text-gray-700 mb-1">Téléphone</label>
-                        <input type="text" name="phone" value="{{ old('phone') }}" placeholder="+225..." class="w-full border-gray-300 rounded-lg p-2.5">
+                        <input type="text" name="phone" value="{{ old('phone') }}" placeholder="+225..." class="w-full border-gray-300 rounded-lg p-2.5 outline-none border">
                     </div>
                 </div>
 
@@ -80,34 +81,36 @@
 
                 {{-- SECTION DESIGN --}}
                 <div class="bg-gray-50 p-6 rounded-xl border-2 border-dashed border-orange-200 mt-6">
-                    <h3 class="text-orange-600 font-bold uppercase text-sm mb-4 tracking-wider">Identité Visuelle des Badges</h3>
+                    <h3 class="text-orange-600 font-bold uppercase text-sm mb-4 tracking-wider text-center md:text-left">Identité Visuelle des Badges (Obligatoire)</h3>
                     
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                         {{-- Sélection du Style --}}
                         <div>
-                            <label class="block text-sm font-bold text-gray-700 mb-3">Modèle de Badge</label>
-                            <select name="badge_style" class="w-full border-gray-300 rounded-lg p-3 focus:ring-orange-500">
-                                <option value="1" {{ old('badge_style') == '1' ? 'selected' : '' }}>Style 1 - Classique Vertical</option>
-                                <option value="2" {{ old('badge_style') == '2' ? 'selected' : '' }}>Style 2 - Moderne</option>
-                                <option value="3" {{ old('badge_style') == '3' ? 'selected' : '' }}>Style 3 - Épuré</option>
-                                <option value="4" {{ old('badge_style') == '4' ? 'selected' : '' }}>Style 4 - Portrait Pro</option>
-                                <option value="5" {{ old('badge_style') == '5' ? 'selected' : '' }}>Style 5 - Corporate</option>
-                                <option value="6" {{ old('badge_style') == '6' ? 'selected' : '' }}>Style 6 - Horizontal (Paysage)</option>
+                            <label class="block text-sm font-bold text-gray-700 mb-3">Modèle de Badge *</label>
+                            <select name="badge_style" required class="w-full border-gray-300 rounded-lg p-3 focus:ring-orange-500 outline-none border bg-white">
+                                <option value="" disabled {{ old('badge_style') ? '' : 'selected' }}>-- Sélectionnez un modèle --</option>
+                                <option value="style_1" {{ old('badge_style') == 'style_1' ? 'selected' : '' }}>Style 1 - Classique Vertical</option>
+                                <option value="style_2" {{ old('badge_style') == 'style_2' ? 'selected' : '' }}>Style 2 - Moderne</option>
+                                <option value="style_3" {{ old('badge_style') == 'style_3' ? 'selected' : '' }}>Style 3 - Épuré</option>
+                                <option value="style_4" {{ old('badge_style') == 'style_4' ? 'selected' : '' }}>Style 4 - Portrait Pro</option>
+                                <option value="style_5" {{ old('badge_style') == 'style_5' ? 'selected' : '' }}>Style 5 - Corporate</option>
+                                <option value="style_6" {{ old('badge_style') == 'style_6' ? 'selected' : '' }}>Style 6 - Horizontal (Paysage)</option>
                             </select>
+                            <p class="text-[10px] text-gray-400 mt-1 italic">Le style définit la disposition des éléments sur le badge.</p>
                         </div>
 
                         {{-- Sélection de la Couleur --}}
                         <div>
-                            <label class="block text-sm font-bold text-gray-700 mb-3">Couleur de l'entreprise</label>
+                            <label class="block text-sm font-bold text-gray-700 mb-3">Couleur de l'entreprise *</label>
                             <div class="flex items-center gap-4">
-                                <input type="color" name="badge_color" value="{{ old('badge_color', '#f97316') }}" class="h-12 w-20 p-1 rounded-lg border-gray-300 cursor-pointer">
-                                <span class="text-[11px] text-gray-500 italic leading-tight">Cette couleur sera appliquée aux titres et bordures des badges.</span>
+                                <input type="color" name="badge_color" value="{{ old('badge_color', '#f97316') }}" required class="h-12 w-20 p-1 rounded-lg border-gray-300 cursor-pointer shadow-sm">
+                                <span class="text-[11px] text-gray-500 italic leading-tight">Cette couleur sera utilisée pour les titres, icônes et bordures du badge.</span>
                             </div>
                         </div>
                     </div>
                 </div>
                 
-                <button type="submit" class="w-full bg-orange-500 text-white font-black py-4 rounded-lg hover:bg-orange-600 shadow-md transition-all uppercase tracking-widest text-lg">
+                <button type="submit" class="w-full bg-orange-500 text-white font-black py-4 rounded-lg hover:bg-orange-600 shadow-md transition-all uppercase tracking-widest text-lg transform hover:scale-[1.01] active:scale-95">
                     Enregistrer et générer le lien
                 </button>
             </form>

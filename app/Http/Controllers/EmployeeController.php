@@ -14,7 +14,9 @@ class EmployeeController extends Controller
      */
     public function registerForm($slug)
     {
+        // On récupère l'entreprise par son slug ou on renvoie une erreur 404
         $company = Company::where('slug', $slug)->firstOrFail();
+        
         return view('inscription', compact('company'));
     }
 
@@ -23,8 +25,7 @@ class EmployeeController extends Controller
      */
     public function store(Request $request)
     {
-        // 1. Validation : On retire 'photo' (car supprimé du HTML) 
-        // et on ajoute 'email' et 'matricule'.
+        // 1. Validation des données du formulaire
         $validated = $request->validate([
             'first_name' => 'required|string|max:255',
             'last_name'  => 'required|string|max:255',
@@ -35,10 +36,18 @@ class EmployeeController extends Controller
             'company_id' => 'required|exists:companies,id',
         ]);
 
-        // 2. Récupération de l'entreprise pour hériter du style
+        // 2. Récupération de l'entreprise
         $company = Company::findOrFail($request->company_id);
 
-        // 3. Création de l'employé avec les styles de l'entreprise
+        // --- SÉCURITÉ ULTIME : Vérification des styles ---
+        // Si l'entreprise n'a pas configuré son style ou sa couleur, on bloque l'inscription
+        if (empty($company->badge_style) || empty($company->badge_color)) {
+            return back()->withErrors([
+                'error' => "Désolé, cette entreprise n'a pas encore configuré son modèle de badge. Veuillez contacter l'administrateur."
+            ])->withInput();
+        }
+
+        // 3. Création de l'employé avec héritage des styles
         $employee = Employee::create([
             'first_name'   => $validated['first_name'],
             'last_name'    => $validated['last_name'],
@@ -48,11 +57,11 @@ class EmployeeController extends Controller
             'department'   => $validated['department'] ?? 'Général',
             'company_id'   => $company->id,
             
-            // HERITAGE AUTOMATIQUE : On prend ce que l'admin a configuré
+            // On utilise les styles configurés par l'entreprise
             'badge_style'  => $company->badge_style, 
             'badge_color'  => $company->badge_color,
             
-            'is_validated' => true,
+            'is_validated' => true, // Validé par défaut
         ]);
 
         // 4. Redirection vers l'aperçu du badge
@@ -65,12 +74,14 @@ class EmployeeController extends Controller
      */
     public function preview($id)
     {
+        // Chargement de l'employé avec sa relation company pour le badge
         $employee = Employee::with('company')->findOrFail($id);
+        
         return view('company.badges.preview_all', compact('employee'));
     }
 
     /**
-     * Liste des employés.
+     * Liste des employés (Espace Administration).
      */
     public function index()
     {
@@ -79,15 +90,17 @@ class EmployeeController extends Controller
     }
 
     /**
-     * Suppression.
+     * Suppression d'un employé.
      */
     public function destroy(Employee $employee)
     {
+        // Suppression de la photo si elle existe
         if ($employee->photo) {
             Storage::disk('public')->delete($employee->photo);
         }
         
         $employee->delete();
-        return back()->with('success', 'Employé supprimé.');
+        
+        return back()->with('success', 'Employé supprimé du système.');
     }
 }

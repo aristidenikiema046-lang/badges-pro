@@ -33,14 +33,18 @@ class CompanyController extends Controller
     public function store(Request $request)
     {
         // 1. Validation rigoureuse
+        // 'in:style_1,style_2...' assure que l'admin ne choisit pas une valeur fantaisiste
         $validated = $request->validate([
             'name'         => 'required|string|max:255',
             'email'        => 'required|email|unique:companies,email',
             'phone'        => 'nullable|string|max:20',
             'manager_name' => 'nullable|string|max:255',
             'logo'         => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'badge_style'  => 'required|string',
-            'badge_color'  => 'required|string|max:7', // Format hexadécimal (#000000)
+            'badge_style'  => 'required|string|in:style_1,style_2,style_3,style_4,style_5,style_6',
+            'badge_color'  => 'required|string|max:7', // Format hexadécimal (#f97316)
+        ], [
+            'badge_style.required' => 'Veuillez sélectionner un modèle de badge obligatoirement.',
+            'badge_color.required' => 'Veuillez choisir une couleur pour les badges.',
         ]);
 
         // 2. Gestion du logo
@@ -49,7 +53,7 @@ class CompanyController extends Controller
             $logoPath = $request->file('logo')->store('logos_entreprises', 'public');
         }
 
-        // 3. Création de l'entreprise
+        // 3. Création de l'entreprise avec génération du Slug unique
         $company = Company::create([
             'name'         => $validated['name'],
             'email'        => $validated['email'],
@@ -62,7 +66,7 @@ class CompanyController extends Controller
             'is_active'    => true,
         ]);
 
-        // 4. Retour avec les données pour la vue (pour afficher le lien généré)
+        // 4. Retour avec les données pour la vue (affichage du lien généré)
         return back()->with([
             'success'        => 'Entreprise configurée avec succès !',
             'generated_slug' => $company->slug,
@@ -80,22 +84,27 @@ class CompanyController extends Controller
             'email'        => 'required|email|unique:companies,email,' . $company->id,
             'phone'        => 'nullable|string|max:20',
             'manager_name' => 'nullable|string|max:255',
-            'logo'         => 'nullable|image|max:2048',
-            'badge_style'  => 'required|string',
+            'logo'         => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'badge_style'  => 'required|string|in:style_1,style_2,style_3,style_4,style_5,style_6',
             'badge_color'  => 'required|string|max:7',
         ]);
 
+        // Gestion du logo (Suppression de l'ancien si nouveau téléchargé)
         if ($request->hasFile('logo')) {
-            // Supprimer l'ancien logo s'il existe
             if ($company->logo) {
                 Storage::disk('public')->delete($company->logo);
             }
             $validated['logo'] = $request->file('logo')->store('logos_entreprises', 'public');
         }
 
+        // Mise à jour du slug si le nom a changé (optionnel mais recommandé)
+        if ($company->name !== $validated['name']) {
+            $validated['slug'] = Str::slug($validated['name']) . '-' . rand(1000, 9999);
+        }
+
         $company->update($validated);
 
-        return redirect()->route('companies.index')->with('success', 'Entreprise mise à jour.');
+        return redirect()->route('companies.index')->with('success', 'L\'entreprise et son style de badge ont été mis à jour.');
     }
 
     /**
@@ -103,12 +112,13 @@ class CompanyController extends Controller
      */
     public function destroy(Company $company)
     {
+        // Supprimer le logo du stockage physique
         if ($company->logo) {
             Storage::disk('public')->delete($company->logo);
         }
 
         $company->delete();
 
-        return redirect()->route('companies.index')->with('success', 'Entreprise supprimée.');
+        return redirect()->route('companies.index')->with('success', 'Entreprise supprimée avec succès.');
     }
 }
