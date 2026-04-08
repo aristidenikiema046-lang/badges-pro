@@ -1,64 +1,66 @@
 @php 
-    $mainColor = $employee->company->badge_color ?? '#059669'; 
-    $lastNameLength = strlen($employee->last_name);
+    $mainColor = $employee->company->badge_color ?? '#1d4ed8'; // Bleu par défaut plus proche de l'image
 @endphp
 
-<div class="relative bg-white flex flex-row items-center overflow-hidden w-full h-full font-sans border border-gray-100">
+<div class="relative bg-white flex flex-row items-center overflow-hidden w-full h-full font-sans shadow-inner">
     
-    <!-- Décoration d'angle -->
-    <div class="absolute top-0 right-0 w-40 h-40 opacity-5 rounded-bl-full pointer-events-none" 
-         style="background-color: {{ $mainColor }}"></div>
+    <!-- Arrière-plan décoratif (Circuit imprimé à gauche) -->
+    <div class="absolute left-0 top-0 bottom-0 w-1/3 opacity-20 pointer-events-none z-0">
+        <svg viewBox="0 0 100 100" preserveAspectRatio="none" class="h-full w-full">
+            <path d="M0 20 L20 20 L30 10 M0 40 L25 40 L35 50 M0 60 L15 60 L25 70 M0 80 L20 80 L30 90" 
+                  stroke="{{ $mainColor }}" stroke-width="1" fill="none" />
+            <circle cx="30" cy="10" r="1.5" fill="{{ $mainColor }}" />
+            <circle cx="35" cy="50" r="1.5" fill="{{ $mainColor }}" />
+            <circle cx="25" cy="70" r="1.5" fill="{{ $mainColor }}" />
+            <circle cx="30" cy="90" r="1.5" fill="{{ $mainColor }}" />
+        </svg>
+    </div>
 
-    <!-- Section Gauche : Identité (Prend tout l'espace restant) -->
-    <div class="flex-grow pl-8 pr-4 z-10 flex flex-col justify-center h-full min-w-0">
-        <!-- Logo -->
-        <div class="mb-3">
-            @if($employee->company && $employee->company->logo)
-                <img src="{{ $getPath($employee->company->logo) }}" class="h-10 w-auto max-w-[180px] object-contain">
+    <!-- Section Photo (Gauche) -->
+    <div class="w-[40%] h-full flex items-center justify-center pl-6 z-10">
+        <div class="relative w-48 h-56 overflow-hidden rounded-[2.5rem] border-4 border-white shadow-lg">
+            @if($employee->photo)
+                <img src="{{ $getPath($employee->photo) }}" class="w-full h-full object-cover">
             @else
-                 <span class="text-[10px] font-black uppercase tracking-widest text-gray-300">{{ $employee->company->name }}</span>
+                <div class="w-full h-full bg-slate-100 flex items-center justify-center">
+                    <svg class="w-20 h-20 text-slate-300" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M24 20.993V24H0v-2.996A14.977 14.977 0 0112.004 15c4.904 0 9.26 2.354 11.996 5.993zM16.002 8.999a4 4 0 11-8 0 4 4 0 018 0z" />
+                    </svg>
+                </div>
             @endif
         </div>
+    </div>
 
-        <!-- Bloc Nom/Prénom Adaptatif -->
-        <div class="mb-4">
-            {{-- Taille dynamique : Normal (4xl), Long (3xl), Très long (2xl) --}}
-            <h1 class="font-black uppercase text-gray-900 leading-tight tracking-tighter truncate
-                {{ $lastNameLength > 18 ? 'text-2xl' : ($lastNameLength > 12 ? 'text-3xl' : 'text-4xl') }}">
-                {{ $employee->last_name }}
-            </h1>
-            <h2 class="text-lg font-bold uppercase opacity-90 truncate" style="color: {{ $mainColor }}">
-                {{ $employee->first_name }}
-            </h2>
-        </div>
+    <!-- Section Infos (Droite) -->
+    <div class="w-[60%] h-full flex flex-col justify-between py-10 px-8 z-10">
         
-        <!-- Fonction et Matricule -->
-        <div class="flex flex-col gap-2">
-            <div class="flex flex-wrap items-center gap-2">
-                <div class="px-2.5 py-1 rounded-md bg-gray-900 text-white text-[9px] font-bold uppercase tracking-wider whitespace-nowrap">
-                    {{ $employee->function }}
-                </div>
-                <div class="text-[10px] font-mono text-gray-400 font-bold border-l pl-2 border-gray-200 whitespace-nowrap">
-                    ID: {{ $employee->matricule }}
-                </div>
-            </div>
-            
-            @if($employee->department)
-                <p class="text-[8px] font-bold text-gray-400 uppercase tracking-[0.2em] truncate">
-                    {{ $employee->department }}
-                </p>
+        <!-- Logo en haut à droite -->
+        <div class="flex justify-end">
+            @if($employee->company && $employee->company->logo)
+                <img src="{{ $getPath($employee->company->logo) }}" class="h-10 w-auto object-contain">
+            @else
+                <span class="font-bold text-xl" style="color: {{ $mainColor }}">{{ $employee->company->name }}</span>
             @endif
         </div>
-    </div>
 
-    <!-- Section Droite : QR Code (Taille fixe garantie) -->
-    <div class="flex-none w-[140px] flex justify-center items-center pr-8 z-10 h-full">
-        <div class="bg-white p-2.5 rounded-2xl shadow-xl border-2 flex-none" style="border-color: {{ $mainColor }}">
-            {!! QrCode::size(105)->margin(1)->generate($employee->matricule) !!}
+        <!-- Détails Employé (Milieu) -->
+        <div class="text-left mt-4">
+            <h1 class="text-3xl font-extrabold text-slate-900 uppercase tracking-tight leading-none mb-2">
+                {{ $employee->first_name }} {{ $employee->last_name }}
+            </h1>
+            <p class="text-lg font-medium opacity-80" style="color: {{ $mainColor }}">
+                {{ $employee->function }}
+            </p>
+            <p class="text-md font-semibold text-slate-500 mt-1">
+                Matricule : {{ $employee->matricule }}
+            </p>
+        </div>
+
+        <!-- QR Code en bas à droite -->
+        <div class="flex justify-end items-end mt-2">
+            <div class="bg-white p-1">
+                {!! QrCode::size(85)->margin(0)->generate($employee->matricule) !!}
+            </div>
         </div>
     </div>
-
-    <!-- Décoration Footer -->
-    <div class="absolute bottom-0 left-0 w-full h-1 opacity-10" style="background-color: {{ $mainColor }}"></div>
-    <div class="absolute bottom-0 left-8 w-24 h-1 rounded-t-full" style="background-color: {{ $mainColor }}"></div>
 </div>
