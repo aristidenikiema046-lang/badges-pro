@@ -1,59 +1,49 @@
 <?php
 
-namespace App\Http\Controllers\Admin;
+namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
 use App\Models\Company;
 use Illuminate\Http\Request;
-use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
 
 class CompanyController extends Controller
 {
-    public function index()
-    {
-        $companies = Company::orderBy('created_at', 'desc')->get();
-        return view('admin.companies.index', compact('companies'));
-    }
+    // ... autres méthodes (index, create, store, etc.) ...
 
-    public function create()
+    /**
+     * Mettre à jour l'entreprise dans la base de données.
+     */
+    public function update(Request $request, $id)
     {
-        return view('admin.companies.create');
-    }
+        $company = Company::findOrFail($id);
 
-    public function store(Request $request)
-    {
         $validated = $request->validate([
             'name'         => 'required|string|max:255',
-            'email'        => 'required|email|unique:companies,email',
+            'email'        => 'required|email|unique:companies,email,' . $id,
             'phone'        => 'nullable|string|max:20',
             'manager_name' => 'nullable|string|max:255',
             'logo'         => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'badge_style'  => 'required|string|in:style_1,style_2,style_3,style_4,style_5,style_6',
-            'badge_color'  => 'required|string|max:7', 
+            'badge_style'  => 'required|string',
+            'badge_color'  => 'required|string|max:7',
         ]);
 
-        $logoPath = null;
+        // Gestion du logo
         if ($request->hasFile('logo')) {
-            $logoPath = $request->file('logo')->store('logos_entreprises', 'public');
+            // Suppression de l'ancien logo du disque s'il existe
+            if ($company->logo) {
+                Storage::disk('public')->delete($company->logo);
+            }
+            // Stockage du nouveau logo
+            $validated['logo'] = $request->file('logo')->store('logos_entreprises', 'public');
+        } else {
+            // On garde l'ancien logo si aucun nouveau n'est téléchargé
+            $validated['logo'] = $company->logo;
         }
 
-        $company = Company::create([
-            'name'         => $validated['name'],
-            'email'        => $validated['email'],
-            'phone'        => $validated['phone'],
-            'manager_name' => $validated['manager_name'],
-            'slug'         => Str::slug($validated['name']) . '-' . rand(1000, 9999),
-            'logo'         => $logoPath,
-            'badge_style'  => $validated['badge_style'],
-            'badge_color'  => $validated['badge_color'],
-            'is_active'    => true,
-        ]);
+        // Mise à jour globale
+        $company->update($validated);
 
-        return back()->with([
-            'success'        => 'Entreprise configurée avec succès !',
-            'generated_slug' => $company->slug,
-            'company_name'   => $company->name
-        ]);
+        return redirect()->route('companies.index')
+            ->with('success', 'Entreprise mise à jour avec succès !');
     }
 }
