@@ -7,30 +7,27 @@ use App\Http\Controllers\Admin\CompanyController;
 use App\Http\Controllers\BadgeExportController;
 use App\Models\Employee;
 use App\Models\Company;
-use Illuminate\Support\Facades\Auth;
 
 // 1. ACCUEIL
 Route::get('/', function () { return view('welcome'); })->name('home');
 
-// 2. INSCRIPTION ENTREPRISE (PUBLIQUE)
+// 2. INSCRIPTION ENTREPRISE (PUBLIQUE / ADMIN)
 Route::get('/inscription-partenaire', [CompanyController::class, 'create'])->name('companies.create');
 Route::post('/inscription-partenaire', [CompanyController::class, 'store'])->name('companies.store');
 
-// 3. INSCRIPTION EMPLOYÉS (VIA SLUG)
-Route::get('/register/{slug}', function ($slug) {
-    $company = Company::where('slug', $slug)->where('is_active', true)->firstOrFail();
-    return view('inscription', compact('company'));
-})->name('inscription.tenant');
-
+// 3. INSCRIPTION EMPLOYÉS (VIA SLUG UNIQUE)
+// Utilisation de la méthode du contrôleur pour garder les routes propres
+Route::get('/register/{slug}', [EmployeeController::class, 'registerForm'])->name('inscription.tenant');
 Route::post('/inscription-employe', [EmployeeController::class, 'store'])->name('employee.store');
 
-// --- ROUTE PUBLIQUE POUR LA GÉNÉRATION DU BADGE ---
-// Placée ici pour que l'employé puisse voir son badge sans être connecté
-Route::get('/badge/preview/{employee}', function (Employee $employee) {
-    return view('company.badges.preview_all', compact('employee'));
-})->name('badge.preview');
+// --- ROUTE PUBLIQUE POUR L'APERÇU DU BADGE ---
+Route::get('/badge/preview/{id}', [EmployeeController::class, 'preview'])->name('badge.preview');
 
-// 4. ZONE CONNECTÉE (DASHBOARD VERT / INTERFACE GÉRANT)
+// 4. EXPORT PDF (Simplifié)
+// On ne passe plus le style et le format dans l'URL, le contrôleur les trouvera en BDD
+Route::get('/badge/export/{id}', [BadgeExportController::class, 'exportSingle'])->name('badge.export.single');
+
+// 5. ZONE CONNECTÉE (INTERFACE GÉRANT / DASHBOARD)
 Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard/employees', [EmployeeController::class, 'index'])->name('company.employees');
     Route::delete('/dashboard/employees/{employee}', [EmployeeController::class, 'destroy'])->name('employees.destroy');
@@ -41,10 +38,7 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-// EXPORT (Accessible via lien généré)
-Route::get('/badge/export/{id}/{style}/{format}', [BadgeExportController::class, 'exportSingle'])->name('badge.export.single');
-
-// 5. ZONE SUPER-ADMIN (VUE NOIRE)
+// 6. ZONE SUPER-ADMIN (GESTION DES ENTREPRISES)
 Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
     Route::get('/entreprises', [CompanyController::class, 'index'])->name('companies.index');
     Route::get('/entreprises/{company}/modifier', [CompanyController::class, 'edit'])->name('companies.edit');

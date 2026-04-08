@@ -13,7 +13,7 @@
             <a href="{{ route('companies.index') }}" class="text-emerald-600 font-bold hover:underline">Gérer les entreprises →</a>
         </div>
 
-        {{-- BLOC ERREURS (Si email déjà pris ou fichier trop lourd) --}}
+        {{-- BLOC ERREURS --}}
         @if ($errors->any())
             <div class="mb-6 bg-red-100 border-l-4 border-red-500 p-4 text-red-700 shadow-sm">
                 <p class="font-bold">Oups ! Il y a des erreurs :</p>
@@ -52,6 +52,8 @@
             
             <form action="{{ route('companies.store') }}" method="POST" enctype="multipart/form-data" class="space-y-6">
                 @csrf
+                
+                {{-- Informations de base --}}
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                         <label class="block text-sm font-bold text-gray-700 mb-1">Nom de l'entreprise *</label>
@@ -74,6 +76,35 @@
                 <div>
                     <label class="block text-sm font-bold text-gray-700 mb-1">Logo de l'entreprise</label>
                     <input type="file" name="logo" class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-orange-50 file:text-orange-700 hover:file:bg-orange-100 cursor-pointer">
+                </div>
+
+                {{-- SECTION DESIGN --}}
+                <div class="bg-gray-50 p-6 rounded-xl border-2 border-dashed border-orange-200 mt-6">
+                    <h3 class="text-orange-600 font-bold uppercase text-sm mb-4 tracking-wider">Identité Visuelle des Badges</h3>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        {{-- Sélection du Style --}}
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-3">Modèle de Badge</label>
+                            <select name="badge_style" class="w-full border-gray-300 rounded-lg p-3 focus:ring-orange-500">
+                                <option value="1" {{ old('badge_style') == '1' ? 'selected' : '' }}>Style 1 - Classique Vertical</option>
+                                <option value="2" {{ old('badge_style') == '2' ? 'selected' : '' }}>Style 2 - Moderne</option>
+                                <option value="3" {{ old('badge_style') == '3' ? 'selected' : '' }}>Style 3 - Épuré</option>
+                                <option value="4" {{ old('badge_style') == '4' ? 'selected' : '' }}>Style 4 - Portrait Pro</option>
+                                <option value="5" {{ old('badge_style') == '5' ? 'selected' : '' }}>Style 5 - Corporate</option>
+                                <option value="6" {{ old('badge_style') == '6' ? 'selected' : '' }}>Style 6 - Horizontal (Paysage)</option>
+                            </select>
+                        </div>
+
+                        {{-- Sélection de la Couleur --}}
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-3">Couleur de l'entreprise</label>
+                            <div class="flex items-center gap-4">
+                                <input type="color" name="badge_color" value="{{ old('badge_color', '#f97316') }}" class="h-12 w-20 p-1 rounded-lg border-gray-300 cursor-pointer">
+                                <span class="text-[11px] text-gray-500 italic leading-tight">Cette couleur sera appliquée aux titres et bordures des badges.</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 
                 <button type="submit" class="w-full bg-orange-500 text-white font-black py-4 rounded-lg hover:bg-orange-600 shadow-md transition-all uppercase tracking-widest text-lg">

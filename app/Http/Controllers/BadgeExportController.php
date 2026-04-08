@@ -8,39 +8,54 @@ use Illuminate\Support\Facades\Storage;
 
 class BadgeExportController extends Controller
 {
-    public function exportSingle($id, $style, $format)
+    /**
+     * Exporte le badge en PDF en utilisant les réglages stockés en BDD.
+     */
+    public function exportSingle($id)
     {
+        // 1. On récupère l'employé avec son entreprise
         $employee = Employee::with('company')->findOrFail($id);
         
-        // Helper pour les images en mode PDF (chemins locaux impératifs pour DomPDF)
+        // 2. On récupère le style et la couleur depuis l'enregistrement de l'employé
+        $style = $employee->badge_style ?? '1'; // Style par défaut si vide
+        $color = $employee->badge_color ?? '#f97316';
+
+        // 3. Helper pour les images (DomPDF préfère les chemins absolus locaux)
         $getPath = function($path) {
             if (!$path) return null;
-            return public_path($path); 
+            // Vérifie si le chemin contient déjà 'storage/', sinon l'ajoute
+            $fullPath = str_starts_with($path, 'storage/') ? $path : 'storage/' . $path;
+            return public_path($fullPath);
         };
 
         $viewData = [
             'employee' => $employee, 
-            'isPdf' => true,
-            'getPath' => $getPath
+            'isPdf'    => true,
+            'getPath'  => $getPath,
+            'color'    => $color // On passe la couleur à la vue
         ];
 
+        // 4. Chargement de la vue dynamique selon le style
+        // Chemin : resources/views/company/badges/styles/style_1.blade.php
         $pdf = Pdf::loadView('company.badges.styles.style_' . $style, $viewData);
         
-        // --- LOGIQUE DE FORMAT ---
-        // Styles 4, 5 sont en Portrait (Vertical)
-        // Style 6 est en Landscape (Horizontal)
-        if ($style == 6) {
-            $pdf->setPaper([0, 0, 242.65, 153.07], 'landscape'); // Format CR80 Horizontal
+        // 5. Configuration du format de papier (CR80 : 86mm x 54mm environ)
+        // Style 6 est configuré en Horizontal (Paysage)
+        if ($style == '6') {
+            $pdf->setPaper([0, 0, 242.65, 153.07], 'landscape'); 
         } else {
-            $pdf->setPaper([0, 0, 153.07, 242.65], 'portrait');  // Format CR80 Vertical
+            $pdf->setPaper([0, 0, 153.07, 242.65], 'portrait');
         }
         
+        // 6. Options de rendu
         $pdf->setOptions([
             'isHtml5ParserEnabled' => true,
-            'isRemoteEnabled' => true, 
-            'defaultFont' => 'sans-serif'
+            'isRemoteEnabled'      => true, 
+            'defaultFont'          => 'sans-serif'
         ]);
 
-        return $pdf->download("badge-{$employee->last_name}-style{$style}.pdf");
+        // 7. Téléchargement du fichier
+        $fileName = "badge-" . strtolower($employee->last_name) . ".pdf";
+        return $pdf->download($fileName);
     }
 }

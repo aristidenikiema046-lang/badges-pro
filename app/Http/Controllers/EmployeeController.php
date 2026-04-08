@@ -5,103 +5,92 @@ namespace App\Http\Controllers;
 use App\Models\Employee;
 use App\Models\Company;
 use Illuminate\Http\Request;
-use Illuminate\Support\Str;
-use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use Illuminate\Support\Facades\Storage;
 
 class EmployeeController extends Controller
 {
     /**
-     * MODULE ENTREPRISE : Liste des employés
+     * Affiche le formulaire d'inscription pour l'employé via le lien de l'entreprise.
+     * URL : /register/{slug}
      */
-    public function index()
+    public function registerForm($slug)
     {
-        $companyId = auth()->user()->company_id;
+        // On cherche l'entreprise par son slug unique
+        $company = Company::where('slug', $slug)->firstOrFail();
 
-        if (!$companyId) {
-            return redirect('/')->with('error', "Votre compte n'est lié à aucune entreprise.");
-        }
-
-        $employees = Employee::where('company_id', $companyId)
-            ->orderBy('created_at', 'desc')
-            ->get();
-
-        return view('company.employees.index', compact('employees'));
+        return view('employee.register', compact('company'));
     }
 
     /**
-     * MODULE ENTREPRISE / PUBLIC : Enregistrement
-     * Gère la création, le QR code et la REDIRECTION vers la prévisualisation.
+     * Enregistre l'employé en héritant du style de badge de l'entreprise.
      */
     public function store(Request $request)
     {
-        // 1. Validation des données
+        // 1. Validation des données de l'employé
         $validated = $request->validate([
-            'first_name'   => 'required|string|max:255',
-            'last_name'    => 'required|string|max:255',
-            'function'     => 'required|string|max:255',
-            'department'   => 'nullable|string|max:255',
-            'company_id'   => 'required|exists:companies,id',
-            'photo'        => 'required|image|max:2048',
-            'badge_color'  => 'nullable|string|max:7',
+            'first_name' => 'required|string|max:255',
+            'last_name'  => 'required|string|max:255',
+            'function'   => 'required|string|max:255',
+            'photo'      => 'required|image|mimes:jpeg,png,jpg|max:2048',
+            'company_id' => 'required|exists:companies,id',
         ]);
 
-        // 2. Gestion de l'upload de la photo
-        if ($request->hasFile('photo')) {
-            $path = $request->file('photo')->store('photos_employes', 'public');
-            $validated['photo'] = $path;
-        }
+        // 2. On récupère l'entreprise pour copier ses réglages de badge
+        $company = Company::findOrFail($request->company_id);
 
-        // 3. Génération automatique des identifiants techniques
-        $validated['matricule'] = 'MAT-' . date('Y') . '-' . strtoupper(Str::random(6));
-        $validated['badge_number'] = 'BP-' . date('Y') . '-' . strtoupper(Str::random(5));
-        $validated['is_validated'] = true; 
-        $validated['badge_color'] = $request->badge_color ?? '#059669';
+        // 3. Gestion de la photo de l'employé
+        $photoPath = $request->file('photo')->store('photos_employes', 'public');
 
-        // 4. Création de l'employé
-        $employee = Employee::create($validated);
+        // 4. Création de l'employé avec héritage du design
+        $employee = Employee::create([
+            'first_name'   => $validated['first_name'],
+            'last_name'    => $validated['last_name'],
+            'function'     => $validated['function'],
+            'photo'        => $photoPath,
+            'company_id'   => $company->id,
+            
+            // LA MAGIE : L'employé hérite des choix de l'admin
+            'badge_style'  => $company->badge_style, 
+            'badge_color'  => $company->badge_color,
+            
+            'matricule'    => 'MAT-' . strtoupper(substr($company->name, 0, 2)) . '-' . rand(1000, 9999),
+            'is_validated' => true, // Validé par défaut ou passer à false si besoin d'approbation
+        ]);
 
-        // 5. Génération du QR CODE
-        $companyName = $employee->company->name ?? 'Entreprise';
-        $qrData = "NOM: {$employee->last_name} | ID: {$employee->badge_number} | ENT: {$companyName}";
-        
-        $qrFolder = 'qrcodes';
-        if (!Storage::disk('public')->exists($qrFolder)) {
-            Storage::disk('public')->makeDirectory($qrFolder);
-        }
-
-        $qrPath = $qrFolder . '/qr-' . $employee->id . '.svg';
-        
-        $qrImage = QrCode::format('svg')
-            ->size(300)
-            ->margin(1)
-            ->generate($qrData);
-
-        Storage::disk('public')->put($qrPath, $qrImage);
-
-        // 6. Mise à jour avec le chemin du QR Code
-        $employee->update(['qr_code' => $qrPath]);
-
-        // 7. REDIRECTION VERS LA ROUTE PUBLIQUE DU BADGE
-        // On utilise redirect()->route() pour déclencher le changement de page côté navigateur
-        return redirect()->route('badge.preview', ['employee' => $employee->id])
-                        ->with('success', 'Informations enregistrées ! Voici vos modèles de badges.');
+        // 5. Redirection vers la prévisualisation du badge
+        return redirect()->route('badge.preview', $employee->id)
+                         ->with('success', 'Votre profil a été enregistré avec succès !');
     }
 
     /**
-     * Suppression d'un employé (Sécurisé par entreprise)
+     * Affiche l'aperçu du badge après inscription.
+     */
+    public function preview($id)
+    {
+        $employee = Employee::with('company')->findOrFail($id);
+        
+        return view('employee.preview', compact('employee'));
+    }
+
+    /**
+     * Liste des employés (pour l'administration).
+     */
+    public function index()
+    {
+        $employees = Employee::with('company')->orderBy('created_at', 'desc')->get();
+        return view('admin.employees.index', compact('employees'));
+    }
+
+    /**
+     * Suppression d'un employé.
      */
     public function destroy(Employee $employee)
     {
-        if ($employee->company_id !== auth()->user()->company_id) {
-            abort(403, "Action non autorisée.");
+        if ($employee->photo) {
+            Storage::disk('public')->delete($employee->photo);
         }
-
-        if ($employee->photo) Storage::disk('public')->delete($employee->photo);
-        if ($employee->qr_code) Storage::disk('public')->delete($employee->qr_code);
-
+        
         $employee->delete();
-
-        return back()->with('success', 'Employé supprimé avec succès.');
+        return back()->with('success', 'Employé supprimé.');
     }
 }
