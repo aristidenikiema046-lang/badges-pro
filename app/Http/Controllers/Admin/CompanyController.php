@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Admin; // <--- CORRECTION ICI
 
+use App\Http\Controllers\Controller; // <--- IMPORT DU PARENT
 use App\Models\Company;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -82,7 +83,6 @@ class CompanyController extends Controller
             'badge_color'  => 'required|string|max:7',
         ]);
 
-        // Gestion du logo (Suppression de l'ancien si un nouveau est envoyé)
         if ($request->hasFile('logo')) {
             if ($company->logo) {
                 Storage::disk('public')->delete($company->logo);
@@ -90,7 +90,6 @@ class CompanyController extends Controller
             $validated['logo'] = $request->file('logo')->store('logos_entreprises', 'public');
         }
 
-        // Mise à jour des données
         $company->update($validated);
 
         return redirect()->route('companies.index')
@@ -112,5 +111,17 @@ class CompanyController extends Controller
 
         return redirect()->route('companies.index')
             ->with('success', 'Entreprise supprimée.');
+    }
+
+    /**
+     * Active ou désactive une entreprise.
+     */
+    public function toggleStatus($id)
+    {
+        $company = Company::findOrFail($id);
+        $company->active = !$company->active;
+        $company->save();
+
+        return back()->with('success', 'Statut mis à jour.');
     }
 }

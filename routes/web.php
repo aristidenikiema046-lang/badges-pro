@@ -3,28 +3,25 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\EmployeeController;
-use App\Http\Controllers\Admin\CompanyController;
+use App\Http\Controllers\Admin\CompanyController; // Import correct
 use App\Http\Controllers\BadgeExportController;
 
 // 1. ACCUEIL
 Route::get('/', function () { return view('welcome'); })->name('home');
 
-// 2. CONFIGURATION ENTREPRISE (ADMIN)
+// 2. CONFIGURATION ENTREPRISE (PARTENAIRE)
 Route::get('/inscription-partenaire', [CompanyController::class, 'create'])->name('companies.create');
 Route::post('/inscription-partenaire', [CompanyController::class, 'store'])->name('companies.store');
 
-// 3. INSCRIPTION EMPLOYÉS (L'URL que l'employé utilise)
-// Cette route AFFICHE le formulaire (GET)
+// 3. INSCRIPTION EMPLOYÉS
 Route::get('/register/{slug}', [EmployeeController::class, 'registerForm'])->name('inscription.tenant');
-
-// Cette route TRAITE le formulaire (POST)
 Route::post('/register/save', [EmployeeController::class, 'store'])->name('employee.store');
 
 // 4. APERÇU ET EXPORT DU BADGE
 Route::get('/badge/preview/{id}', [EmployeeController::class, 'preview'])->name('badge.preview');
 Route::get('/badge/export/{id}', [BadgeExportController::class, 'exportSingle'])->name('badge.export.single');
 
-// 5. ZONE CONNECTÉE (GÉRANT)
+// 5. ZONE CONNECTÉE (GÉRANT / UTILISATEUR)
 Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard/employees', [EmployeeController::class, 'index'])->name('company.employees');
     Route::delete('/dashboard/employees/{employee}', [EmployeeController::class, 'destroy'])->name('employees.destroy');
