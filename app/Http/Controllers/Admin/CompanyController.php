@@ -12,7 +12,6 @@ class CompanyController extends Controller
 {
     /**
      * Affiche la liste des entreprises.
-     * Vue : resources/views/admin/companies/index.blade.php
      */
     public function index()
     {
@@ -22,7 +21,6 @@ class CompanyController extends Controller
 
     /**
      * Formulaire de création d'une entreprise.
-     * Vue : resources/views/admin/companies/create.blade.php
      */
     public function create()
     {
@@ -44,25 +42,25 @@ class CompanyController extends Controller
             'badge_color'  => 'required|string|max:7',
         ]);
 
+        // Gestion de l'upload du logo
         if ($request->hasFile('logo')) {
-            $validated['logo'] = $request->file('logo')->store('logos_entreprises', 'public');
+            $path = $request->file('logo')->store('logos_entreprises', 'public');
+            $validated['logo'] = $path;
         }
 
-        // Génération d'un slug unique pour le lien d'inscription des employés
-        $validated['slug'] = Str::slug($validated['name']) . '-' . Str::random(5);
+        // Génération d'un slug unique
+        $validated['slug'] = Str::slug($request->name) . '-' . Str::lower(Str::random(5));
 
         $company = Company::create($validated);
 
-        // Redirection vers la page de création avec succès
         return redirect()->route('companies.create')
-            ->with('success', 'Entreprise créée !')
+            ->with('success', 'Entreprise créée avec succès !')
             ->with('generated_slug', $company->slug)
             ->with('company_name', $company->name);
     }
 
     /**
      * Formulaire de modification d'une entreprise.
-     * Vue : resources/views/admin/companies/edit.blade.php
      */
     public function edit($id)
     {
@@ -85,13 +83,16 @@ class CompanyController extends Controller
             'logo'         => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'badge_style'  => 'required|in:style_1,style_2,style_3,style_4,style_5,style_6',
             'badge_color'  => 'required|string|max:7',
+            'active'       => 'nullable|boolean',
         ]);
 
         if ($request->hasFile('logo')) {
+            // Suppression de l'ancien logo s'il existe
             if ($company->logo) {
                 Storage::disk('public')->delete($company->logo);
             }
-            $validated['logo'] = $request->file('logo')->store('logos_entreprises', 'public');
+            $path = $request->file('logo')->store('logos_entreprises', 'public');
+            $validated['logo'] = $path;
         }
 
         $company->update($validated);
@@ -114,7 +115,7 @@ class CompanyController extends Controller
         $company->delete();
 
         return redirect()->route('companies.index')
-            ->with('success', 'Entreprise supprimée.');
+            ->with('success', 'Entreprise supprimée définitivement.');
     }
 
     /**
@@ -126,6 +127,7 @@ class CompanyController extends Controller
         $company->active = !$company->active;
         $company->save();
 
-        return back()->with('success', 'Statut mis à jour.');
+        $status = $company->active ? 'activée' : 'désactivée';
+        return back()->with('success', "L'entreprise a été {$status} avec succès.");
     }
 }

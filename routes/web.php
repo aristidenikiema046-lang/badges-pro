@@ -5,6 +5,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\Admin\CompanyController;
 use App\Http\Controllers\BadgeExportController;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 // 1. ACCUEIL
 Route::get('/', function () { return view('welcome'); })->name('home');
@@ -13,29 +14,42 @@ Route::get('/', function () { return view('welcome'); })->name('home');
 Route::get('/inscription-partenaire', [CompanyController::class, 'create'])->name('companies.create');
 Route::post('/inscription-partenaire', [CompanyController::class, 'store'])->name('companies.store');
 
-// --- NOUVELLE ROUTE POUR LA PREVIEW DYNAMIQUE ---
+// --- ROUTE DE PREVIEW DYNAMIQUE CORRIGÉE ---
 Route::get('/admin/preview-style/{style}', function ($style) {
-    // Simulation de données pour l'aperçu
+    // Simulation du getPath
+    $getPath = function($path) {
+        if (empty($path)) return 'https://via.placeholder.com/150';
+        return asset('storage/' . $path);
+    };
+
+    // Simulation complète de l'employé pour le badge
     $employee = (object)[
         'first_name' => 'Jean',
-        'last_name' => 'Dupont',
-        'position' => 'Directeur Marketing',
-        'photo' => null
-    ];
-    $company = (object)[
-        'name' => 'Nom de l\'Entreprise',
-        'badge_color' => request('color', '#f97316'),
-        'logo' => null
+        'last_name' => 'DUPONT',
+        'matricule' => 'EMP-2026-001',
+        'function' => 'Directeur Stratégie',
+        'department' => 'DIRECTION',
+        'email' => 'j.dupont@consulting.com',
+        'photo' => null, 
+        'company' => (object)[
+            'name' => 'ENTREPRISE DÉMO',
+            'badge_color' => request('color', '#f97316'),
+            'logo' => null
+        ]
     ];
 
-    // On vérifie si la vue existe pour éviter une erreur 500
     if (!view()->exists('company.badges.styles.' . $style)) {
-        return response('<p class="text-red-500">Style non trouvé.</p>', 404);
+        return response("<div style='color:red; font-family:sans-serif; text-align:center; padding:50px;'>
+            <h3>Erreur 404</h3>
+            <p>Le fichier <b>resources/views/company/badges/styles/{$style}.blade.php</b> est introuvable.</p>
+        </div>", 404);
     }
 
-    return view('company.badges.styles.' . $style, compact('employee', 'company'))->render();
+    return view('company.badges.styles.' . $style, [
+        'employee' => $employee,
+        'getPath' => $getPath
+    ]);
 })->name('admin.style.render');
-// ------------------------------------------------
 
 // 3. INSCRIPTION EMPLOYÉS
 Route::get('/register/{slug}', [EmployeeController::class, 'registerForm'])->name('inscription.tenant');
@@ -45,14 +59,10 @@ Route::post('/register/save', [EmployeeController::class, 'store'])->name('emplo
 Route::get('/badge/preview/{id}', [EmployeeController::class, 'preview'])->name('badge.preview');
 Route::get('/badge/export/{id}', [BadgeExportController::class, 'exportSingle'])->name('badge.export.single');
 
-// 5. ZONE CONNECTÉE (GÉRANT / UTILISATEUR)
+// 5. ZONE CONNECTÉE
 Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard/employees', [EmployeeController::class, 'index'])->name('company.employees');
     Route::delete('/dashboard/employees/{employee}', [EmployeeController::class, 'destroy'])->name('employees.destroy');
-    
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
 // 6. ZONE SUPER-ADMIN
