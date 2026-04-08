@@ -18,7 +18,8 @@ class EmployeeController extends Controller
         // On cherche l'entreprise par son slug unique
         $company = Company::where('slug', $slug)->firstOrFail();
 
-        return view('employee.register', compact('company'));
+        // CORRECTION : Ta vue s'appelle 'inscription.blade.php' à la racine de views
+        return view('inscription', compact('company'));
     }
 
     /**
@@ -49,12 +50,12 @@ class EmployeeController extends Controller
             'photo'        => $photoPath,
             'company_id'   => $company->id,
             
-            // LA MAGIE : L'employé hérite des choix de l'admin
+            // L'employé hérite des choix de l'admin configurés dans 'companies'
             'badge_style'  => $company->badge_style, 
             'badge_color'  => $company->badge_color,
             
             'matricule'    => 'MAT-' . strtoupper(substr($company->name, 0, 2)) . '-' . rand(1000, 9999),
-            'is_validated' => true, // Validé par défaut ou passer à false si besoin d'approbation
+            'is_validated' => true,
         ]);
 
         // 5. Redirection vers la prévisualisation du badge
@@ -69,7 +70,8 @@ class EmployeeController extends Controller
     {
         $employee = Employee::with('company')->findOrFail($id);
         
-        return view('employee.preview', compact('employee'));
+        // CORRECTION : Selon ton image, le fichier est dans company/badges/preview_all.blade.php
+        return view('company.badges.preview_all', compact('employee'));
     }
 
     /**
@@ -78,7 +80,8 @@ class EmployeeController extends Controller
     public function index()
     {
         $employees = Employee::with('company')->orderBy('created_at', 'desc')->get();
-        return view('admin.employees.index', compact('employees'));
+        // CORRECTION : Selon ton image, le fichier est dans employees/index.blade.php
+        return view('employees.index', compact('employees'));
     }
 
     /**
