@@ -3,123 +3,142 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Configuration Entreprise - YA Consulting</title>
+    <title>Configuration de l'Entreprise</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
-<body class="bg-gray-100 p-6 font-sans">
-    <div class="max-w-3xl mx-auto">
-        <div class="mb-6 flex justify-between items-center">
-            <a href="{{ url('/') }}" class="text-orange-600 font-bold hover:underline">← Retour à l'accueil</a>
-            <a href="{{ route('companies.index') }}" class="text-emerald-600 font-bold hover:underline">Gérer les entreprises →</a>
+<body class="bg-gray-100 p-4 md:p-8 font-sans">
+
+    <div class="max-w-4xl mx-auto">
+        {{-- Navigation --}}
+        <div class="flex justify-between items-center mb-6">
+            <a href="{{ route('home') }}" class="text-orange-600 font-bold hover:underline">← Retour à l'accueil</a>
+            <a href="{{ route('companies.index') }}" class="text-teal-700 font-bold hover:underline">Gérer les entreprises →</a>
         </div>
 
-        {{-- BLOC ERREURS --}}
-        @if ($errors->any())
-            <div class="mb-6 bg-red-100 border-l-4 border-red-500 p-4 text-red-700 shadow-sm rounded-r-lg">
-                <p class="font-bold">Oups ! Il y a des erreurs :</p>
-                <ul class="list-disc ml-5 text-sm">
-                    @foreach ($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
-            </div>
-        @endif
+        <div class="bg-white rounded-2xl shadow-2xl overflow-hidden border-t-8 border-orange-500">
+            <div class="p-8">
+                <h2 class="text-2xl font-black text-slate-800 uppercase tracking-tight mb-8">Configuration de l'Entreprise</h2>
 
-        {{-- BLOC SUCCÈS ET LIEN GÉNÉRÉ --}}
-        @if(session('generated_slug'))
-            <div class="mb-8 bg-emerald-50 border-2 border-emerald-500 p-6 rounded-xl shadow-lg border-dashed">
-                <div class="flex items-center mb-3">
-                    <span class="text-2xl mr-2">🎉</span>
-                    <h3 class="text-emerald-800 font-bold text-lg uppercase">Lien généré pour {{ session('company_name') }}</h3>
-                </div>
-                <p class="text-sm text-emerald-700 mb-4 font-medium italic">Partagez ce lien avec les employés pour qu'ils créent leurs badges :</p>
-                
-                <div class="flex items-center gap-2 bg-white p-4 rounded-lg border border-emerald-200 shadow-inner">
-                    <code id="company-link" class="text-emerald-600 font-mono font-bold flex-grow text-sm md:text-base break-all">
-                        {{ url('/register/' . session('generated_slug')) }}
-                    </code>
-                    <button onclick="copyToClipboard()" class="bg-emerald-600 text-white px-5 py-2 rounded-lg hover:bg-emerald-700 transition font-bold uppercase text-xs shrink-0">
-                        Copier
-                    </button>
-                </div>
-                <p id="copy-status" class="text-xs text-emerald-600 mt-2 font-bold hidden italic text-center">Lien copié dans le presse-papier !</p>
-            </div>
-        @endif
+                <form action="{{ route('companies.store') }}" method="POST" enctype="multipart/form-data" class="space-y-8">
+                    @csrf
 
-        {{-- FORMULAIRE --}}
-        <div class="bg-white rounded-xl shadow-xl border-t-8 border-orange-500 p-8">
-            <h2 class="text-2xl font-bold mb-6 text-gray-800 uppercase tracking-tight">Configuration de l'Entreprise</h2>
-            
-            <form action="{{ route('companies.store') }}" method="POST" enctype="multipart/form-data" class="space-y-6">
-                @csrf
-                
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                        <label class="block text-sm font-bold text-gray-700 mb-1">Nom de l'entreprise *</label>
-                        <input type="text" name="name" value="{{ old('name') }}" required placeholder="Ex: AgroNova SA" class="w-full border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-orange-500 outline-none border">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-bold text-gray-700 mb-1">Email Professionnel *</label>
-                        <input type="email" name="email" value="{{ old('email') }}" required placeholder="contact@entreprise.com" class="w-full border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-orange-500 outline-none border">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-bold text-gray-700 mb-1">Responsable</label>
-                        <input type="text" name="manager_name" value="{{ old('manager_name') }}" placeholder="Nom du gérant" class="w-full border-gray-300 rounded-lg p-2.5 outline-none border">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-bold text-gray-700 mb-1">Téléphone</label>
-                        <input type="text" name="phone" value="{{ old('phone') }}" placeholder="+225..." class="w-full border-gray-300 rounded-lg p-2.5 outline-none border">
-                    </div>
-                </div>
-
-                <div>
-                    <label class="block text-sm font-bold text-gray-700 mb-1">Logo de l'entreprise</label>
-                    <input type="file" name="logo" class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-orange-50 file:text-orange-700 hover:file:bg-orange-100 cursor-pointer">
-                </div>
-
-                {{-- SECTION DESIGN --}}
-                <div class="bg-gray-50 p-6 rounded-xl border-2 border-dashed border-orange-200 mt-6">
-                    <h3 class="text-orange-600 font-bold uppercase text-sm mb-4 tracking-wider">Identité Visuelle des Badges</h3>
-                    
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    {{-- Section 1 : Infos de base --}}
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
-                            <label class="block text-sm font-bold text-gray-700 mb-3">Modèle de Badge *</label>
-                            <select name="badge_style" required class="w-full border-gray-300 rounded-lg p-3 focus:ring-orange-500 outline-none border bg-white">
-                                <option value="style_1" {{ old('badge_style') == 'style_1' ? 'selected' : '' }}>Style 1 - Classique Vertical</option>
-                                <option value="style_2" {{ old('badge_style') == 'style_2' ? 'selected' : '' }}>Style 2 - Moderne</option>
-                                <option value="style_3" {{ old('badge_style') == 'style_3' ? 'selected' : '' }}>Style 3 - Épuré</option>
-                                <option value="style_4" {{ old('badge_style') == 'style_4' ? 'selected' : '' }}>Style 4 - Portrait Pro</option>
-                                <option value="style_5" {{ old('badge_style') == 'style_5' ? 'selected' : '' }}>Style 5 - Corporate</option>
-                                <option value="style_6" {{ old('badge_style') == 'style_6' ? 'selected' : '' }}>Style 6 - Horizontal (Paysage)</option>
-                            </select>
+                            <label class="block text-sm font-bold text-slate-700 mb-2">Nom de l'entreprise *</label>
+                            <input type="text" name="name" placeholder="Ex: AgroNova SA" required class="w-full border-gray-200 rounded-xl p-3 bg-gray-50 focus:ring-2 focus:ring-orange-500 outline-none transition-all">
                         </div>
-
                         <div>
-                            <label class="block text-sm font-bold text-gray-700 mb-3">Couleur de l'entreprise *</label>
-                            <div class="flex items-center gap-4">
-                                <input type="color" name="badge_color" value="{{ old('badge_color', '#f97316') }}" required class="h-12 w-20 p-1 rounded-lg border-gray-300 cursor-pointer shadow-sm">
-                                <span class="text-[11px] text-gray-500 italic leading-tight">Cette couleur sera appliquée aux titres et bordures des badges.</span>
+                            <label class="block text-sm font-bold text-slate-700 mb-2">Email Professionnel *</label>
+                            <input type="email" name="email" placeholder="contact@entreprise.com" required class="w-full border-gray-200 rounded-xl p-3 bg-gray-50 focus:ring-2 focus:ring-orange-500 outline-none transition-all">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold text-slate-700 mb-2">Responsable</label>
+                            <input type="text" name="manager_name" placeholder="Nom du gérant" class="w-full border-gray-200 rounded-xl p-3 bg-gray-50 focus:ring-2 focus:ring-orange-500 outline-none transition-all">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold text-slate-700 mb-2">Téléphone</label>
+                            <input type="text" name="phone" placeholder="+225..." class="w-full border-gray-200 rounded-xl p-3 bg-gray-50 focus:ring-2 focus:ring-orange-500 outline-none transition-all">
+                        </div>
+                    </div>
+
+                    {{-- Section 2 : Logo --}}
+                    <div class="bg-slate-50 p-4 rounded-xl border border-dashed border-slate-300">
+                        <label class="block text-sm font-bold text-slate-700 mb-2">Logo de l'entreprise</label>
+                        <input type="file" name="logo" class="w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-bold file:bg-orange-100 file:text-orange-700 hover:file:bg-orange-200 cursor-pointer">
+                    </div>
+
+                    {{-- Section 3 : Design & Preview --}}
+                    <div class="border-2 border-orange-100 rounded-2xl p-6 bg-orange-50/30">
+                        <h3 class="text-orange-600 font-black uppercase text-sm mb-6 tracking-widest">Identité Visuelle des Badges</h3>
+                        
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                            {{-- Contrôles --}}
+                            <div class="space-y-6">
+                                <div>
+                                    <label class="block text-sm font-bold text-slate-700 mb-2">Modèle de Badge *</label>
+                                    <select name="badge_style" id="badge_style" required class="w-full border-gray-200 rounded-xl p-3 bg-white shadow-sm focus:ring-2 focus:ring-orange-500 outline-none transition-all">
+                                        <option value="style_1">Style 1 - Classique Vertical</option>
+                                        <option value="style_2">Style 2 - Moderne Géométrique</option>
+                                        <option value="style_3">Style 3 - Épuré Minimaliste</option>
+                                        <option value="style_4">Style 4 - Portrait Focus</option>
+                                        <option value="style_5">Style 5 - Corporate Dark</option>
+                                        <option value="style_6">Style 6 - Horizontal Pro</option>
+                                    </select>
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-bold text-slate-700 mb-2">Couleur de l'entreprise *</label>
+                                    <div class="flex items-center gap-4">
+                                        <input type="color" name="badge_color" id="badge_color" value="#f97316" class="h-14 w-24 p-1 rounded-lg border-2 border-white shadow-md cursor-pointer">
+                                        <p class="text-xs text-slate-500 italic leading-snug">Cette couleur sera appliquée aux titres et bordures des badges.</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {{-- Preview Dynamique --}}
+                            <div class="flex flex-col items-center justify-center bg-white p-4 rounded-xl border border-orange-100 shadow-inner min-h-[250px]">
+                                <span class="text-[10px] font-bold text-slate-400 uppercase mb-4">Aperçu en direct</span>
+                                <div id="preview-container" class="relative transition-all duration-300 transform scale-90">
+                                    {{-- L'image de preview changera ici via JS --}}
+                                    <img id="style-preview-img" src="{{ asset('images/previews/style_1.png') }}" alt="Preview" class="rounded shadow-lg max-h-48">
+                                    <div id="color-bar" class="absolute top-0 left-0 w-full h-2 rounded-t" style="background-color: #f97316;"></div>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
-                
-                <button type="submit" class="w-full bg-orange-500 text-white font-black py-4 rounded-lg hover:bg-orange-600 shadow-md transition-all uppercase tracking-widest text-lg">
-                    Enregistrer et générer le lien
-                </button>
-            </form>
+
+                    <button type="submit" class="w-full bg-orange-500 hover:bg-orange-600 text-white font-black py-5 rounded-xl shadow-lg shadow-orange-200 transition-all transform hover:-translate-y-1 uppercase tracking-widest text-lg">
+                        Enregistrer et Générer le lien
+                    </button>
+                </form>
+            </div>
         </div>
     </div>
 
+    {{-- Script pour la prévisualisation et l'affichage du lien généré --}}
     <script>
-        function copyToClipboard() {
-            const text = document.getElementById('company-link').innerText;
+        // 1. Gestion de la prévisualisation
+        const styleSelect = document.getElementById('badge_style');
+        const colorInput = document.getElementById('badge_color');
+        const previewImg = document.getElementById('style-preview-img');
+        const colorBar = document.getElementById('color-bar');
+
+        function updatePreview() {
+            // Change l'image selon le style (Assure-toi d'avoir ces images dans public/images/previews/)
+            const style = styleSelect.value;
+            previewImg.src = `/images/previews/${style}.png`;
+            
+            // Applique la couleur sur la petite barre d'accent
+            colorBar.style.backgroundColor = colorInput.value;
+        }
+
+        styleSelect.addEventListener('change', updatePreview);
+        colorInput.addEventListener('input', updatePreview);
+
+        // 2. Affichage du lien après succès (SweetAlert)
+        @if(session('generated_slug'))
+            Swal.fire({
+                title: 'Entreprise Enregistrée !',
+                html: `
+                    <p class="mb-4">Le lien d'inscription pour vos employés est prêt :</p>
+                    <div class="bg-gray-100 p-3 rounded-lg border border-dashed border-orange-500 break-all font-mono text-sm mb-4">
+                        {{ url('/register/' . session('generated_slug')) }}
+                    </div>
+                    <button onclick="copyLink('{{ url('/register/' . session('generated_slug')) }}')" class="bg-teal-600 text-white px-4 py-2 rounded-lg text-sm font-bold">
+                        Copier le lien
+                    </button>
+                `,
+                icon: 'success',
+                confirmButtonText: 'Terminer',
+                confirmButtonColor: '#f97316'
+            });
+        @endif
+
+        function copyLink(text) {
             navigator.clipboard.writeText(text).then(() => {
-                const status = document.getElementById('copy-status');
-                status.classList.remove('hidden');
-                setTimeout(() => status.classList.add('hidden'), 3000);
-            }).catch(err => {
-                console.error('Erreur lors de la copie : ', err);
+                alert('Lien copié dans le presse-papier !');
             });
         }
     </script>
