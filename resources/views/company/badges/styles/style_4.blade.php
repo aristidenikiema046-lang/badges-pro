@@ -1,42 +1,54 @@
-@php $mainColor = $employee->company->badge_color ?? '#059669'; @endphp
-<div class="badge-fixed-container relative bg-white flex overflow-hidden w-full h-full border border-gray-200">
-    <div class="absolute left-0 top-0 bottom-0 w-4 z-20" style="background-color: {{ $mainColor }}"></div>
+@php 
+    $mainColor = $employee->company->badge_color ?? '#059669'; 
+@endphp
 
-    <div class="w-1/2 flex items-center justify-center p-10 flex-none bg-gray-50/50 relative border-r border-gray-100">
-        <div class="bg-white p-6 rounded-[2rem] shadow-2xl z-10 border border-gray-100">
-            {!! QrCode::size(180)->margin(1)->generate($employee->matricule) !!}
+<div class="relative bg-white flex flex-row overflow-hidden w-full h-full font-sans">
+    <!-- Barre d'accentuation latérale gauche -->
+    <div class="absolute left-0 top-0 bottom-0 w-3 z-20" style="background-color: {{ $mainColor }}"></div>
+
+    <!-- Zone Gauche : QR Code (50% de la largeur) -->
+    <div class="w-1/2 flex items-center justify-center p-6 flex-none bg-gray-50 relative border-r border-gray-100">
+        <div class="bg-white p-4 rounded-[1.5rem] shadow-xl z-10 border border-gray-100">
+            {!! QrCode::size(130)->margin(1)->generate($employee->matricule) !!}
         </div>
+        <!-- Filigrane discret -->
+        <span class="absolute bottom-4 left-8 text-[8px] font-bold text-gray-300 uppercase tracking-widest">Digital Security</span>
     </div>
 
-    <div class="flex-1 flex flex-col justify-center p-10 text-right relative">
-        <div class="absolute top-8 right-10">
+    <!-- Zone Droite : Infos (50% de la largeur) -->
+    <div class="w-1/2 flex flex-col justify-center p-6 text-right relative">
+        <!-- Logo en haut à droite -->
+        <div class="absolute top-6 right-6">
             @if($employee->company && $employee->company->logo)
-                <img src="{{ $getPath($employee->company->logo) }}" class="h-10 w-auto object-contain">
+                <img src="{{ $getPath($employee->company->logo) }}" class="h-8 w-auto object-contain">
             @endif
         </div>
 
-        <div class="mt-4">
-            <h1 class="text-4xl font-black uppercase text-gray-900 leading-none tracking-tighter">
+        <!-- Identité de l'employé -->
+        <div class="mt-8">
+            <h1 class="text-2xl font-black uppercase text-gray-900 leading-tight tracking-tighter truncate">
                 {{ $employee->last_name }}
             </h1>
-            <h1 class="text-2xl font-bold uppercase leading-none mt-3" style="color: {{ $mainColor }}">
+            <h2 class="text-xl font-bold uppercase leading-none mt-1 truncate" style="color: {{ $mainColor }}">
                 {{ $employee->first_name }}
-            </h1>
+            </h2>
         </div>
 
-        <div class="mt-8 pt-6 border-t-2 border-gray-100">
-            <p class="text-lg font-black text-gray-800 uppercase leading-none">
+        <!-- Fonction et Département -->
+        <div class="mt-4 pt-4 border-t-2 border-gray-100/80">
+            <p class="text-sm font-black text-gray-800 uppercase leading-none truncate">
                 {{ $employee->function }}
             </p>
-            <p class="text-xs font-bold uppercase italic mt-2" style="color: {{ $mainColor }}">
+            <p class="text-[9px] font-bold uppercase italic mt-1.5" style="color: {{ $mainColor }}">
                 {{ $employee->department ?? 'DIRECTION GÉNÉRALE' }}
             </p>
         </div>
 
-        <div class="mt-auto flex justify-end gap-6 items-end">
+        <!-- Matricule en bas -->
+        <div class="mt-auto pt-4 flex justify-end">
             <div class="flex flex-col">
-                <span class="text-[9px] font-bold text-gray-300 uppercase tracking-widest">Matricule</span>
-                <span class="text-sm font-mono font-black text-gray-800">{{ $employee->matricule }}</span>
+                <span class="text-[7px] font-bold text-gray-300 uppercase tracking-widest">Matricule</span>
+                <span class="text-xs font-mono font-black text-gray-800 tracking-tighter">{{ $employee->matricule }}</span>
             </div>
         </div>
     </div>

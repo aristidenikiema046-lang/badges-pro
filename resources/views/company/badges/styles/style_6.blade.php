@@ -1,33 +1,51 @@
-@php $mainColor = $employee->company->badge_color ?? '#059669'; @endphp
-<div class="badge-fixed-container relative bg-white overflow-hidden w-full h-full border border-gray-100 flex items-center">
+@php 
+    $mainColor = $employee->company->badge_color ?? '#059669'; 
+@endphp
+
+<div class="relative bg-white flex flex-row items-center overflow-hidden w-full h-full font-sans border border-gray-100">
     
-    <div class="absolute top-0 right-0 w-32 h-32 opacity-10 rounded-bl-full" style="background-color: {{ $mainColor }}"></div>
+    <!-- Décoration d'angle (Haut-Droit) -->
+    <div class="absolute top-0 right-0 w-32 h-32 opacity-10 rounded-bl-full pointer-events-none" 
+         style="background-color: {{ $mainColor }}"></div>
 
-    <div class="flex-1 pl-12 pr-6 z-10">
-        @if($employee->company && $employee->company->logo)
-            <img src="{{ $getPath($employee->company->logo) }}" class="h-10 w-auto object-contain mb-8">
-        @endif
+    <!-- Section Gauche : Identité (65% de la largeur) -->
+    <div class="w-[65%] pl-10 pr-4 z-10 flex flex-col justify-center h-full">
+        <!-- Logo -->
+        <div class="mb-6">
+            @if($employee->company && $employee->company->logo)
+                <img src="{{ $getPath($employee->company->logo) }}" class="h-10 w-auto object-contain">
+            @endif
+        </div>
 
-        <h1 class="text-5xl font-black uppercase text-gray-900 leading-[0.8] tracking-tighter mb-2">
-            {{ $employee->last_name }}
-        </h1>
-        <h1 class="text-2xl font-bold uppercase mb-6" style="color: {{ $mainColor }}">
-            {{ $employee->first_name }}
-        </h1>
+        <!-- Nom et Prénom -->
+        <div class="mb-5">
+            <h1 class="text-4xl font-black uppercase text-gray-900 leading-none tracking-tighter truncate">
+                {{ $employee->last_name }}
+            </h1>
+            <h2 class="text-xl font-bold uppercase mt-1 truncate" style="color: {{ $mainColor }}">
+                {{ $employee->first_name }}
+            </h2>
+        </div>
         
-        <div class="flex items-center gap-4">
-            <div class="px-4 py-2 rounded-xl bg-gray-900 text-white text-xs font-black uppercase tracking-widest">
+        <!-- Fonction et Matricule -->
+        <div class="flex items-center gap-3">
+            <div class="px-3 py-1.5 rounded-lg bg-gray-900 text-white text-[10px] font-black uppercase tracking-widest truncate max-w-[180px]">
                 {{ $employee->function }}
             </div>
-            <span class="text-xs font-mono text-gray-400 font-bold tracking-widest">{{ $employee->matricule }}</span>
+            <span class="text-[10px] font-mono text-gray-400 font-bold tracking-widest border-l pl-3 border-gray-200">
+                {{ $employee->matricule }}
+            </span>
         </div>
     </div>
 
-    <div class="w-1/3 flex justify-center items-center pr-12 z-10">
-        <div class="bg-white p-4 rounded-3xl shadow-2xl border-2" style="border-color: {{ $mainColor }}">
-            {!! QrCode::size(140)->margin(1)->generate($employee->matricule) !!}
+    <!-- Section Droite : QR Code (35% de la largeur) -->
+    <div class="w-[35%] flex justify-center items-center pr-10 z-10 h-full">
+        <div class="bg-white p-3 rounded-2xl shadow-xl border-2 transform rotate-2" style="border-color: {{ $mainColor }}">
+            {!! QrCode::size(115)->margin(1)->generate($employee->matricule) !!}
         </div>
     </div>
 
-    <div class="absolute bottom-0 left-12 w-48 h-2 rounded-t-full" style="background-color: {{ $mainColor }}"></div>
+    <!-- Ligne d'accentuation (Bas-Gauche) -->
+    <div class="absolute bottom-0 left-10 w-40 h-1.5 rounded-t-full pointer-events-none" 
+         style="background-color: {{ $mainColor }}"></div>
 </div>
