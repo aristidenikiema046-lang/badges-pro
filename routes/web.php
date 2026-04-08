@@ -3,7 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\EmployeeController;
-use App\Http\Controllers\Admin\CompanyController; // Import correct
+use App\Http\Controllers\Admin\CompanyController;
 use App\Http\Controllers\BadgeExportController;
 
 // 1. ACCUEIL
@@ -12,6 +12,30 @@ Route::get('/', function () { return view('welcome'); })->name('home');
 // 2. CONFIGURATION ENTREPRISE (PARTENAIRE)
 Route::get('/inscription-partenaire', [CompanyController::class, 'create'])->name('companies.create');
 Route::post('/inscription-partenaire', [CompanyController::class, 'store'])->name('companies.store');
+
+// --- NOUVELLE ROUTE POUR LA PREVIEW DYNAMIQUE ---
+Route::get('/admin/preview-style/{style}', function ($style) {
+    // Simulation de données pour l'aperçu
+    $employee = (object)[
+        'first_name' => 'Jean',
+        'last_name' => 'Dupont',
+        'position' => 'Directeur Marketing',
+        'photo' => null
+    ];
+    $company = (object)[
+        'name' => 'Nom de l\'Entreprise',
+        'badge_color' => request('color', '#f97316'),
+        'logo' => null
+    ];
+
+    // On vérifie si la vue existe pour éviter une erreur 500
+    if (!view()->exists('company.badges.styles.' . $style)) {
+        return response('<p class="text-red-500">Style non trouvé.</p>', 404);
+    }
+
+    return view('company.badges.styles.' . $style, compact('employee', 'company'))->render();
+})->name('admin.style.render');
+// ------------------------------------------------
 
 // 3. INSCRIPTION EMPLOYÉS
 Route::get('/register/{slug}', [EmployeeController::class, 'registerForm'])->name('inscription.tenant');
