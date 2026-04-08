@@ -32,22 +32,23 @@
                     <span class="text-2xl mr-2">🎉</span>
                     <h3 class="text-emerald-800 font-bold text-lg uppercase">Lien généré pour {{ session('company_name') }}</h3>
                 </div>
-                <p class="text-sm text-emerald-700 mb-4 font-medium italic">Partagez ce lien avec les employés :</p>
+                <p class="text-sm text-emerald-700 mb-4 font-medium italic">Partagez ce lien avec les employés pour qu'ils créent leurs badges :</p>
                 
                 <div class="flex items-center gap-2 bg-white p-4 rounded-lg border border-emerald-200 shadow-inner">
-                    <code id="company-link" class="text-emerald-600 font-mono font-bold flex-grow text-sm break-all">
+                    <code id="company-link" class="text-emerald-600 font-mono font-bold flex-grow text-sm md:text-base break-all">
                         {{ url('/register/' . session('generated_slug')) }}
                     </code>
                     <button onclick="copyToClipboard()" class="bg-emerald-600 text-white px-5 py-2 rounded-lg hover:bg-emerald-700 transition font-bold uppercase text-xs shrink-0">
                         Copier
                     </button>
                 </div>
-                <p id="copy-status" class="text-xs text-emerald-600 mt-2 font-bold hidden italic text-center">Lien copié !</p>
+                <p id="copy-status" class="text-xs text-emerald-600 mt-2 font-bold hidden italic text-center">Lien copié dans le presse-papier !</p>
             </div>
         @endif
 
+        {{-- FORMULAIRE --}}
         <div class="bg-white rounded-xl shadow-xl border-t-8 border-orange-500 p-8">
-            <h2 class="text-2xl font-bold mb-6 text-gray-800 uppercase tracking-tight">Nouvelle Entreprise</h2>
+            <h2 class="text-2xl font-bold mb-6 text-gray-800 uppercase tracking-tight">Configuration de l'Entreprise</h2>
             
             <form action="{{ route('companies.store') }}" method="POST" enctype="multipart/form-data" class="space-y-6">
                 @csrf
@@ -76,26 +77,28 @@
                     <input type="file" name="logo" class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-orange-50 file:text-orange-700 hover:file:bg-orange-100 cursor-pointer">
                 </div>
 
+                {{-- SECTION DESIGN --}}
                 <div class="bg-gray-50 p-6 rounded-xl border-2 border-dashed border-orange-200 mt-6">
-                    <h3 class="text-orange-600 font-bold uppercase text-sm mb-4 tracking-wider">Design du Badge</h3>
+                    <h3 class="text-orange-600 font-bold uppercase text-sm mb-4 tracking-wider">Identité Visuelle des Badges</h3>
+                    
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                         <div>
                             <label class="block text-sm font-bold text-gray-700 mb-3">Modèle de Badge *</label>
                             <select name="badge_style" required class="w-full border-gray-300 rounded-lg p-3 focus:ring-orange-500 outline-none border bg-white">
-                                <option value="" disabled {{ old('badge_style') ? '' : 'selected' }}>-- Choisir un modèle --</option>
-                                <option value="style_1" {{ old('badge_style') == 'style_1' ? 'selected' : '' }}>Style 1 - Classique</option>
+                                <option value="style_1" {{ old('badge_style') == 'style_1' ? 'selected' : '' }}>Style 1 - Classique Vertical</option>
                                 <option value="style_2" {{ old('badge_style') == 'style_2' ? 'selected' : '' }}>Style 2 - Moderne</option>
                                 <option value="style_3" {{ old('badge_style') == 'style_3' ? 'selected' : '' }}>Style 3 - Épuré</option>
-                                <option value="style_4" {{ old('badge_style') == 'style_4' ? 'selected' : '' }}>Style 4 - Portrait</option>
+                                <option value="style_4" {{ old('badge_style') == 'style_4' ? 'selected' : '' }}>Style 4 - Portrait Pro</option>
                                 <option value="style_5" {{ old('badge_style') == 'style_5' ? 'selected' : '' }}>Style 5 - Corporate</option>
-                                <option value="style_6" {{ old('badge_style') == 'style_6' ? 'selected' : '' }}>Style 6 - Paysage</option>
+                                <option value="style_6" {{ old('badge_style') == 'style_6' ? 'selected' : '' }}>Style 6 - Horizontal (Paysage)</option>
                             </select>
                         </div>
+
                         <div>
-                            <label class="block text-sm font-bold text-gray-700 mb-3">Couleur Principale *</label>
+                            <label class="block text-sm font-bold text-gray-700 mb-3">Couleur de l'entreprise *</label>
                             <div class="flex items-center gap-4">
                                 <input type="color" name="badge_color" value="{{ old('badge_color', '#f97316') }}" required class="h-12 w-20 p-1 rounded-lg border-gray-300 cursor-pointer shadow-sm">
-                                <span class="text-[11px] text-gray-500 italic leading-tight">Cette couleur sera le thème visuel du badge.</span>
+                                <span class="text-[11px] text-gray-500 italic leading-tight">Cette couleur sera appliquée aux titres et bordures des badges.</span>
                             </div>
                         </div>
                     </div>
@@ -115,6 +118,8 @@
                 const status = document.getElementById('copy-status');
                 status.classList.remove('hidden');
                 setTimeout(() => status.classList.add('hidden'), 3000);
+            }).catch(err => {
+                console.error('Erreur lors de la copie : ', err);
             });
         }
     </script>
