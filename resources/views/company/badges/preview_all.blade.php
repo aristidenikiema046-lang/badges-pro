@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sélecteur de Badge - {{ $employee->first_name }}</title>
+    <title>Mon Badge - {{ $employee->first_name }}</title>
     <script src="https://cdn.tailwindcss.com"></script>
     
     @php 
@@ -14,10 +14,14 @@
             $cleanPath = str_replace('storage/', '', $path);
             return $is_export ? public_path('storage/' . $cleanPath) : asset('storage/' . $cleanPath);
         };
+
+        // On récupère le style choisi par l'entreprise (ex: style_1, style_2...)
+        // Si c'est vide pour une raison X, on met style_1 par défaut
+        $selectedStyle = $employee->badge_style ?? 'style_1';
+        $styleNumber = (int) filter_var($selectedStyle, FILTER_SANITIZE_NUMBER_INT);
     @endphp
 
     <style>
-        /* CONFIGURATION DES FORMATS DE BADGES */
         .badge-card {
             background: white;
             border-radius: 1.5rem;
@@ -27,89 +31,57 @@
             transition: all 0.3s ease;
         }
 
+        /* Tailles réelles pour l'impression */
         .portrait-card { width: 85mm; height: 125mm; }
         .landscape-card { width: 125mm; height: 80mm; padding: 0; }
 
-        .badge-card:hover { transform: scale(1.02); }
-
         @media print {
-            .no-print, .other-badges-hidden { display: none !important; }
-            body { background: white; padding: 0; margin: 0; display: flex; justify-content: center; }
+            .no-print { display: none !important; }
+            body { background: white; padding: 0; margin: 0; display: flex; justify-content: center; align-items: center; height: 100vh; }
             .badge-card { box-shadow: none; border: none; margin: 0; }
-            .print-active { display: flex !important; }
         }
     </style>
 </head>
-<body class="bg-slate-50 p-8">
+<body class="bg-slate-50 p-4 md:p-12">
 
-    <div class="max-w-7xl mx-auto no-print text-center mb-12">
-        <h1 class="text-3xl font-black uppercase text-slate-800">Interface de Prévisualisation</h1>
-        <p class="text-slate-500">Aperçu en temps réel pour <strong>{{ $employee->first_name }} {{ $employee->last_name }}</strong></p>
-        
-        <div class="mt-4 flex justify-center gap-4">
-            <span class="px-4 py-1 bg-emerald-100 text-emerald-700 rounded-full text-xs font-bold uppercase">
-                Département : {{ $employee->department ?? 'Non défini' }}
-            </span>
-            <span class="px-4 py-1 bg-slate-200 text-slate-700 rounded-full text-xs font-bold uppercase">
-                Couleur : {{ $employee->badge_color }}
-            </span>
-        </div>
+    <div class="max-w-2xl mx-auto no-print text-center mb-8">
+        <h1 class="text-2xl font-black uppercase text-slate-800">Félicitations !</h1>
+        <p class="text-slate-500">Votre badge pour <strong>{{ $employee->company->name }}</strong> est prêt.</p>
     </div>
 
-    <div class="flex flex-wrap justify-center gap-12">
-        @foreach(range(1, 6) as $styleIndex)
-            <div class="flex flex-col items-center badge-wrapper" id="wrapper-{{ $styleIndex }}">
-                <span class="mb-4 font-bold text-slate-400 uppercase tracking-widest text-xs no-print">
-                    Design Option #0{{ $styleIndex }}
-                </span>
-                
-                <div id="badge-{{ $styleIndex }}" 
-                     class="badge-card {{ in_array($styleIndex, [4, 6]) ? 'landscape-card' : 'portrait-card' }}">
-                    
-                    @include('company.badges.styles.style_' . $styleIndex, [
-                        'employee' => $employee,
-                        'getPath' => $getPath
-                    ])
-                </div>
-
-                <div class="mt-6 flex gap-3 no-print">
-                    {{-- Bouton Imprimer Solo --}}
-                    <button onclick="printSingle({{ $styleIndex }})" class="bg-emerald-600 text-white px-6 py-2 rounded-xl font-bold hover:bg-emerald-700 transition shadow-lg shadow-emerald-100">
-                        Imprimer
-                    </button>
-                    
-                    {{-- BOUTON TÉLÉCHARGER CORRIGÉ --}}
-                    <a href="{{ route('badge.export.single', ['id' => $employee->id, 'style' => $styleIndex, 'format' => 'pdf']) }}" 
-                       class="bg-white border border-slate-200 px-6 py-2 rounded-xl font-bold text-slate-600 hover:bg-slate-50 transition">
-                        Télécharger
-                    </a>
-                </div>
-            </div>
-        @endforeach
-    </div>
-
-    <script>
-        function printSingle(index) {
-            // 1. On cache tous les autres wrappers de badges
-            document.querySelectorAll('.badge-wrapper').forEach(el => {
-                el.classList.add('other-badges-hidden');
-            });
+    <div class="flex flex-col items-center">
+        {{-- Affichage unique du badge sélectionné --}}
+        <div id="badge-final" 
+             class="badge-card {{ in_array($styleNumber, [4, 6]) ? 'landscape-card' : 'portrait-card' }}">
             
-            // 2. On s'assure que celui qu'on veut est visible et seul
-            const activeWrapper = document.getElementById('wrapper-' + index);
-            activeWrapper.classList.remove('other-badges-hidden');
-            activeWrapper.classList.add('print-active');
+            @include('company.badges.styles.' . $selectedStyle, [
+                'employee' => $employee,
+                'getPath' => $getPath
+            ])
+        </div>
 
-            // 3. On lance l'impression
-            window.print();
+        {{-- Actions --}}
+        <div class="mt-10 flex flex-col sm:flex-row gap-4 no-print">
+            <button onclick="window.print()" class="bg-emerald-600 text-white px-8 py-3 rounded-2xl font-bold hover:bg-emerald-700 transition shadow-xl shadow-emerald-100 flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                </svg>
+                Imprimer mon badge
+            </button>
+            
+            <a href="{{ route('badge.export.single', ['id' => $employee->id, 'style' => $styleNumber, 'format' => 'pdf']) }}" 
+               class="bg-white border-2 border-slate-200 px-8 py-3 rounded-2xl font-bold text-slate-600 hover:bg-slate-50 transition flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                </svg>
+                Télécharger en PDF
+            </a>
+        </div>
 
-            // 4. On remet tout à la normale après l'impression
-            setTimeout(() => {
-                document.querySelectorAll('.badge-wrapper').forEach(el => {
-                    el.classList.remove('other-badges-hidden', 'print-active');
-                });
-            }, 500);
-        }
-    </script>
+        <p class="mt-6 text-slate-400 text-xs no-print italic">
+            Note : Pour un résultat optimal, activez "Graphiques d'arrière-plan" dans les options d'impression.
+        </p>
+    </div>
+
 </body>
 </html>
