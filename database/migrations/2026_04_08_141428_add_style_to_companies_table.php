@@ -6,27 +6,19 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     * Ajoute les colonnes de personnalisation visuelle pour les badges de l'entreprise.
-     */
     public function up(): void
     {
         Schema::table('companies', function (Blueprint $table) {
-            // On vérifie si la colonne n'existe pas déjà pour éviter les erreurs
+            // On vérifie si la colonne n'existe pas avant de l'ajouter pour éviter les erreurs
             if (!Schema::hasColumn('companies', 'badge_style')) {
-                $table->string('badge_style')->default('1')->after('logo');
+                $table->string('badge_style')->nullable()->after('manager_name');
             }
-            
             if (!Schema::hasColumn('companies', 'badge_color')) {
-                $table->string('badge_color')->default('#f97316')->after('badge_style');
+                $table->string('badge_color')->nullable()->after('badge_style');
             }
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::table('companies', function (Blueprint $table) {
