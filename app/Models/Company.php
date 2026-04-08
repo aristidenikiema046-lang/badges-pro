@@ -3,7 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasMany; // <--- N'oublie pas l'import
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Company extends Model
 {
@@ -15,6 +15,8 @@ class Company extends Model
         'email', 
         'phone', 
         'manager_name', 
+        'badge_style', // AJOUTÉ
+        'badge_color', // AJOUTÉ
         'is_active'
     ];
 
