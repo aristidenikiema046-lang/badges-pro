@@ -1,5 +1,6 @@
 @php 
-    $mainColor = $employee->company->badge_color ?? '#1e293b'; 
+    // Utilisation d'un bleu foncé par défaut (#1e3a8a) si aucune couleur d'entreprise n'est définie
+    $mainColor = $employee->company->badge_color ?? '#1e3a8a'; 
     
     $qrData = "NOM: {$employee->last_name}\n"
             . "PRENOM: {$employee->first_name}\n"
@@ -20,13 +21,12 @@
             font-family: 'sans-serif';
         }
         
-        /* Conteneur du circuit SVG pour qu'il soit identique à l'image */
         .circuit-bg {
             position: absolute;
             left: 0;
             top: 0;
             bottom: 0;
-            width: 100px; /* Largeur de la zone de circuit */
+            width: 120px;
             pointer-events: none;
             z-index: 1;
         }
@@ -55,20 +55,20 @@
         <div class="w-[42%] relative flex items-center justify-center bg-white border-r border-gray-100 overflow-hidden">
             
             <svg class="circuit-bg" viewBox="0 0 100 350" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <g opacity="0.4" stroke="{{ $mainColor }}" stroke-width="1.5">
+                <g opacity="0.8" stroke="{{ $mainColor }}" stroke-width="2">
                     <path d="M0 40H40L60 60H80" />
-                    <circle cx="80" cy="60" r="3" fill="{{ $mainColor }}" />
+                    <circle cx="80" cy="60" r="3.5" fill="{{ $mainColor }}" />
                     
                     <path d="M0 120H30L50 140H70" />
-                    <circle cx="70" cy="140" r="3" fill="{{ $mainColor }}" />
+                    <circle cx="70" cy="140" r="3.5" fill="{{ $mainColor }}" />
                     
-                    <path d="M0 200H20L40 220V280L60 300H90" />
-                    <circle cx="90" cy="300" r="3" fill="{{ $mainColor }}" />
+                    <path d="M0 200H20L40 220V280L60 300H95" />
+                    <circle cx="95" cy="300" r="3.5" fill="{{ $mainColor }}" />
                     
-                    <path d="M0 320H50L70 300" />
+                    <path d="M15 0V50" />
+                    <circle cx="15" cy="50" r="2.5" fill="{{ $mainColor }}" />
                     
-                    <path d="M20 0V30" />
-                    <circle cx="20" cy="30" r="2" fill="{{ $mainColor }}" />
+                    <path d="M30 350V310L50 290" />
                 </g>
             </svg>
 
