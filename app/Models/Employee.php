@@ -18,6 +18,7 @@ class Employee extends Model
         'function',      
         'department', 
         'company_id',
+        'photo', // <--- AJOUTE CECI ABSOLUMENT
         'is_validated'   
     ];
 
