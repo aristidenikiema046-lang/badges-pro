@@ -21,13 +21,24 @@ Route::get('/badge/preview/{id}', [EmployeeController::class, 'preview'])->name(
 Route::get('/badge/export/{id}', [BadgeExportController::class, 'exportSingle'])->name('badge.export.single');
 
 // 5. ZONE GESTION ENTREPRISE (ESPACE DU MANAGER D'ENTREPRISE)
+// Pas de middleware 'auth' ici car seul l'admin a un compte, l'entreprise accède via le slug
 Route::prefix('{slug}/dashboard')->group(function () {
-    Route::get('/employees', [EmployeeController::class, 'index'])->name('company.employees');
     
-    // CORRECTION : On utilise {id} pour correspondre aux arguments de ton contrôleur (edit, update, destroy)
-    Route::get('/employees/{id}/edit', [EmployeeController::class, 'edit'])->name('employees.edit');
-    Route::put('/employees/{id}', [EmployeeController::class, 'update'])->name('employees.update');
-    Route::delete('/employees/{id}', [EmployeeController::class, 'destroy'])->name('employees.destroy');
+    Route::get('/employees', [EmployeeController::class, 'index'])
+        ->name('company.employees');
+    
+    // On force Laravel à reconnaître que {id} est un nombre (digit)
+    Route::get('/employees/{id}/edit', [EmployeeController::class, 'edit'])
+        ->name('employees.edit')
+        ->where('id', '[0-9]+');
+
+    Route::put('/employees/{id}', [EmployeeController::class, 'update'])
+        ->name('employees.update')
+        ->where('id', '[0-9]+');
+
+    Route::delete('/employees/{id}', [EmployeeController::class, 'destroy'])
+        ->name('employees.destroy')
+        ->where('id', '[0-9]+');
 });
 
 // 6. ZONE SUPER-ADMIN (YA CONSULTING)
