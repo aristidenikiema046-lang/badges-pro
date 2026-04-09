@@ -1,7 +1,6 @@
 @php 
     $mainColor = $employee->company->badge_color ?? '#1e293b'; 
     
-    // Préparation des données pour le QR Code (Inspiré du Style 6)
     $qrData = "NOM: {$employee->last_name}\n"
             . "PRENOM: {$employee->first_name}\n"
             . "POSTE: {$employee->function}\n"
@@ -20,14 +19,18 @@
             height: 350px;
             font-family: 'sans-serif';
         }
-        /* Motif circuit board spécifique au Style 1 */
-        .tech-pattern {
-            background-image: url('https://www.transparenttextures.com/patterns/circuit-board.png');
+        /* Style pour les lignes technologiques sur le côté gauche */
+        .tech-line {
+            position: absolute;
+            background-color: {{ $mainColor }};
+            opacity: 0.2;
+            height: 2px;
+            border-radius: 2px;
         }
         @media print {
             .no-print { display: none; }
             body { background: white; }
-            .badge-container { shadow: none; border: 1px solid #eee; }
+            .badge-container { box-shadow: none; border: 1px solid #eee; }
         }
     </style>
 </head>
@@ -45,43 +48,56 @@
     <div class="badge-container bg-white shadow-2xl overflow-hidden flex relative border-2 mx-auto rounded-[1.5rem]" 
          style="border-color: {{ $mainColor }}">
         
-        <div class="w-[40%] relative flex items-center justify-center bg-slate-50 border-r border-gray-100 overflow-hidden">
-            <div class="absolute inset-0 opacity-10 tech-pattern"></div>
+        <div class="w-[42%] relative flex items-center justify-center bg-slate-50 border-r border-gray-100 overflow-hidden">
+            
+            <div class="absolute inset-0 pointer-events-none">
+                <div class="tech-line w-24 top-10 left-0"></div>
+                <div class="tech-line w-16 top-10 left-24 rotate-45 origin-left"></div>
+                
+                <div class="tech-line w-32 top-32 left-0"></div>
+                
+                <div class="tech-line w-20 bottom-20 left-0"></div>
+                <div class="tech-line w-12 bottom-20 left-20 -rotate-45 origin-left"></div>
 
-            <div class="absolute inset-0 opacity-30 pointer-events-none">
+                <div class="tech-line w-40 bottom-10 left-0"></div>
+                
+                <div class="absolute top-[38px] left-32 w-2 h-2 rounded-full opacity-20" style="background-color: {{ $mainColor }}"></div>
+                <div class="absolute bottom-[28px] left-36 w-2 h-2 rounded-full opacity-20" style="background-color: {{ $mainColor }}"></div>
+            </div>
+
+            <div class="absolute inset-0 opacity-10 pointer-events-none">
                 <svg width="100%" height="100%" viewBox="0 0 100 100" preserveAspectRatio="none">
-                    <path d="M0 20 L35 20 L55 45" stroke="{{ $mainColor }}" stroke-width="1.5" fill="none" />
-                    <circle cx="35" cy="20" r="1.5" fill="{{ $mainColor }}" />
-                    <path d="M0 80 L45 80 L65 100" stroke="{{ $mainColor }}" stroke-width="1.5" fill="none" />
+                    <path d="M0 50 Q 25 45, 50 50 T 100 50" stroke="{{ $mainColor }}" fill="none" stroke-width="0.5"/>
                 </svg>
             </div>
 
-            <div class="z-10 w-44 h-56 rounded-[2rem] overflow-hidden shadow-xl border-4 border-white bg-white">
+            <div class="z-10 w-44 h-56 rounded-[1.5rem] overflow-hidden shadow-2xl border-4 border-white bg-white">
                 @if($employee->photo)
                     <img src="{{ asset('storage/' . $employee->photo) }}" class="w-full h-full object-cover">
                 @else
-                    <div class="w-full h-full flex items-center justify-center bg-gray-100 text-gray-400 font-bold border-2 border-dashed border-gray-200 uppercase text-[10px]">
-                        Sans Photo
+                    <div class="w-full h-full flex items-center justify-center bg-gray-100 text-gray-400 font-bold uppercase text-[10px] p-4 text-center">
+                        Photo de l'employé
                     </div>
                 @endif
             </div>
         </div>
 
-        <div class="w-[60%] flex flex-col p-8 justify-between bg-white relative">
+        <div class="w-[58%] flex flex-col p-8 justify-between bg-white relative">
             
-            <div class="flex items-center justify-end gap-3 border-b pb-4">
+            <div class="flex items-center justify-end gap-3 border-b border-gray-50 pb-4">
                 <div class="text-right">
-                    <p class="font-black text-lg uppercase leading-none" style="color: {{ $mainColor }}">
-                        {{ $employee->company->name ?? 'YA CONSULTING' }}
+                    <p class="font-black text-xl uppercase leading-none" style="color: {{ $mainColor }}">
+                        {{ $employee->company->name ?? 'ENTREPRISE' }}
                     </p>
-                    <p class="text-[8px] text-gray-400 font-bold tracking-[0.2em] mt-1 uppercase">Carte Professionnelle</p>
+                    <p class="text-[8px] text-gray-400 font-bold tracking-[0.2em] mt-1 uppercase">Identification Digitale</p>
                 </div>
                 @if($employee->company && $employee->company->logo)
-                    <img src="{{ asset('storage/' . $employee->company->logo) }}" class="h-10 w-auto object-contain">
+                    <img src="{{ asset('storage/' . $employee->company->logo) }}" class="h-12 w-auto object-contain">
                 @endif
             </div>
 
-            <div class="mt-4 flex-grow">
+            <div class="mt-6">
+                <p class="text-[10px] font-black text-gray-300 uppercase tracking-widest mb-1">Détails Collaborateur</p>
                 <h1 class="text-3xl font-black text-slate-900 uppercase tracking-tighter leading-none">
                     {{ $employee->last_name }}
                 </h1>
@@ -89,26 +105,26 @@
                     {{ $employee->first_name }}
                 </h2>
                 
-                <div class="mt-4 flex flex-col gap-1">
-                    <div class="flex items-center gap-2">
-                        <span class="text-[9px] font-black text-gray-400 uppercase tracking-widest">Poste:</span>
-                        <span class="text-xs font-bold text-slate-700 uppercase">{{ $employee->function ?? 'N/A' }}</span>
+                <div class="mt-6 grid grid-cols-2 gap-4">
+                    <div>
+                        <span class="block text-[8px] font-black text-gray-400 uppercase tracking-widest">Poste</span>
+                        <span class="text-xs font-bold text-slate-700 uppercase">{{ $employee->function ?? 'Collaborateur' }}</span>
                     </div>
-                    <div class="flex items-center gap-2">
-                        <span class="text-[9px] font-black text-gray-400 uppercase tracking-widest">Matricule:</span>
+                    <div>
+                        <span class="block text-[8px] font-black text-gray-400 uppercase tracking-widest">Matricule</span>
                         <span class="text-xs font-mono font-black" style="color: {{ $mainColor }}">{{ $employee->matricule }}</span>
                     </div>
                 </div>
             </div>
 
-            <div class="flex justify-between items-end">
-                <div class="text-left">
-                    <p class="text-[7px] font-black text-slate-300 uppercase tracking-[0.3em]">Digital Security ID</p>
-                    <p class="text-[9px] font-bold text-slate-400 italic lowercase">{{ $employee->department ?? 'direction générale' }}</p>
+            <div class="flex justify-between items-end mt-4">
+                <div class="text-left border-l-2 pl-3" style="border-color: {{ $mainColor }}">
+                    <p class="text-[7px] font-black text-slate-400 uppercase tracking-[0.2em]">Sécurité & Accès</p>
+                    <p class="text-[10px] font-bold text-slate-900 uppercase">{{ $employee->department ?? 'Standard' }}</p>
                 </div>
                 
                 <div class="p-1.5 bg-white border-2 rounded-xl shadow-sm" style="border-color: {{ $mainColor }}">
-                    {!! QrCode::size(70)->margin(0)->generate($qrData) !!}
+                    {!! QrCode::size(75)->margin(0)->generate($qrData) !!}
                 </div>
             </div>
         </div>
