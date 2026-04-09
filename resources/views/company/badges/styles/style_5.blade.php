@@ -1,8 +1,8 @@
 @php 
-    // Couleur principale dynamique ou un bleu nuit élégant par défaut
+    // Couleur principale dynamique (YA-CONSULTING ou Entreprise)
     $mainColor = $employee->company->badge_color ?? '#1e293b'; 
     
-    // Données QR Code complètes
+    // Données QR Code
     $qrData = "NOM: {$employee->last_name}\n"
             . "PRENOM: {$employee->first_name}\n"
             . "POSTE: {$employee->function}\n"
@@ -11,14 +11,15 @@
 @endphp
 
 <!DOCTYPE html>
-<html>
+<html lang="fr">
 <head>
     <meta charset="utf-8">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
+        /* Dimensions agrandies (400px) pour éviter les coupures de texte */
         .badge-vertical {
-            width: 350px;
-            height: 550px;
+            width: 400px; 
+            height: 650px;
             font-family: 'sans-serif';
         }
         @media print {
@@ -26,72 +27,68 @@
             body { background: white; padding: 0; }
             .badge-vertical { shadow: none; border: 1px solid #eee; margin: 0; }
         }
+        /* Teinte de fond Slate-50 pour le contraste */
+        .bg-custom-slate { background-color: #f8fafc; }
     </style>
 </head>
-<body class="bg-gray-100 flex flex-col items-center justify-center min-h-screen gap-4">
+<body class="bg-gray-200 flex flex-col items-center justify-center min-h-screen gap-4 p-6">
 
     <div class="no-print">
-        <button onclick="window.print()" class="flex items-center gap-2 bg-slate-800 text-white px-8 py-3 rounded-full hover:bg-black transition shadow-xl font-bold uppercase text-sm tracking-widest">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 00-2 2h2m2 4h10a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
-            </svg>
-            Imprimer le Badge
+        <button onclick="window.print()" class="bg-slate-900 text-white px-10 py-4 rounded-full hover:bg-black transition shadow-2xl font-black uppercase text-sm tracking-widest">
+            Imprimer le Badge Format Large
         </button>
     </div>
 
-    <div class="badge-vertical relative flex flex-col items-center overflow-hidden shadow-2xl rounded-[2.5rem] border" style="background-color: #f4f6f9; border-color: {{ $mainColor }}22">
+    <div class="badge-vertical relative flex flex-col items-center overflow-hidden shadow-2xl rounded-[3.5rem] border-2 bg-custom-slate" style="border-color: {{ $mainColor }}33">
         
-        <div class="w-full pt-8 flex-none flex items-center justify-center gap-3 z-10 px-6">
+        <div class="w-full pt-10 flex flex-col items-center gap-2 z-10 px-10 text-center">
             @if($employee->company && $employee->company->logo)
-                <img src="{{ asset('storage/' . $employee->company->logo) }}" class="h-10 w-auto object-contain mx-auto">
+                <img src="{{ asset('storage/' . $employee->company->logo) }}" class="h-12 w-auto object-contain">
             @endif
+            <h3 class="font-black text-lg uppercase tracking-widest leading-tight" style="color: {{ $mainColor }}">
+                {{ $employee->company->name ?? 'YA CONSULTING' }}
+            </h3>
         </div>
 
-        <div class="relative mt-4 z-10">
-            {{-- Cadre photo : Bordure blanche fine et halo de couleur discret --}}
-            <div class="w-40 h-40 shadow-2xl overflow-hidden bg-gray-100 rounded-2xl border-2 border-white ring-1 ring-{{ $mainColor }}22">
+        <div class="relative mt-6 z-10">
+            <div class="w-48 h-48 shadow-2xl overflow-hidden bg-white rounded-3xl border-2 border-white ring-8 ring-slate-100">
                 @if($employee->photo)
                     <img src="{{ asset('storage/' . $employee->photo) }}" class="w-full h-full object-cover">
                 @else
-                    <div class="w-full h-full flex items-center justify-center text-gray-300">
-                        <svg class="w-20 h-20" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path></svg>
+                    <div class="w-full h-full flex items-center justify-center text-slate-200">
+                        <svg class="w-24 h-24" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path></svg>
                     </div>
                 @endif
             </div>
-            
-            <div class="h-1.5 w-16 bg-slate-900 mx-auto mt-4 rounded-full"></div>
         </div>
 
-        <div class="mt-4 flex flex-col items-center justify-center w-full px-8 text-center z-10">
-            <h1 class="text-3xl font-black uppercase tracking-tight text-slate-950 leading-none mb-1">
+        <div class="mt-8 text-center z-10 w-full px-6">
+            <h1 class="text-4xl font-black uppercase tracking-tighter text-slate-900 leading-none">
                 {{ $employee->last_name }}
             </h1>
-            <h2 class="text-xl font-bold uppercase mt-1" style="color: {{ $mainColor }}">
+            <h2 class="text-2xl font-bold uppercase mt-2" style="color: {{ $mainColor }}">
                 {{ $employee->first_name }}
             </h2>
-            <p class="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] mt-3">
-                {{ $employee->function ?? 'Collaborateur' }}
-            </p>
-        </div>
-
-        <div class="mt-5 z-10 mb-4">
-            <div class="bg-slate-900 text-white px-5 py-1.5 rounded-full text-sm font-mono font-bold shadow-lg border-2 border-white">
-                ID: {{ $employee->matricule }}
+            <div class="mt-3 inline-block bg-slate-200/50 px-4 py-1 rounded-md">
+                <p class="text-[12px] font-black text-slate-500 uppercase tracking-widest">
+                    {{ $employee->function ?? 'COLLABORATEUR' }}
+                </p>
             </div>
         </div>
 
-        <div class="mt-2 mb-2 z-10">
-            <div class="bg-white p-2 rounded-xl shadow-md border border-gray-100">
-                {!! QrCode::size(85)->margin(1)->generate($qrData) !!}
+        <div class="mt-6 z-10">
+            <div class="bg-slate-950 text-white px-10 py-3 rounded-2xl text-xl font-mono font-black shadow-xl tracking-tighter border-b-4 border-slate-700">
+                {{ $employee->matricule }}
             </div>
         </div>
 
-        <div class="w-full h-12 flex-none relative z-10 mt-6">
-            <div class="absolute inset-0 opacity-95" style="background-color: {{ $mainColor }}; clip-path: polygon(0 100%, 100% 100%, 100% 0);"></div>
-            <div class="absolute inset-0 flex items-center justify-center">
-                 <span class="text-[9px] text-white font-bold uppercase tracking-[0.5em] pr-8">Authentifié</span>
+        <div class="mt-6 mb-10 z-10">
+            <div class="bg-white p-3 rounded-2xl shadow-lg border border-slate-100">
+                {!! QrCode::size(95)->margin(1)->generate($qrData) !!}
             </div>
         </div>
+
+        <div class="absolute bottom-0 w-full h-16 z-0" style="background-color: {{ $mainColor }}; clip-path: polygon(0 100%, 100% 100%, 100% 0);"></div>
     </div>
 
 </body>
