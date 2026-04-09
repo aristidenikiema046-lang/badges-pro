@@ -1,8 +1,8 @@
 @php 
-    // Sécurité : couleur principale ou vert émeraude par défaut
-    $mainColor = $employee->company->badge_color ?? '#059669'; 
+    // Couleur principale dynamique ou un bleu nuit élégant par défaut
+    $mainColor = $employee->company->badge_color ?? '#1e293b'; 
     
-    // Préparation des données pour le QR Code
+    // Données QR Code complètes
     $qrData = "NOM: {$employee->last_name}\n"
             . "PRENOM: {$employee->first_name}\n"
             . "POSTE: {$employee->function}\n"
@@ -35,36 +35,24 @@
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 00-2 2h2m2 4h10a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
             </svg>
-            Imprimer ce Badge
+            Imprimer le Badge
         </button>
     </div>
 
-    <div class="badge-vertical relative bg-white flex flex-col items-center overflow-hidden shadow-2xl rounded-3xl border border-gray-100">
+    <div class="badge-vertical relative bg-white flex flex-col items-center overflow-hidden shadow-2xl rounded-[2.5rem] border-2" style="border-color: {{ $mainColor }}22">
         
-        {{-- Grille technique décorative SF --}}
-        <div class="absolute inset-0 opacity-[0.1] pointer-events-none">
-            <svg width="100%" height="100%" viewBox="0 0 100 120" fill="none" stroke="{{ $mainColor }}" stroke-width="0.3">
-                <path d="M0 20 L100 20 M0 40 L100 40 M0 60 L100 60 M0 80 L100 80 M0 100 L100 100 M20 0 L20 120 M40 0 L40 120 M60 0 L60 120 M80 0 L80 120" stroke-dasharray="1 1" />
-            </svg>
-        </div>
-
-        <div class="absolute -top-6 -left-6 w-20 h-20 rounded-full bg-slate-900 opacity-90 z-0"></div>
-        <div class="absolute -top-10 -right-10 w-24 h-24 rounded-full opacity-60 z-0" style="background-color: {{ $mainColor }}"></div>
-
-        <div class="w-full pt-10 flex-none flex justify-center z-10 px-6">
+        <div class="w-full pt-8 flex-none flex items-center justify-center gap-3 z-10 px-6">
             @if($employee->company && $employee->company->logo)
-                <img src="{{ asset('storage/' . $employee->company->logo) }}" class="h-8 w-auto object-contain">
-            @else
-                 <div class="font-black text-xs uppercase text-white/90 tracking-widest">
-                    {{ $employee->company->name ?? 'YA CONSULTING' }}
-                </div>
+                <img src="{{ asset('storage/' . $employee->company->logo) }}" class="h-10 w-auto object-contain">
             @endif
+            <span class="font-black text-lg uppercase tracking-tight" style="color: {{ $mainColor }}">
+                {{ $employee->company->name ?? 'ENTREPRISE' }}
+            </span>
         </div>
 
-        <div class="relative mt-8 z-10">
-            {{-- Cadre photo carré avec coins angulaires coupés --}}
-            <div class="w-40 h-40 border-4 shadow-2xl overflow-hidden bg-gray-100 rounded-2xl" 
-                 style="border-color: {{ $mainColor }}; clip-path: polygon(10% 0, 100% 0, 100% 100%, 0 100%, 0 10%);">
+        <div class="relative mt-6 z-10">
+            <div class="w-40 h-40 border-4 shadow-xl overflow-hidden bg-gray-100 rounded-3xl" 
+                 style="border-color: {{ $mainColor }};">
                 @if($employee->photo)
                     <img src="{{ asset('storage/' . $employee->photo) }}" class="w-full h-full object-cover">
                 @else
@@ -73,44 +61,33 @@
                     </div>
                 @endif
             </div>
-            
-            {{-- Décoration géométrique sous la photo --}}
-            <div class="h-1.5 w-20 bg-slate-900 mx-auto mt-4 rounded-full"></div>
         </div>
 
-        <div class="flex-grow flex flex-col items-center justify-center w-full px-8 text-center z-10 mt-6">
-            
-            <div class="mb-4">
-                {{-- Nom : Forcé en Noir pour lisibilité --}}
-                <h1 class="text-3xl font-black uppercase tracking-tight text-slate-950 leading-none">
-                    {{ $employee->last_name }}
-                </h1>
-                {{-- Prénom : Couleur d'accentuation --}}
-                <h2 class="text-xl font-bold uppercase mt-1" style="color: {{ $mainColor }}">
-                    {{ $employee->first_name }}
-                </h2>
-            </div>
-            
-            {{-- Fonction / Poste --}}
-            <p class="text-[11px] font-black text-slate-500 uppercase tracking-widest mb-3">
+        <div class="mt-6 text-center z-10">
+            <h1 class="text-3xl font-black uppercase tracking-tight text-slate-900 leading-none">
+                {{ $employee->last_name }}
+            </h1>
+            <h2 class="text-xl font-bold uppercase mt-1" style="color: {{ $mainColor }}">
+                {{ $employee->first_name }}
+            </h2>
+            <p class="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] mt-2">
                 {{ $employee->function ?? 'Collaborateur' }}
             </p>
+        </div>
 
-            <div class="bg-slate-900 text-white px-5 py-1.5 rounded-full text-sm font-mono font-bold shadow-lg border-2 border-white mb-8">
-                ID: {{ $employee->matricule }}
-            </div>
-
-            <div class="bg-white p-2 rounded-2xl shadow-md border border-gray-100">
-                {!! QrCode::size(80)->margin(1)->generate($qrData) !!}
+        <div class="mt-4 mb-4 z-10">
+            <div class="bg-white p-2 rounded-2xl shadow-lg border border-gray-100">
+                {!! QrCode::size(100)->margin(1)->generate($qrData) !!}
             </div>
         </div>
 
-        <div class="w-full h-12 flex-none relative z-10 mt-6">
-            <div class="absolute inset-0 opacity-95" style="background-color: {{ $mainColor }}; clip-path: polygon(0 100%, 100% 100%, 100% 0);"></div>
-            <div class="absolute inset-0 flex items-center justify-center pr-12">
-                 <span class="text-[9px] text-white font-bold uppercase tracking-[0.5em]">Authentifié</span>
+        <div class="w-full flex-grow flex items-end justify-center relative z-10 pb-6">
+            <div class="bg-slate-900 text-white px-8 py-2 rounded-full text-sm font-mono font-bold shadow-lg border-2 border-white">
+                MATRICULE : {{ $employee->matricule }}
             </div>
         </div>
+
+        <div class="absolute bottom-0 w-full h-32 opacity-10" style="background-color: {{ $mainColor }}; clip-path: polygon(0 100%, 100% 100%, 100% 0);"></div>
     </div>
 
 </body>
