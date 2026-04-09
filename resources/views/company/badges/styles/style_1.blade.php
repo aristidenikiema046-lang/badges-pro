@@ -26,22 +26,21 @@
             border: 1px solid #f3f4f6;
         }
 
-        /* Motif style Circuit Intégré (Microchip) ultra-dense */
+        /* Motif style Circuit Intégré remplissant toute la hauteur */
         .circuit-pattern {
             position: absolute;
             left: 0;
             top: 0;
             width: 38%; 
-            height: 100%;
-            opacity: 0.9; /* Couleur plus marquée pour l'effet silicium */
+            height: 100%; /* Remplit toute la hauteur du conteneur parent */
+            opacity: 0.9;
             z-index: 1;
-        /* SVG avec tracé géométrique type microprocesseur */
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 150'%3E%3Cg fill='none' stroke='%23{{ str_replace('#', '', $mainColor) }}' stroke-width='0.7'%3E%3C!-- Bus de données haut (3 lignes parallèles serrées) --%3E%3Cpath d='M-5 10 h15 l10 10 v15 l10 10 h70'/%3E%3Cpath d='M-5 14 h14 l10 10 v15 l10 10 h71'/%3E%3Cpath d='M-5 18 h13 l10 10 v15 l10 10 h72'/%3E%3C!-- Structure centrale type processeur --%3E%3Cpath d='M-5 50 h25 l5 5 v20 l5 5 h65'/%3E%3Cpath d='M-5 55 h23 l5 5 v20 l5 5 h67'/%3E%3C!-- Bus de données bas --%3E%3Cpath d='M-5 90 h15 l15 15 v30 l5 5 h60'/%3E%3Cpath d='M-5 94 h14 l15 15 v30 l5 5 h61'/%3E%3C!-- Lignes verticales d'interconnexion --%3E%3Cpath d='M10 0 v15'/%3E%3Cpath d='M35 0 v25'/%3E%3Cpath d='M25 150 v-30'/%3E%3C!-- Pads de soudure (points de connexion du circuit intégré) --%3E%3Ccircle cx='10' cy='15' r='1.2' fill='%23{{ str_replace('#', '', $mainColor) }}'/%3E%3Ccircle cx='35' cy='25' r='1.2' fill='%23{{ str_replace('#', '', $mainColor) }}'/%3E%3Ccircle cx='25' cy='120' r='1.2' fill='%23{{ str_replace('#', '', $mainColor) }}'/%3E%3Ccircle cx='40' cy='35' r='1' fill='%23{{ str_replace('#', '', $mainColor) }}'/%3E%3Ccircle cx='30' cy='75' r='1' fill='%23{{ str_replace('#', '', $mainColor) }}'/%3E%3Ccircle cx='45' cy='110' r='1' fill='%23{{ str_replace('#', '', $mainColor) }}'/%3E%3Crect x='18' y='48' width='2' height='2' fill='%23{{ str_replace('#', '', $mainColor) }}'/%3E%3Crect x='28' y='88' width='2' height='2' fill='%23{{ str_replace('#', '', $mainColor) }}'/%3E%3C/g%3E%3C/svg%3E");
+        /* Utilisation de background-size: cover et un SVG optimisé pour la répétition verticale */
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 200'%3E%3Cg fill='none' stroke='%23{{ str_replace('#', '', $mainColor) }}' stroke-width='0.7'%3E%3C!-- Bloc Haut --%3E%3Cpath d='M-5 10 h15 l10 10 v15 l10 10 h70'/%3E%3Cpath d='M-5 14 h14 l10 10 v15 l10 10 h71'/%3E%3Ccircle cx='10' cy='10' r='1.2' fill='%23{{ str_replace('#', '', $mainColor) }}'/%3E%3C!-- Bloc Milieu Haut --%3E%3Cpath d='M-5 60 h25 l5 5 v20 l5 5 h65'/%3E%3Cpath d='M-5 65 h23 l5 5 v20 l5 5 h67'/%3E%3Crect x='15' y='58' width='2' height='2' fill='%23{{ str_replace('#', '', $mainColor) }}'/%3E%3C!-- Bloc Milieu Bas --%3E%3Cpath d='M-5 110 h15 l15 15 v25 l5 5 h60'/%3E%3Cpath d='M-5 114 h14 l15 15 v25 l5 5 h61'/%3E%3Ccircle cx='30' cy='125' r='1.2' fill='%23{{ str_replace('#', '', $mainColor) }}'/%3E%3C!-- Bloc Bas --%3E%3Cpath d='M-5 160 h20 l10 10 v20 l10 10 h60'/%3E%3Cpath d='M-5 165 h18 l10 10 v20 l10 10 h62'/%3E%3Crect x='25' y='168' width='2' height='2' fill='%23{{ str_replace('#', '', $mainColor) }}'/%3E%3C!-- Interconnexions Verticales --%3E%3Cpath d='M12 0 v200' stroke-dasharray='4 2' opacity='0.3'/%3E%3Cpath d='M28 0 v200' stroke-dasharray='4 2' opacity='0.3'/%3E%3C/g%3E%3C/svg%3E");
             background-repeat: no-repeat;
-            background-size: cover;
+            background-size: 100% 100%; /* Force le SVG à s'étirer sur toute la hauteur */
             background-position: left center;
         }
-
         @media print {
             .no-print { display: none; }
             body { background: white; }
