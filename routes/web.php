@@ -20,14 +20,40 @@ Route::post('/register/save', [EmployeeController::class, 'store'])->name('emplo
 Route::get('/badge/preview/{id}', [EmployeeController::class, 'preview'])->name('badge.preview');
 Route::get('/badge/export/{id}', [BadgeExportController::class, 'exportSingle'])->name('badge.export.single');
 
+// Route d'aperçu dynamique déplacée ici pour être accessible publiquement
+Route::get('/preview-style/{style}', function ($style) {
+    $getPath = function($path) {
+        return empty($path) ? 'https://via.placeholder.com/150' : asset('storage/' . $path);
+    };
+
+    $employee = (object)[
+        'first_name' => 'Jean',
+        'last_name' => 'DUPONT',
+        'matricule' => 'EMP-2026-001',
+        'function' => 'Directeur Stratégie',
+        'department' => 'DIRECTION',
+        'email' => 'j.dupont@consulting.com',
+        'photo' => null, 
+        'company' => (object)[
+            'name' => 'ENTREPRISE DÉMO',
+            'badge_color' => request('color', '#f97316'),
+            'logo' => null
+        ]
+    ];
+
+    if (!view()->exists('company.badges.styles.' . $style)) {
+        return response("Style introuvable.", 404);
+    }
+
+    return view('company.badges.styles.' . $style, compact('employee', 'getPath'));
+})->name('style.preview');
+
 // 5. ZONE GESTION ENTREPRISE (ESPACE DU MANAGER D'ENTREPRISE)
-// Pas de middleware 'auth' ici car seul l'admin a un compte, l'entreprise accède via le slug
 Route::prefix('{slug}/dashboard')->group(function () {
     
     Route::get('/employees', [EmployeeController::class, 'index'])
         ->name('company.employees');
     
-    // On force Laravel à reconnaître que {id} est un nombre (digit)
     Route::get('/employees/{id}/edit', [EmployeeController::class, 'edit'])
         ->name('employees.edit')
         ->where('id', '[0-9]+');
@@ -48,34 +74,6 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
     Route::put('/entreprises/{id}', [CompanyController::class, 'update'])->name('companies.update');
     Route::delete('/entreprises/{id}', [CompanyController::class, 'destroy'])->name('companies.destroy');
     Route::patch('/entreprises/{id}/toggle', [CompanyController::class, 'toggleStatus'])->name('companies.toggle');
-
-    // Aperçu dynamique pour le choix du design
-    Route::get('/preview-style/{style}', function ($style) {
-        $getPath = function($path) {
-            return empty($path) ? 'https://via.placeholder.com/150' : asset('storage/' . $path);
-        };
-
-        $employee = (object)[
-            'first_name' => 'Jean',
-            'last_name' => 'DUPONT',
-            'matricule' => 'EMP-2026-001',
-            'function' => 'Directeur Stratégie',
-            'department' => 'DIRECTION',
-            'email' => 'j.dupont@consulting.com',
-            'photo' => null, 
-            'company' => (object)[
-                'name' => 'ENTREPRISE DÉMO',
-                'badge_color' => request('color', '#f97316'),
-                'logo' => null
-            ]
-        ];
-
-        if (!view()->exists('company.badges.styles.' . $style)) {
-            return response("Style introuvable.", 404);
-        }
-
-        return view('company.badges.styles.' . $style, compact('employee', 'getPath'));
-    })->name('admin.style.render');
 });
 
 require __DIR__.'/auth.php';

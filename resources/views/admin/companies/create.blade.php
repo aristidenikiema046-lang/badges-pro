@@ -112,24 +112,34 @@
         function updateLivePreview() {
             const style = styleSelect.value;
             const color = encodeURIComponent(colorInput.value);
+            
+            // On affiche le loader
             loader.classList.remove('hidden');
             renderContainer.style.opacity = '0.3';
 
-            fetch(`/admin/preview-style/${style}?color=${color}`)
-                .then(response => response.text())
+            // URL mise à jour vers la route publique /preview-style/
+            fetch(`/preview-style/${style}?color=${color}`)
+                .then(response => {
+                    if (!response.ok) throw new Error('Erreur de chargement');
+                    return response.text();
+                })
                 .then(html => {
                     renderContainer.innerHTML = html;
                     renderContainer.style.opacity = '1';
                     loader.classList.add('hidden');
                 })
                 .catch(err => {
-                    renderContainer.innerHTML = "<p class='text-red-400 mt-10 text-xs'>Erreur de chargement</p>";
+                    console.error(err);
+                    renderContainer.innerHTML = "<p class='text-red-400 mt-20 text-xs text-center font-bold'>Style non disponible ou erreur serveur</p>";
                     loader.classList.add('hidden');
                 });
         }
 
+        // Écouteurs pour mettre à jour lors d'un changement
         styleSelect.addEventListener('change', updateLivePreview);
         colorInput.addEventListener('input', updateLivePreview);
+        
+        // Chargement initial au lancement de la page
         document.addEventListener('DOMContentLoaded', updateLivePreview);
     </script>
 </body>

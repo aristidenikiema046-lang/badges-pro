@@ -29,22 +29,35 @@
         </button>
     </div>
 
-    <div class="badge-card bg-white shadow-xl overflow-hidden flex relative border border-gray-200">
+    {{-- Ajout d'une bordure de la couleur choisie --}}
+    <div class="badge-card bg-white shadow-xl overflow-hidden flex relative border-2" style="border-color: {{ $employee->company->badge_color }}">
         
         <div class="w-2/5 relative flex items-center justify-center border-r border-gray-50">
             <div class="absolute inset-0 circuit-bg"></div>
-            <img src="{{ asset('storage/' . $employee->photo) }}" 
-                 class="z-10 w-40 h-52 rounded-2xl object-cover shadow-lg border-2 border-white">
+            {{-- On vérifie si la photo existe pour éviter la 404 --}}
+            @if($employee->photo)
+                <img src="{{ asset('storage/' . $employee->photo) }}" 
+                     class="z-10 w-40 h-52 rounded-2xl object-cover shadow-lg border-2 border-white">
+            @else
+                <div class="z-10 w-40 h-52 rounded-2xl bg-gray-200 flex items-center justify-center text-gray-400 font-bold border-2 border-dashed border-gray-300">
+                    SANS PHOTO
+                </div>
+            @endif
         </div>
 
         <div class="w-3/5 flex flex-col p-6 justify-between">
             
             <div class="flex items-center gap-3 justify-end border-b pb-3">
                 <div class="text-right">
-                    <p class="text-blue-800 font-black text-2xl uppercase leading-none">{{ $employee->company->name }}</p>
+                    {{-- NOM DE L'ENTREPRISE EN COULEUR DYNAMIQUE --}}
+                    <p class="font-black text-2xl uppercase leading-none" style="color: {{ $employee->company->badge_color }}">
+                        {{ $employee->company->name }}
+                    </p>
                     <p class="text-[10px] text-gray-400 font-bold tracking-[0.2em]">IDENTITÉ PROFESSIONNELLE</p>
                 </div>
-                <img src="{{ asset('storage/' . $employee->company->logo) }}" class="h-12 w-12 object-contain">
+                @if($employee->company->logo)
+                    <img src="{{ asset('storage/' . $employee->company->logo) }}" class="h-12 w-12 object-contain">
+                @endif
             </div>
 
             <div class="py-2">
@@ -56,7 +69,10 @@
                 <div class="grid grid-cols-1 gap-2">
                     <div>
                         <p class="text-gray-400 text-[9px] font-black uppercase">Poste occupé</p>
-                        <p class="text-sm font-bold text-blue-600 uppercase">{{ $employee->function }}</p>
+                        {{-- POSTE EN COULEUR DYNAMIQUE --}}
+                        <p class="text-sm font-bold uppercase" style="color: {{ $employee->company->badge_color }}">
+                            {{ $employee->function }}
+                        </p>
                     </div>
                     <div>
                         <p class="text-gray-400 text-[9px] font-black uppercase">Matricule</p>
@@ -66,7 +82,8 @@
             </div>
 
             <div class="flex justify-end items-end">
-                <div class="p-1 border border-gray-100 rounded-lg">
+                {{-- PETIT RAPPEL DE COULEUR SUR LE QR CODE --}}
+                <div class="p-1 border rounded-lg" style="border-color: {{ $employee->company->badge_color }}33"> {{-- 33 ajoute de la transparence --}}
                     {!! QrCode::size(70)->generate($employee->matricule) !!}
                 </div>
             </div>
