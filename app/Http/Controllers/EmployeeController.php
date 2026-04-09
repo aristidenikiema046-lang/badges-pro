@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Auth;
 class EmployeeController extends Controller
 {
     /**
-     * Liste des employés de l'entreprise connectée
+     * Liste des employés de l'entreprise connectée (Dashboard)
      */
     public function index()
     {
@@ -24,7 +24,7 @@ class EmployeeController extends Controller
     }
 
     /**
-     * Formulaire de modification (Vue que nous venons de créer)
+     * Formulaire de modification d'un collaborateur (Dashboard)
      */
     public function edit(Employee $employee)
     {
@@ -49,13 +49,13 @@ class EmployeeController extends Controller
         $validated = $request->validate([
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
-            'function' => 'nullable|string|max:255',
+            'function'   => 'nullable|string|max:255',
             'department' => 'nullable|string|max:255',
-            'photo' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+            'photo'      => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
         if ($request->hasFile('photo')) {
-            // Nettoyage de l'ancien fichier pour ne pas encombrer le serveur
+            // Supprimer l'ancienne photo pour économiser de l'espace
             if ($employee->photo) {
                 Storage::disk('public')->delete($employee->photo);
             }
@@ -63,7 +63,6 @@ class EmployeeController extends Controller
             $employee->photo = $path;
         }
 
-        // Mise à jour des champs textes
         $employee->first_name = $validated['first_name'];
         $employee->last_name = $validated['last_name'];
         $employee->function = $validated['function'];
@@ -91,5 +90,54 @@ class EmployeeController extends Controller
         return redirect()->route('company.employees')->with('success', 'Employé supprimé avec succès.');
     }
 
-    // --- Gardez vos méthodes registerForm() et store() ici si elles existent déjà ---
+    /**
+     * Affiche le formulaire d'inscription public (via le lien généré)
+     */
+    public function registerForm($slug)
+    {
+        // On cherche l'entreprise par son slug unique
+        $company = Company::where('slug', $slug)->firstOrFail();
+
+        return view('company.employees.register', compact('company'));
+    }
+
+    /**
+     * Enregistre un nouvel employé (soumission du formulaire public)
+     */
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'first_name' => 'required|string|max:255',
+            'last_name'  => 'required|string|max:255',
+            'email'      => 'required|email|unique:employees,email',
+            'matricule'  => 'required|string|unique:employees,matricule',
+            'function'   => 'nullable|string|max:255',
+            'department' => 'nullable|string|max:255',
+            'company_id' => 'required|exists:companies,id',
+            'photo'      => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+        ]);
+
+        // Traitement de la photo si présente
+        if ($request->hasFile('photo')) {
+            $validated['photo'] = $request->file('photo')->store('employees/photos', 'public');
+        }
+
+        // Création de l'employé
+        Employee::create($validated);
+
+        return back()->with('success', 'Votre demande de badge a été envoyée avec succès !');
+    }
+
+    /**
+     * Preview du badge (Si nécessaire pour votre logique)
+     */
+    public function preview($id)
+    {
+        $employee = Employee::with('company')->findOrFail($id);
+        
+        // On utilise le style de badge défini dans les paramètres de l'entreprise
+        $style = $employee->company->badge_style ?? 'style_1';
+        
+        return view('company.badges.styles.' . $style, compact('employee'));
+    }
 }
