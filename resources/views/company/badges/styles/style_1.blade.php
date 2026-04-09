@@ -27,18 +27,19 @@
         }
 
         /* Motif style Circuit Intégré remplissant toute la hauteur */
+        /* Motif style Circuit Intégré Haute Densité - Full Hauteur */
         .circuit-pattern {
             position: absolute;
             left: 0;
             top: 0;
-            width: 38%; 
-            height: 100%; /* Remplit toute la hauteur du conteneur parent */
+            width: 40%; /* Légèrement plus large pour la densité */
+            height: 100%;
             opacity: 0.9;
             z-index: 1;
-        /* Utilisation de background-size: cover et un SVG optimisé pour la répétition verticale */
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 200'%3E%3Cg fill='none' stroke='%23{{ str_replace('#', '', $mainColor) }}' stroke-width='0.7'%3E%3C!-- Bloc Haut --%3E%3Cpath d='M-5 10 h15 l10 10 v15 l10 10 h70'/%3E%3Cpath d='M-5 14 h14 l10 10 v15 l10 10 h71'/%3E%3Ccircle cx='10' cy='10' r='1.2' fill='%23{{ str_replace('#', '', $mainColor) }}'/%3E%3C!-- Bloc Milieu Haut --%3E%3Cpath d='M-5 60 h25 l5 5 v20 l5 5 h65'/%3E%3Cpath d='M-5 65 h23 l5 5 v20 l5 5 h67'/%3E%3Crect x='15' y='58' width='2' height='2' fill='%23{{ str_replace('#', '', $mainColor) }}'/%3E%3C!-- Bloc Milieu Bas --%3E%3Cpath d='M-5 110 h15 l15 15 v25 l5 5 h60'/%3E%3Cpath d='M-5 114 h14 l15 15 v25 l5 5 h61'/%3E%3Ccircle cx='30' cy='125' r='1.2' fill='%23{{ str_replace('#', '', $mainColor) }}'/%3E%3C!-- Bloc Bas --%3E%3Cpath d='M-5 170 h20 l15 15 v25 l15 15 h65'/%3E%3Cpath d='M-7 170 h20 l15 15 v25 l15 15 h65'/%3E%3Crect x='30' y='170' width='4' height='4' fill='%25{{ str_replace('#', '', $mainColor) }}'/%3E%3C!-- Interconnexions Verticales --%3E%3Cpath d='M12 0 v300' stroke-dasharray='6 3' opacity='0.4'/%3E%3Cpath d='M28 0 v300' stroke-dasharray='6 3' opacity='0.4'/%3E%3C/g%3E%3C/svg%3E");
+        /* SVG enrichi : Lignes triples et multiplication des chemins */
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 200'%3E%3Cg fill='none' stroke='%23{{ str_replace('#', '', $mainColor) }}' stroke-width='0.6'%3E%3C!-- BLOC 1 : HAUT DENSE --%3E%3Cpath d='M-5 5 h20 l10 10 v10 l10 10 h70'/%3E%3Cpath d='M-5 9 h19 l10 10 v10 l10 10 h70'/%3E%3Cpath d='M-5 13 h18 l10 10 v10 l10 10 h70'/%3E%3Ccircle cx='15' cy='5' r='1' fill='%23{{ str_replace('#', '', $mainColor) }}'/%3E%3C!-- BLOC 2 : MILIEU HAUT --%3E%3Cpath d='M-5 45 h30 l15 15 v20 l10 10 h55'/%3E%3Cpath d='M-5 49 h29 l15 15 v20 l10 10 h55'/%3E%3Cpath d='M-5 53 h28 l15 15 v20 l10 10 h55'/%3E%3Crect x='25' y='43' width='2' height='2' fill='%23{{ str_replace('#', '', $mainColor) }}'/%3E%3C!-- BLOC 3 : CENTRAL --%3E%3Cpath d='M-5 90 h15 l10 10 v30 l10 10 h75'/%3E%3Cpath d='M-5 94 h14 l10 10 v30 l10 10 h75'/%3E%3Ccircle cx='10' cy='90' r='1' fill='%23{{ str_replace('#', '', $mainColor) }}'/%3E%3C!-- BLOC 4 : MILIEU BAS --%3E%3Cpath d='M-5 135 h25 l10 10 v15 l10 10 h60'/%3E%3Cpath d='M-5 139 h24 l10 10 v15 l10 10 h60'/%3E%3Crect x='20' y='133' width='2' height='2' fill='%23{{ str_replace('#', '', $mainColor) }}'/%3E%3C!-- BLOC 5 : BAS DENSE --%3E%3Cpath d='M-5 175 h15 l15 15 v10 l10 10 h60'/%3E%3Cpath d='M-5 179 h14 l15 15 v10 l10 10 h60'/%3E%3Cpath d='M-5 183 h13 l15 15 v10 l10 10 h60'/%3E%3C!-- LIGNES DE LIAISON VERTICALES --%3E%3Cpath d='M8 0 v200' opacity='0.3'/%3E%3Cpath d='M22 0 v200' opacity='0.3'/%3E%3Cpath d='M36 0 v200' opacity='0.3'/%3E%3C!-- POINTS DE SOUDURE SUPPLEMENTAIRES --%3E%3Ccircle cx='45' cy='25' r='1' fill='%23{{ str_replace('#', '', $mainColor) }}'/%3E%3Ccircle cx='55' cy='65' r='1' fill='%23{{ str_replace('#', '', $mainColor) }}'/%3E%3Ccircle cx='25' cy='100' r='1' fill='%23{{ str_replace('#', '', $mainColor) }}'/%3E%3C/g%3E%3C/svg%3E");
             background-repeat: no-repeat;
-            background-size: 100% 100%; /* Force le SVG à s'étirer sur toute la hauteur */
+            background-size: 100% 100%;
             background-position: left center;
         }
         @media print {
