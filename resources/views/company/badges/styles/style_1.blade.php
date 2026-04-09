@@ -7,59 +7,64 @@
     <style>
         @media print {
             .no-print { display: none; }
-            body { background: white; }
+            body { background: white; padding: 0; }
+            .badge-container { shadow: none; border: 1px solid #ccc; }
         }
         .badge-container {
-            width: 350px;
-            height: 500px;
-            border: 2px solid #e2e8f0;
+            width: 380px;
+            height: 550px;
         }
     </style>
 </head>
-<body class="bg-gray-100 flex flex-col items-center py-10">
+<body class="bg-slate-200 flex flex-col items-center py-10">
 
     <div class="no-print mb-6">
-        <button onclick="window.print()" class="bg-orange-600 text-white px-6 py-2 rounded-full font-bold shadow-lg hover:bg-orange-700 transition">
-            🖨️ IMPRIMER MON BADGE
+        <button onclick="window.print()" class="bg-orange-600 text-white px-8 py-3 rounded-xl font-black shadow-lg hover:bg-orange-700 transition uppercase tracking-widest">
+            🖨️ Imprimer mon Badge
         </button>
     </div>
 
-    <div class="badge-container bg-white rounded-2xl shadow-2xl overflow-hidden flex flex-col items-center relative">
+    <div class="badge-container bg-white rounded-[2rem] shadow-2xl overflow-hidden flex flex-col items-center relative border border-gray-100">
         
-        <div class="w-full bg-green-700 h-24 flex items-center justify-center p-4">
-            <img src="{{ $getPath($employee->company->logo) }}" class="h-16 w-16 object-contain bg-white rounded-full p-1 border-2 border-white shadow-sm">
+        <div class="w-full bg-green-700 h-28 flex items-center justify-center p-4 relative">
+            <div class="bg-white p-2 rounded-full shadow-md">
+                 <img src="{{ asset('storage/' . $employee->company->logo) }}" class="h-16 w-16 object-contain">
+            </div>
         </div>
 
-        <div class="flex-grow flex flex-col items-center w-full px-6 pt-6">
-            <h2 class="text-green-800 font-black text-xl uppercase text-center leading-tight">
+        <div class="flex-grow flex flex-col items-center w-full px-6 pt-4 text-center">
+            <h2 class="text-green-800 font-black text-xl uppercase tracking-tighter mb-4">
                 {{ $employee->company->name }}
             </h2>
             
-            <div class="mt-4 mb-4">
-                <img src="{{ $getPath($employee->photo) }}" class="w-32 h-32 rounded-xl border-4 border-orange-500 object-cover shadow-md">
+            <div class="mb-4">
+                <img src="{{ asset('storage/' . $employee->photo) }}" class="w-32 h-32 rounded-2xl border-4 border-orange-500 object-cover shadow-lg">
             </div>
 
-            <div class="text-center">
-                <p class="text-2xl font-black text-slate-800 uppercase leading-none">{{ $employee->last_name }}</p>
-                <p class="text-xl font-bold text-orange-600 leading-none mb-2">{{ $employee->first_name }}</p>
-                
-                <span class="inline-block bg-slate-900 text-white text-[10px] px-3 py-1 rounded font-black uppercase tracking-widest mb-4">
-                    {{ $employee->function ?? 'COLLABORATEUR' }}
+            <div class="mb-2">
+                <p class="text-3xl font-black text-slate-900 uppercase leading-none">{{ $employee->last_name }}</p>
+                <p class="text-xl font-bold text-orange-600 uppercase">{{ $employee->first_name }}</p>
+            </div>
+
+            <div class="flex flex-col gap-1 mb-4">
+                <span class="bg-slate-900 text-white text-[11px] px-4 py-1 rounded-full font-black uppercase tracking-widest">
+                    {{ $employee->function ?? 'Poste non défini' }}
+                </span>
+                <span class="text-slate-500 text-[10px] font-bold uppercase italic">
+                    Département : {{ $employee->department ?? 'N/A' }}
                 </span>
             </div>
 
-            <div class="mt-auto mb-4 bg-gray-50 p-2 border rounded-lg">
-                {{-- Si vous utilisez une lib QR code comme SimpleQRCode --}}
-                {!! QrCode::size(80)->generate($employee->matricule) !!}
-                {{-- Sinon, remettez votre balise QR Code actuelle ici --}}
+            <div class="mt-auto mb-6">
+                {{-- Remplace par ta logique QR Code si différente --}}
+                <div class="p-2 bg-white border-2 border-slate-100 rounded-xl shadow-inner">
+                    {!! QrCode::size(90)->generate($employee->matricule) !!}
+                </div>
+                <p class="text-[10px] font-mono font-bold text-slate-400 mt-1">ID: {{ $employee->matricule }}</p>
             </div>
         </div>
 
-        <div class="w-full bg-orange-500 py-2 px-4 text-center">
-            <p class="text-white text-[10px] font-bold uppercase tracking-tighter">
-                Matricule: {{ $employee->matricule }} | Service: {{ $employee->department ?? 'Général' }}
-            </p>
-        </div>
+        <div class="w-full bg-orange-500 h-3"></div>
     </div>
 
 </body>
