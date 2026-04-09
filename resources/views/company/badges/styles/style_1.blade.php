@@ -26,17 +26,17 @@
             border: 1px solid #f3f4f6;
         }
 
-        /* Motif de circuits ultra-dense et resserré */
+        /* Motif style Circuit Intégré (Microchip) ultra-dense */
         .circuit-pattern {
             position: absolute;
             left: 0;
             top: 0;
-            width: 35%; 
+            width: 38%; 
             height: 100%;
-            opacity: 0.85; /* Encore un peu plus opaque pour la visibilité */
+            opacity: 0.9; /* Couleur plus marquée pour l'effet silicium */
             z-index: 1;
-        /* SVG avec espacements réduits pour densifier le rendu */
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 150'%3E%3Cg fill='none' stroke='%23{{ str_replace('#', '', $mainColor) }}' stroke-width='0.8'%3E%3C!-- Groupe de lignes resserrées haut --%3E%3Cpath d='M-10 5 L10 5 L20 15 L20 30 L35 45 L100 45'/%3E%3Cpath d='M-10 12 L8 12 L18 22 L18 35 L33 50 L100 50'/%3E%3Cpath d='M-10 25 L5 25 L15 35 L15 50 L30 65 L100 65'/%3E%3C!-- Groupe de lignes resserrées milieu --%3E%3Cpath d='M-10 45 L0 45 L10 55 L10 75 L25 90 L100 90'/%3E%3Cpath d='M-10 52 L-2 52 L8 62 L8 80 L23 95 L100 95'/%3E%3Cpath d='M-10 70 L-5 70 L5 80 L5 105 L20 120 L100 120'/%3E%3C!-- Groupe de lignes resserrées bas --%3E%3Cpath d='M-10 95 L-5 95 L5 105 L5 130 L15 140'/%3E%3Cpath d='M-10 102 L-7 102 L3 112 L3 135 L13 145'/%3E%3C!-- Points de connexion rapprochés --%3E%3Ccircle cx='20' cy='15' r='1.2' fill='%23{{ str_replace('#', '', $mainColor) }}'/%3E%3Ccircle cx='18' cy='22' r='1.2' fill='%23{{ str_replace('#', '', $mainColor) }}'/%3E%3Ccircle cx='15' cy='35' r='1.2' fill='%23{{ str_replace('#', '', $mainColor) }}'/%3E%3Ccircle cx='10' cy='55' r='1.2' fill='%23{{ str_replace('#', '', $mainColor) }}'/%3E%3Ccircle cx='8' cy='62' r='1.2' fill='%23{{ str_replace('#', '', $mainColor) }}'/%3E%3Ccircle cx='25' cy='90' r='1.2' fill='%23{{ str_replace('#', '', $mainColor) }}'/%3E%3Ccircle cx='23' cy='95' r='1.2' fill='%23{{ str_replace('#', '', $mainColor) }}'/%3E%3C/g%3E%3C/svg%3E");
+        /* SVG avec tracé géométrique type microprocesseur */
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 150'%3E%3Cg fill='none' stroke='%23{{ str_replace('#', '', $mainColor) }}' stroke-width='0.7'%3E%3C!-- Bus de données haut (3 lignes parallèles serrées) --%3E%3Cpath d='M-5 10 h15 l10 10 v15 l10 10 h70'/%3E%3Cpath d='M-5 14 h14 l10 10 v15 l10 10 h71'/%3E%3Cpath d='M-5 18 h13 l10 10 v15 l10 10 h72'/%3E%3C!-- Structure centrale type processeur --%3E%3Cpath d='M-5 50 h25 l5 5 v20 l5 5 h65'/%3E%3Cpath d='M-5 55 h23 l5 5 v20 l5 5 h67'/%3E%3C!-- Bus de données bas --%3E%3Cpath d='M-5 90 h15 l15 15 v30 l5 5 h60'/%3E%3Cpath d='M-5 94 h14 l15 15 v30 l5 5 h61'/%3E%3C!-- Lignes verticales d'interconnexion --%3E%3Cpath d='M10 0 v15'/%3E%3Cpath d='M35 0 v25'/%3E%3Cpath d='M25 150 v-30'/%3E%3C!-- Pads de soudure (points de connexion du circuit intégré) --%3E%3Ccircle cx='10' cy='15' r='1.2' fill='%23{{ str_replace('#', '', $mainColor) }}'/%3E%3Ccircle cx='35' cy='25' r='1.2' fill='%23{{ str_replace('#', '', $mainColor) }}'/%3E%3Ccircle cx='25' cy='120' r='1.2' fill='%23{{ str_replace('#', '', $mainColor) }}'/%3E%3Ccircle cx='40' cy='35' r='1' fill='%23{{ str_replace('#', '', $mainColor) }}'/%3E%3Ccircle cx='30' cy='75' r='1' fill='%23{{ str_replace('#', '', $mainColor) }}'/%3E%3Ccircle cx='45' cy='110' r='1' fill='%23{{ str_replace('#', '', $mainColor) }}'/%3E%3Crect x='18' y='48' width='2' height='2' fill='%23{{ str_replace('#', '', $mainColor) }}'/%3E%3Crect x='28' y='88' width='2' height='2' fill='%23{{ str_replace('#', '', $mainColor) }}'/%3E%3C/g%3E%3C/svg%3E");
             background-repeat: no-repeat;
             background-size: cover;
             background-position: left center;
