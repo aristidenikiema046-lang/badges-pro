@@ -26,13 +26,14 @@ class EmployeeController extends Controller
     /**
      * Formulaire de modification d'un collaborateur
      */
-    public function edit($slug, $id) // Modification ici : on utilise $id
+    public function edit($slug, $id)
     {
         $company = Company::where('slug', $slug)->firstOrFail();
-        $employee = Employee::findOrFail($id); // On récupère l'employé par son ID
+        $employee = Employee::findOrFail($id);
 
-        if ($employee->company_id !== $company->id) {
-            abort(403);
+        // FORCER LA COMPARAISON NUMÉRIQUE ICI
+        if ((int)$employee->company_id !== (int)$company->id) {
+            abort(403, "L'employé appartient à une autre entreprise.");
         }
 
         return view('company.employees.edit', compact('employee', 'company'));
@@ -41,12 +42,12 @@ class EmployeeController extends Controller
     /**
      * Mise à jour des informations
      */
-    public function update(Request $request, $slug, $id) // Modification ici : on utilise $id
+    public function update(Request $request, $slug, $id)
     {
         $company = Company::where('slug', $slug)->firstOrFail();
         $employee = Employee::findOrFail($id);
 
-        if ($employee->company_id !== $company->id) {
+        if ((int)$employee->company_id !== (int)$company->id) {
             abort(403);
         }
 
@@ -58,20 +59,22 @@ class EmployeeController extends Controller
             'photo'      => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
-        if ($request->hasFile('photo')) {
-            if ($employee->photo) {
-                Storage::disk('public')->delete($employee->photo);
-            }
-            $path = $request->file('photo')->store('employees/photos', 'public');
-            $employee->photo = $path;
-        }
-
-        $employee->update([
+        // On prépare les données pour l'update
+        $data = [
             'first_name' => $validated['first_name'],
             'last_name'  => $validated['last_name'],
             'function'   => $validated['function'],
             'department' => $validated['department'],
-        ]);
+        ];
+
+        if ($request->hasFile('photo')) {
+            if ($employee->photo) {
+                Storage::disk('public')->delete($employee->photo);
+            }
+            $data['photo'] = $request->file('photo')->store('employees/photos', 'public');
+        }
+
+        $employee->update($data);
 
         return redirect()->route('company.employees', $slug)
             ->with('success', 'La fiche de l\'employé a été mise à jour.');
@@ -80,12 +83,12 @@ class EmployeeController extends Controller
     /**
      * Suppression d'un collaborateur
      */
-    public function destroy($slug, $id) // Modification ici : on utilise $id
+    public function destroy($slug, $id)
     {
         $company = Company::where('slug', $slug)->firstOrFail();
         $employee = Employee::findOrFail($id);
 
-        if ($employee->company_id !== $company->id) {
+        if ((int)$employee->company_id !== (int)$company->id) {
             abort(403);
         }
 
@@ -109,7 +112,7 @@ class EmployeeController extends Controller
     }
 
     /**
-     * Enregistre un nouvel employé et redirige vers le badge généré
+     * Enregistre un nouvel employé
      */
     public function store(Request $request)
     {
