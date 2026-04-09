@@ -2,63 +2,76 @@
     $mainColor = $employee->company->badge_color ?? '#059669'; 
 @endphp
 
-<div class="relative bg-white flex flex-col items-center overflow-hidden w-full h-full font-sans">
-    <!-- Forme géométrique d'arrière-plan -->
-    <div class="absolute top-0 left-0 w-full h-56 flex-none" 
-         style="background-color: {{ $mainColor }}; clip-path: polygon(0 0, 100% 0, 100% 75%, 0% 100%);">
+<div class="relative bg-white flex flex-col items-center overflow-hidden w-full h-full font-sans border border-gray-100">
+    <div class="absolute top-0 left-0 w-full h-52 flex-none" 
+         style="background-color: {{ $mainColor }}; clip-path: polygon(0 0, 100% 0, 100% 85%, 0% 100%);">
     </div>
 
-    <!-- Header : Logo et Nom Entreprise (au-dessus de la forme) -->
     <div class="w-full pt-6 flex-none flex flex-col items-center px-4 z-10">
         @if($employee->company && $employee->company->logo)
-            <div class="bg-white p-2 rounded-xl shadow-lg mb-2">
-                <img src="{{ $getPath($employee->company->logo) }}" class="h-10 w-auto object-contain">
+            <div class="bg-white p-2 rounded-lg shadow-sm mb-1">
+                <img src="{{ $getPath($employee->company->logo) }}" class="h-8 w-auto object-contain">
             </div>
         @endif
-        <p class="text-[9px] font-black uppercase tracking-[0.2em] text-white drop-shadow-md text-center line-clamp-1">
+        <p class="text-[8px] font-black uppercase tracking-[0.3em] text-white/90 text-center drop-shadow-sm">
             {{ $employee->company->name }}
         </p>
     </div>
 
-    <!-- Corps central -->
-    <div class="flex-grow flex flex-col items-center justify-center w-full px-6 text-center z-10">
-        <!-- Zone QR Code avec bordure épaisse blanche -->
-        <div class="bg-white p-4 rounded-[2rem] shadow-xl mb-6 border-[6px] border-white">
-            {!! QrCode::size(130)->margin(1)->generate($employee->matricule) !!}
+    <div class="relative mt-4 z-20">
+        <div class="w-32 h-32 rounded-full border-[6px] border-white shadow-xl overflow-hidden bg-gray-100">
+            @if($employee->photo)
+                <img src="{{ $getPath($employee->photo) }}" class="w-full h-full object-cover">
+            @else
+                <div class="w-full h-full flex items-center justify-center bg-gray-200">
+                    <svg class="w-16 h-16 text-gray-400" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                    </svg>
+                </div>
+            @endif
         </div>
+        @if($employee->is_validated)
+        <div class="absolute bottom-1 right-1 bg-green-500 border-2 border-white w-6 h-6 rounded-full flex items-center justify-center shadow-lg">
+            <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path>
+            </svg>
+        </div>
+        @endif
+    </div>
 
-        <!-- Identité -->
-        <div class="space-y-1 w-full px-2">
-            <h2 class="text-xl font-black uppercase tracking-tight text-gray-900 leading-none truncate">
+    <div class="flex-grow flex flex-col items-center justify-center w-full px-6 text-center mt-2">
+        <div class="space-y-0 w-full">
+            <h2 class="text-xl font-bold uppercase tracking-tight text-gray-700 leading-none">
                 {{ $employee->first_name }}
             </h2>
-            <h1 class="text-2xl font-black uppercase tracking-tighter leading-tight truncate" style="color: {{ $mainColor }}">
+            <h1 class="text-3xl font-black uppercase tracking-tighter leading-none mb-2" style="color: {{ $mainColor }}">
                 {{ $employee->last_name }}
             </h1>
         </div>
         
-        <!-- Séparateur discret -->
-        <div class="w-12 h-1 my-4 rounded-full mx-auto" style="background-color: {{ $mainColor }}; opacity: 0.2;"></div>
-        
-        <!-- Fonction et Département -->
-        <div class="w-full px-2">
-            <p class="text-[13px] font-black text-gray-800 uppercase tracking-widest truncate">
+        <div class="w-full bg-gray-50 py-2 rounded-xl border border-gray-100">
+            <p class="text-[12px] font-black text-gray-800 uppercase tracking-wider">
                 {{ $employee->function }}
             </p>
-            <p class="text-[9px] font-bold uppercase italic mt-1" style="color: {{ $mainColor }}">
+            <p class="text-[10px] font-bold uppercase italic" style="color: {{ $mainColor }}">
                 {{ $employee->department ?? 'SANS DÉPARTEMENT' }}
             </p>
         </div>
+
+        <div class="mt-4 opacity-90 hover:opacity-100 transition-opacity">
+            {!! QrCode::size(70)->margin(0)->color(substr($mainColor, 1, 2) ? 0 : 0, 0, 0)->generate($employee->matricule) !!}
+        </div>
     </div>
 
-    <!-- Footer -->
-    <div class="w-full p-4 flex justify-between items-center flex-none bg-gray-50 border-t border-gray-100">
-        <div class="border-l-4 pl-3" style="border-color: {{ $mainColor }}">
-            <span class="text-[7px] text-gray-400 font-bold uppercase tracking-widest block">ID Number</span>
-            <span class="text-xs font-mono font-black text-gray-800 uppercase leading-none">{{ $employee->matricule }}</span>
+    <div class="w-full p-4 flex justify-between items-center flex-none bg-white border-t border-dashed border-gray-200">
+        <div class="flex flex-col">
+            <span class="text-[7px] text-gray-400 font-bold uppercase tracking-widest">Matricule</span>
+            <span class="text-[11px] font-mono font-black text-gray-800 tracking-tighter">{{ $employee->matricule }}</span>
         </div>
-        <div class="overflow-hidden text-right ml-2">
-            <span class="text-[9px] font-bold text-gray-700 truncate block">{{ $employee->email }}</span>
+        <div class="h-8 w-[1px] bg-gray-200"></div>
+        <div class="flex flex-col text-right">
+            <span class="text-[7px] text-gray-400 font-bold uppercase tracking-widest">Contact</span>
+            <span class="text-[9px] font-bold text-gray-700 truncate max-w-[120px]">{{ $employee->email }}</span>
         </div>
     </div>
 </div>
