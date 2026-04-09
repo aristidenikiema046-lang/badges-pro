@@ -8,11 +8,12 @@
 </head>
 <body class="bg-gray-100 min-h-screen flex items-center justify-center p-4">
     <div class="max-w-md w-full bg-white rounded-3xl shadow-2xl overflow-hidden border border-gray-100">
+        
         <div class="bg-green-700 p-8 text-center">
             @if($company->logo)
-                <img src="{{ asset('storage/' . $company->logo) }}" class="h-16 mx-auto mb-4 bg-white p-2 rounded-lg">
+                <img src="{{ asset('storage/' . $company->logo) }}" class="h-16 mx-auto mb-4 bg-white p-2 rounded-lg shadow-sm">
             @endif
-            <h2 class="text-white text-xl font-black uppercase italic">Demande de Badge</h2>
+            <h2 class="text-white text-xl font-black uppercase italic tracking-tight">Demande de Badge</h2>
             <p class="text-green-100 text-xs uppercase tracking-widest mt-1">{{ $company->name }}</p>
         </div>
 
@@ -20,42 +21,62 @@
             @csrf
             <input type="hidden" name="company_id" value="{{ $company->id }}">
 
-            @if(session('success'))
-                <div class="bg-green-100 text-green-700 p-3 rounded-lg text-sm font-bold text-center mb-4">
-                    {{ session('success') }}
+            @if ($errors->any())
+                <div class="bg-red-50 text-red-600 p-3 rounded-xl text-xs">
+                    <ul class="list-disc ml-4">
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
                 </div>
             @endif
 
             <div class="grid grid-cols-2 gap-4">
                 <div>
                     <label class="block text-[10px] font-black uppercase text-gray-400 mb-1">Prénom</label>
-                    <input type="text" name="first_name" required class="w-full border-2 border-gray-50 p-2 rounded-xl focus:border-orange-500 outline-none transition text-sm">
+                    <input type="text" name="first_name" value="{{ old('first_name') }}" required 
+                           class="w-full border-2 border-gray-50 p-2 rounded-xl focus:border-orange-500 outline-none transition text-sm">
                 </div>
                 <div>
                     <label class="block text-[10px] font-black uppercase text-gray-400 mb-1">Nom</label>
-                    <input type="text" name="last_name" required class="w-full border-2 border-gray-50 p-2 rounded-xl focus:border-orange-500 outline-none transition text-sm">
+                    <input type="text" name="last_name" value="{{ old('last_name') }}" required 
+                           class="w-full border-2 border-gray-50 p-2 rounded-xl focus:border-orange-500 outline-none transition text-sm">
                 </div>
             </div>
 
             <div>
-                <label class="block text-[10px] font-black uppercase text-gray-400 mb-1">Email</label>
-                <input type="email" name="email" required class="w-full border-2 border-gray-50 p-2 rounded-xl focus:border-orange-500 outline-none transition text-sm">
+                <label class="block text-[10px] font-black uppercase text-gray-400 mb-1">Email Professionnel</label>
+                <input type="email" name="email" value="{{ old('email') }}" required 
+                       class="w-full border-2 border-gray-50 p-2 rounded-xl focus:border-orange-500 outline-none transition text-sm">
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-[10px] font-black uppercase text-gray-400 mb-1">Poste occupé</label>
+                    <input type="text" name="function" value="{{ old('function') }}" required placeholder="Ex: Analyste"
+                           class="w-full border-2 border-gray-50 p-2 rounded-xl focus:border-orange-500 outline-none transition text-sm">
+                </div>
+                
+            <div>
+                <label class="block text-[10px] font-black uppercase text-gray-400 mb-1">Matricule Interne</label>
+                <input type="text" name="matricule" value="{{ old('matricule') }}" required 
+                       class="w-full border-2 border-gray-50 p-2 rounded-xl focus:border-orange-500 outline-none transition text-sm font-mono uppercase">
             </div>
 
             <div>
-                <label class="block text-[10px] font-black uppercase text-gray-400 mb-1">Matricule</label>
-                <input type="text" name="matricule" required class="w-full border-2 border-gray-50 p-2 rounded-xl focus:border-orange-500 outline-none transition text-sm">
+                <label class="block text-[10px] font-black uppercase text-gray-400 mb-1">Photo d'identité (JPG, PNG)</label>
+                <input type="file" name="photo" required 
+                       class="w-full text-xs text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-black file:bg-orange-600 file:text-white hover:file:bg-orange-700 cursor-pointer">
             </div>
 
-            <div>
-                <label class="block text-[10px] font-black uppercase text-gray-400 mb-1">Photo d'identité</label>
-                <input type="file" name="photo" class="w-full text-xs text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-black file:bg-orange-600 file:text-white hover:file:bg-orange-700 cursor-pointer">
-            </div>
-
-            <button type="submit" class="w-full bg-orange-600 text-white font-black py-4 rounded-2xl shadow-lg hover:bg-orange-700 transition uppercase tracking-widest text-sm mt-4">
-                Envoyer ma demande
+            <button type="submit" class="w-full bg-orange-600 text-white font-black py-4 rounded-2xl shadow-lg hover:bg-orange-700 hover:scale-[1.02] transition-all uppercase tracking-widest text-sm mt-4">
+                Générer mon badge
             </button>
         </form>
+
+        <p class="text-center pb-6 text-[9px] text-gray-300 uppercase font-bold tracking-tighter">
+            Système de gestion des badges - {{ date('Y') }}
+        </p>
     </div>
 </body>
 </html>
