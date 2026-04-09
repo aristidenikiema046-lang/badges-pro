@@ -11,51 +11,56 @@ use Illuminate\Support\Facades\Auth;
 class EmployeeController extends Controller
 {
     /**
-     * Liste des employés de l'entreprise connectée (Dashboard)
+     * Liste des employés de l'entreprise (Dashboard Espace Entreprise)
      */
-    public function index()
+    public function index($slug)
     {
-        // On récupère uniquement les employés liés à l'entreprise de l'utilisateur actuel
-        $employees = Employee::where('company_id', Auth::user()->company_id)
+        // On récupère l'entreprise par son slug
+        $company = Company::where('slug', $slug)->firstOrFail();
+
+        // On récupère les employés de cette entreprise spécifique
+        $employees = Employee::where('company_id', $company->id)
             ->orderBy('created_at', 'desc')
             ->get();
         
-        return view('company.employees.index', compact('employees'));
+        return view('company.dashboard', compact('employees', 'company'));
     }
 
     /**
-     * Formulaire de modification d'un collaborateur (Dashboard)
+     * Formulaire de modification d'un collaborateur
      */
-    public function edit(Employee $employee)
+    public function edit($slug, Employee $employee)
     {
-        // Sécurité : Vérifier que l'employé appartient bien à l'entreprise du user connecté
-        if ($employee->company_id !== Auth::user()->company_id) {
-            abort(403, 'Action non autorisée.');
+        $company = Company::where('slug', $slug)->firstOrFail();
+
+        // Sécurité : Vérifier que l'employé appartient bien à cette entreprise
+        if ($employee->company_id !== $company->id) {
+            abort(403, 'Cet employé n\'appartient pas à cette entreprise.');
         }
 
-        return view('company.employees.edit', compact('employee'));
+        return view('company.employees.edit', compact('employee', 'company'));
     }
 
     /**
-     * Mise à jour des informations en base de données
+     * Mise à jour des informations
      */
-    public function update(Request $request, Employee $employee)
+    public function update(Request $request, $slug, Employee $employee)
     {
-        // Sécurité
-        if ($employee->company_id !== Auth::user()->company_id) {
+        $company = Company::where('slug', $slug)->firstOrFail();
+
+        if ($employee->company_id !== $company->id) {
             abort(403);
         }
 
         $validated = $request->validate([
             'first_name' => 'required|string|max:255',
-            'last_name' => 'required|string|max:255',
+            'last_name'  => 'required|string|max:255',
             'function'   => 'nullable|string|max:255',
             'department' => 'nullable|string|max:255',
             'photo'      => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
         if ($request->hasFile('photo')) {
-            // Supprimer l'ancienne photo pour économiser de l'espace
             if ($employee->photo) {
                 Storage::disk('public')->delete($employee->photo);
             }
@@ -63,21 +68,25 @@ class EmployeeController extends Controller
             $employee->photo = $path;
         }
 
-        $employee->first_name = $validated['first_name'];
-        $employee->last_name = $validated['last_name'];
-        $employee->function = $validated['function'];
-        $employee->department = $validated['department'];
-        $employee->save();
+        $employee->update([
+            'first_name' => $validated['first_name'],
+            'last_name'  => $validated['last_name'],
+            'function'   => $validated['function'],
+            'department' => $validated['department'],
+        ]);
 
-        return redirect()->route('company.employees')->with('success', 'La fiche de l\'employé a été mise à jour.');
+        return redirect()->route('company.employees', $slug)
+            ->with('success', 'La fiche de l\'employé a été mise à jour.');
     }
 
     /**
-     * Suppression définitive d'un collaborateur
+     * Suppression d'un collaborateur
      */
-    public function destroy(Employee $employee)
+    public function destroy($slug, Employee $employee)
     {
-        if ($employee->company_id !== Auth::user()->company_id) {
+        $company = Company::where('slug', $slug)->firstOrFail();
+
+        if ($employee->company_id !== $company->id) {
             abort(403);
         }
 
@@ -87,22 +96,26 @@ class EmployeeController extends Controller
         
         $employee->delete();
 
-        return redirect()->route('company.employees')->with('success', 'Employé supprimé avec succès.');
+        return redirect()->route('company.employees', $slug)
+            ->with('success', 'Employé supprimé avec succès.');
     }
 
     /**
-     * Affiche le formulaire d'inscription public (via le lien généré)
+     * Formulaire d'inscription public (Lien partagé par l'entreprise)
      */
     public function registerForm($slug)
     {
-        // On cherche l'entreprise par son slug unique
         $company = Company::where('slug', $slug)->firstOrFail();
+
+        if (!$company->active) {
+            abort(403, 'Cet espace d\'inscription est actuellement suspendu.');
+        }
 
         return view('company.employees.register', compact('company'));
     }
 
     /**
-     * Enregistre un nouvel employé (soumission du formulaire public)
+     * Enregistre un nouvel employé (Formulaire public)
      */
     public function store(Request $request)
     {
@@ -117,27 +130,29 @@ class EmployeeController extends Controller
             'photo'      => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
-        // Traitement de la photo si présente
         if ($request->hasFile('photo')) {
             $validated['photo'] = $request->file('photo')->store('employees/photos', 'public');
         }
 
-        // Création de l'employé
         Employee::create($validated);
 
         return back()->with('success', 'Votre demande de badge a été envoyée avec succès !');
     }
 
     /**
-     * Preview du badge (Si nécessaire pour votre logique)
+     * Aperçu du badge
      */
     public function preview($id)
     {
         $employee = Employee::with('company')->findOrFail($id);
         
-        // On utilise le style de badge défini dans les paramètres de l'entreprise
         $style = $employee->company->badge_style ?? 'style_1';
+
+        // Helper pour le chemin des images dans la vue
+        $getPath = function($path) {
+            return empty($path) ? 'https://via.placeholder.com/150' : asset('storage/' . $path);
+        };
         
-        return view('company.badges.styles.' . $style, compact('employee'));
+        return view('company.badges.styles.' . $style, compact('employee', 'getPath'));
     }
 }
