@@ -58,8 +58,8 @@
     <div class="badge-card">
         <div class="circuit-pattern"></div>
 
-        <div class="w-[45%] flex items-center justify-center p-8 z-10">
-            <div class="w-full h-full rounded-[2.5rem] overflow-hidden shadow-2xl bg-white border-4 border-white">
+        <div class="w-[40%] flex items-center justify-center p-10 z-10">
+            <div class="w-full aspect-square rounded-[2rem] overflow-hidden shadow-xl bg-white border-4 border-white">
                 @if($employee->photo)
                     <img src="{{ asset('storage/' . $employee->photo) }}" class="w-full h-full object-cover">
                 @else
