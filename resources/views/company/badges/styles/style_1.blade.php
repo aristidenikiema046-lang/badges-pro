@@ -19,14 +19,27 @@
             height: 350px;
             font-family: 'sans-serif';
         }
-        /* Style pour les lignes technologiques sur le côté gauche */
+        /* Style des circuits renforcé */
         .tech-line {
             position: absolute;
             background-color: {{ $mainColor }};
-            opacity: 0.2;
+            opacity: 0.6; /* Opacité augmentée pour plus de contraste */
             height: 2px;
             border-radius: 2px;
+            /* Petit effet de lueur pour donner un aspect "électrique" */
+            box-shadow: 0 0 4px {{ $mainColor }};
         }
+        
+        .tech-dot {
+            position: absolute;
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            background-color: {{ $mainColor }};
+            opacity: 0.8;
+            box-shadow: 0 0 6px {{ $mainColor }};
+        }
+
         @media print {
             .no-print { display: none; }
             body { background: white; }
@@ -48,27 +61,22 @@
     <div class="badge-container bg-white shadow-2xl overflow-hidden flex relative border-2 mx-auto rounded-[1.5rem]" 
          style="border-color: {{ $mainColor }}">
         
-        <div class="w-[42%] relative flex items-center justify-center bg-slate-50 border-r border-gray-100 overflow-hidden">
+        <div class="w-[42%] relative flex items-center justify-center bg-slate-100 border-r border-gray-200 overflow-hidden">
             
             <div class="absolute inset-0 pointer-events-none">
-                <div class="tech-line w-24 top-10 left-0"></div>
-                <div class="tech-line w-16 top-10 left-24 rotate-45 origin-left"></div>
+                <div class="tech-line w-24 top-12 left-0"></div>
+                <div class="tech-line w-16 top-12 left-24 rotate-45 origin-left"></div>
+                <div class="tech-dot top-[38px] left-[32px]"></div>
                 
-                <div class="tech-line w-32 top-32 left-0"></div>
+                <div class="tech-line w-32 top-1/2 left-0 -translate-y-1/2"></div>
+                <div class="tech-dot top-1/2 left-[120px] -translate-y-1/2"></div>
                 
-                <div class="tech-line w-20 bottom-20 left-0"></div>
-                <div class="tech-line w-12 bottom-20 left-20 -rotate-45 origin-left"></div>
+                <div class="tech-line w-20 bottom-16 left-0"></div>
+                <div class="tech-line w-12 bottom-16 left-20 -rotate-45 origin-left"></div>
+                <div class="tech-dot bottom-[22px] left-[138px]"></div>
 
-                <div class="tech-line w-40 bottom-10 left-0"></div>
-                
-                <div class="absolute top-[38px] left-32 w-2 h-2 rounded-full opacity-20" style="background-color: {{ $mainColor }}"></div>
-                <div class="absolute bottom-[28px] left-36 w-2 h-2 rounded-full opacity-20" style="background-color: {{ $mainColor }}"></div>
-            </div>
-
-            <div class="absolute inset-0 opacity-10 pointer-events-none">
-                <svg width="100%" height="100%" viewBox="0 0 100 100" preserveAspectRatio="none">
-                    <path d="M0 50 Q 25 45, 50 50 T 100 50" stroke="{{ $mainColor }}" fill="none" stroke-width="0.5"/>
-                </svg>
+                <div class="tech-line w-40 bottom-8 left-0"></div>
+                <div class="tech-dot bottom-[30px] left-[155px]"></div>
             </div>
 
             <div class="z-10 w-44 h-56 rounded-[1.5rem] overflow-hidden shadow-2xl border-4 border-white bg-white">
@@ -76,14 +84,13 @@
                     <img src="{{ asset('storage/' . $employee->photo) }}" class="w-full h-full object-cover">
                 @else
                     <div class="w-full h-full flex items-center justify-center bg-gray-100 text-gray-400 font-bold uppercase text-[10px] p-4 text-center">
-                        Photo de l'employé
+                        Photo
                     </div>
                 @endif
             </div>
         </div>
 
         <div class="w-[58%] flex flex-col p-8 justify-between bg-white relative">
-            
             <div class="flex items-center justify-end gap-3 border-b border-gray-50 pb-4">
                 <div class="text-right">
                     <p class="font-black text-xl uppercase leading-none" style="color: {{ $mainColor }}">
