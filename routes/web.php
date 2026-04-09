@@ -21,12 +21,12 @@ Route::get('/badge/preview/{id}', [EmployeeController::class, 'preview'])->name(
 Route::get('/badge/export/{id}', [BadgeExportController::class, 'exportSingle'])->name('badge.export.single');
 
 // 5. ZONE GESTION ENTREPRISE (ESPACE DU MANAGER D'ENTREPRISE)
-// Utilisation du slug dans l'URL pour isoler les données de l'entreprise
-Route::prefix('{slug}/dashboard')->group(function () {
+// CORRECTION : Utilisation de {id} pour éviter le conflit de sécurité avec {slug}
+Route::middleware(['auth'])->prefix('{slug}/dashboard')->group(function () {
     Route::get('/employees', [EmployeeController::class, 'index'])->name('company.employees');
-    Route::get('/employees/{employee}/edit', [EmployeeController::class, 'edit'])->name('employees.edit');
-    Route::put('/employees/{employee}', [EmployeeController::class, 'update'])->name('employees.update');
-    Route::delete('/employees/{employee}', [EmployeeController::class, 'destroy'])->name('employees.destroy');
+    Route::get('/employees/{id}/edit', [EmployeeController::class, 'edit'])->name('employees.edit');
+    Route::put('/employees/{id}', [EmployeeController::class, 'update'])->name('employees.update');
+    Route::delete('/employees/{id}', [EmployeeController::class, 'destroy'])->name('employees.destroy');
 });
 
 // 6. ZONE SUPER-ADMIN (YA CONSULTING)
