@@ -20,16 +20,16 @@ class EmployeeController extends Controller
             ->orderBy('created_at', 'desc')
             ->get();
         
-        // CORRECTION ICI : Le chemin correspond à ton dossier
         return view('company.employees.index', compact('employees', 'company'));
     }
 
     /**
      * Formulaire de modification d'un collaborateur
      */
-    public function edit($slug, Employee $employee)
+    public function edit($slug, $id) // Modification ici : on utilise $id
     {
         $company = Company::where('slug', $slug)->firstOrFail();
+        $employee = Employee::findOrFail($id); // On récupère l'employé par son ID
 
         if ($employee->company_id !== $company->id) {
             abort(403);
@@ -41,9 +41,10 @@ class EmployeeController extends Controller
     /**
      * Mise à jour des informations
      */
-    public function update(Request $request, $slug, Employee $employee)
+    public function update(Request $request, $slug, $id) // Modification ici : on utilise $id
     {
         $company = Company::where('slug', $slug)->firstOrFail();
+        $employee = Employee::findOrFail($id);
 
         if ($employee->company_id !== $company->id) {
             abort(403);
@@ -79,9 +80,10 @@ class EmployeeController extends Controller
     /**
      * Suppression d'un collaborateur
      */
-    public function destroy($slug, Employee $employee)
+    public function destroy($slug, $id) // Modification ici : on utilise $id
     {
         $company = Company::where('slug', $slug)->firstOrFail();
+        $employee = Employee::findOrFail($id);
 
         if ($employee->company_id !== $company->id) {
             abort(403);
@@ -126,10 +128,8 @@ class EmployeeController extends Controller
             $validated['photo'] = $request->file('photo')->store('employees/photos', 'public');
         }
 
-        // Création et récupération de l'instance de l'employé
         $employee = Employee::create($validated);
 
-        // Redirection directe vers la preview du badge avec l'ID de l'employé
         return redirect()->route('badge.preview', $employee->id);
     }
 
