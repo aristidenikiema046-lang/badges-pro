@@ -20,7 +20,7 @@ Route::post('/register/save', [EmployeeController::class, 'store'])->name('emplo
 Route::get('/badge/preview/{id}', [EmployeeController::class, 'preview'])->name('badge.preview');
 Route::get('/badge/export/{id}', [BadgeExportController::class, 'exportSingle'])->name('badge.export.single');
 
-// Route d'aperçu dynamique déplacée ici pour être accessible publiquement
+// Route d'aperçu dynamique pour la configuration
 Route::get('/preview-style/{style}', function ($style) {
     $getPath = function($path) {
         return empty($path) ? 'https://via.placeholder.com/150' : asset('storage/' . $path);
@@ -45,29 +45,21 @@ Route::get('/preview-style/{style}', function ($style) {
         return response("Style introuvable.", 404);
     }
 
-    return view('company.badges.styles.' . $style, compact('employee', 'getPath'));
+    // Passage de la variable mainColor pour assurer la compatibilité avec tes nouveaux styles
+    $mainColor = request('color', '#f97316');
+
+    return view('company.badges.styles.' . $style, compact('employee', 'getPath', 'mainColor'));
 })->name('style.preview');
 
 // 5. ZONE GESTION ENTREPRISE (ESPACE DU MANAGER D'ENTREPRISE)
 Route::prefix('{slug}/dashboard')->group(function () {
-    
-    Route::get('/employees', [EmployeeController::class, 'index'])
-        ->name('company.employees');
-    
-    Route::get('/employees/{id}/edit', [EmployeeController::class, 'edit'])
-        ->name('employees.edit')
-        ->where('id', '[0-9]+');
-
-    Route::put('/employees/{id}', [EmployeeController::class, 'update'])
-        ->name('employees.update')
-        ->where('id', '[0-9]+');
-
-    Route::delete('/employees/{id}', [EmployeeController::class, 'destroy'])
-        ->name('employees.destroy')
-        ->where('id', '[0-9]+');
+    Route::get('/employees', [EmployeeController::class, 'index'])->name('company.employees');
+    Route::get('/employees/{id}/edit', [EmployeeController::class, 'edit'])->name('employees.edit')->where('id', '[0-9]+');
+    Route::put('/employees/{id}', [EmployeeController::class, 'update'])->name('employees.update')->where('id', '[0-9]+');
+    Route::delete('/employees/{id}', [EmployeeController::class, 'destroy'])->name('employees.destroy')->where('id', '[0-9]+');
 });
 
-// 6. ZONE SUPER-ADMIN (YA CONSULTING)
+// 6. ZONE SUPER-ADMIN (YA CONSULTING) - SÉCURISÉE
 Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
     Route::get('/entreprises', [CompanyController::class, 'index'])->name('companies.index');
     Route::get('/entreprises/{id}/modifier', [CompanyController::class, 'edit'])->name('companies.edit');

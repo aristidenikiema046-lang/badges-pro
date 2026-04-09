@@ -35,7 +35,13 @@
     <div class="max-w-6xl mx-auto">
         <div class="flex justify-between items-center mb-6">
             <a href="{{ route('home') }}" class="text-orange-600 font-bold hover:underline">← Accueil</a>
-            <a href="{{ route('companies.index') }}" class="text-teal-700 font-bold hover:underline">Gérer les entreprises →</a>
+            
+            {{-- AFFICHAGE CONDITIONNEL : Uniquement pour le Super Admin connecté --}}
+            @auth
+                @if(auth()->user()->usertype === 'admin')
+                    <a href="{{ route('companies.index') }}" class="text-teal-700 font-bold hover:underline">Gérer les entreprises →</a>
+                @endif
+            @endauth
         </div>
 
         <div class="bg-white rounded-2xl shadow-2xl overflow-hidden border-t-8 border-orange-500">
@@ -116,8 +122,6 @@
             loader.classList.remove('hidden');
             renderContainer.style.opacity = '0.3';
 
-            // Utilisation de la fonction url() de Laravel pour construire le chemin complet
-            // Cela résout le problème du sous-dossier /badges-pro/public/
             const baseUrl = "{{ url('/preview-style') }}";
 
             fetch(`${baseUrl}/${style}?color=${color}`)
@@ -139,8 +143,6 @@
 
         styleSelect.addEventListener('change', updateLivePreview);
         colorInput.addEventListener('input', updateLivePreview);
-        
-        // Lancement automatique au chargement de la page
         document.addEventListener('DOMContentLoaded', updateLivePreview);
     </script>
 </body>
