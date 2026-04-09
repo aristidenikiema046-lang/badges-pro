@@ -12,32 +12,32 @@ Route::get('/', function () { return view('welcome'); })->name('home');
 Route::get('/inscription-partenaire', [CompanyController::class, 'create'])->name('companies.create');
 Route::post('/inscription-partenaire', [CompanyController::class, 'store'])->name('companies.store');
 
-// 3. INSCRIPTION EMPLOYÉS (VIA LIEN DE PARTAGE)
+// 3. INSCRIPTION EMPLOYÉS (VIA LIEN DE PARTAGE UNIQUE)
 Route::get('/register/{slug}', [EmployeeController::class, 'registerForm'])->name('inscription.tenant');
 Route::post('/register/save', [EmployeeController::class, 'store'])->name('employee.store');
 
-// 4. BADGES
+// 4. BADGES ET EXPORT
 Route::get('/badge/preview/{id}', [EmployeeController::class, 'preview'])->name('badge.preview');
 Route::get('/badge/export/{id}', [BadgeExportController::class, 'exportSingle'])->name('badge.export.single');
 
-// 5. ZONE CONNECTÉE (ESPACE GESTION)
-Route::middleware(['auth'])->group(function () {
-    Route::get('/dashboard/employees', [EmployeeController::class, 'index'])->name('company.employees');
-    Route::get('/dashboard/employees/{employee}/edit', [EmployeeController::class, 'edit'])->name('employees.edit');
-    Route::put('/dashboard/employees/{employee}', [EmployeeController::class, 'update'])->name('employees.update');
-    Route::delete('/dashboard/employees/{employee}', [EmployeeController::class, 'destroy'])->name('employees.destroy');
+// 5. ZONE GESTION ENTREPRISE (ESPACE DU MANAGER D'ENTREPRISE)
+// Utilisation du slug dans l'URL pour isoler les données de l'entreprise
+Route::prefix('{slug}/dashboard')->group(function () {
+    Route::get('/employees', [EmployeeController::class, 'index'])->name('company.employees');
+    Route::get('/employees/{employee}/edit', [EmployeeController::class, 'edit'])->name('employees.edit');
+    Route::put('/employees/{employee}', [EmployeeController::class, 'update'])->name('employees.update');
+    Route::delete('/employees/{employee}', [EmployeeController::class, 'destroy'])->name('employees.destroy');
 });
 
 // 6. ZONE SUPER-ADMIN (YA CONSULTING)
 Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
-    // Liste et Actions principales
     Route::get('/entreprises', [CompanyController::class, 'index'])->name('companies.index');
     Route::get('/entreprises/{id}/modifier', [CompanyController::class, 'edit'])->name('companies.edit');
     Route::put('/entreprises/{id}', [CompanyController::class, 'update'])->name('companies.update');
     Route::delete('/entreprises/{id}', [CompanyController::class, 'destroy'])->name('companies.destroy');
     Route::patch('/entreprises/{id}/toggle', [CompanyController::class, 'toggleStatus'])->name('companies.toggle');
 
-    // Route spécifique pour l'aperçu dynamique du badge dans le formulaire
+    // Aperçu dynamique pour le choix du design
     Route::get('/preview-style/{style}', function ($style) {
         $getPath = function($path) {
             return empty($path) ? 'https://via.placeholder.com/150' : asset('storage/' . $path);
