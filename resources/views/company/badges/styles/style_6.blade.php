@@ -1,65 +1,73 @@
 @php 
-    $mainColor = $employee->company->badge_color ?? '#1d4ed8'; // Bleu par défaut plus proche de l'image
+    // Sécurité : récupération de la couleur principale
+    $mainColor = $mainColor ?? ($employee->company->badge_color ?? '#000000'); 
 @endphp
 
-<div class="relative bg-white flex flex-row items-center overflow-hidden w-full h-full font-sans shadow-inner">
+<div class="badge-card bg-white shadow-xl overflow-hidden flex relative border-2 mx-auto" 
+     style="width: 600px; height: 350px; border-radius: 1.5rem; border-color: {{ $mainColor }}">
     
-    <!-- Arrière-plan décoratif (Circuit imprimé à gauche) -->
-    <div class="absolute left-0 top-0 bottom-0 w-1/3 opacity-20 pointer-events-none z-0">
-        <svg viewBox="0 0 100 100" preserveAspectRatio="none" class="h-full w-full">
-            <path d="M0 20 L20 20 L30 10 M0 40 L25 40 L35 50 M0 60 L15 60 L25 70 M0 80 L20 80 L30 90" 
-                  stroke="{{ $mainColor }}" stroke-width="1" fill="none" />
-            <circle cx="30" cy="10" r="1.5" fill="{{ $mainColor }}" />
-            <circle cx="35" cy="50" r="1.5" fill="{{ $mainColor }}" />
-            <circle cx="25" cy="70" r="1.5" fill="{{ $mainColor }}" />
-            <circle cx="30" cy="90" r="1.5" fill="{{ $mainColor }}" />
-        </svg>
-    </div>
+    <div class="w-2/5 relative flex items-center justify-center" style="background-color: {{ $mainColor }}">
+        {{-- Motif décoratif discret --}}
+        <div class="absolute inset-0 opacity-20" 
+             style="background-image: url('https://www.transparenttextures.com/patterns/cubes.png');">
+        </div>
 
-    <!-- Section Photo (Gauche) -->
-    <div class="w-[40%] h-full flex items-center justify-center pl-6 z-10">
-        <div class="relative w-48 h-56 overflow-hidden rounded-[2.5rem] border-4 border-white shadow-lg">
+        {{-- Photo de l'employé --}}
+        <div class="z-10 relative">
             @if($employee->photo)
-                <img src="{{ $getPath($employee->photo) }}" class="w-full h-full object-cover">
+                <img src="{{ asset('storage/' . $employee->photo) }}" 
+                     class="w-44 h-56 rounded-full object-cover shadow-2xl border-4 border-white">
             @else
-                <div class="w-full h-full bg-slate-100 flex items-center justify-center">
-                    <svg class="w-20 h-20 text-slate-300" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M24 20.993V24H0v-2.996A14.977 14.977 0 0112.004 15c4.904 0 9.26 2.354 11.996 5.993zM16.002 8.999a4 4 0 11-8 0 4 4 0 018 0z" />
-                    </svg>
+                <div class="w-44 h-56 rounded-full bg-white flex items-center justify-center text-gray-400 font-bold border-2 border-dashed border-gray-200">
+                    SANS PHOTO
                 </div>
             @endif
         </div>
+        
+        {{-- Décoration géométrique (le cercle bleu de ta capture) --}}
+        <div class="absolute -bottom-10 -left-10 w-32 h-32 rounded-full opacity-50 bg-white"></div>
     </div>
 
-    <!-- Section Infos (Droite) -->
-    <div class="w-[60%] h-full flex flex-col justify-between py-10 px-8 z-10">
+    <div class="w-3/5 flex flex-col p-6 justify-between bg-white">
         
-        <!-- Logo en haut à droite -->
-        <div class="flex justify-end">
+        {{-- Header : Logo + Nom Entreprise --}}
+        <div class="flex items-center gap-3 justify-end border-b pb-3">
+            <div class="text-right">
+                <p class="font-black text-2xl uppercase leading-none" style="color: {{ $mainColor }}">
+                    {{ $employee->company->name ?? 'YA CONSULTING' }}
+                </p>
+                <p class="text-[10px] text-gray-400 font-bold tracking-[0.2em]">CARTE PROFESSIONNELLE</p>
+            </div>
             @if($employee->company && $employee->company->logo)
-                <img src="{{ $getPath($employee->company->logo) }}" class="h-10 w-auto object-contain">
-            @else
-                <span class="font-bold text-xl" style="color: {{ $mainColor }}">{{ $employee->company->name }}</span>
+                <img src="{{ asset('storage/' . $employee->company->logo) }}" class="h-12 w-12 object-contain">
             @endif
         </div>
 
-        <!-- Détails Employé (Milieu) -->
-        <div class="text-left mt-4">
-            <h1 class="text-3xl font-extrabold text-slate-900 uppercase tracking-tight leading-none mb-2">
-                {{ $employee->first_name }} {{ $employee->last_name }}
-            </h1>
-            <p class="text-lg font-medium opacity-80" style="color: {{ $mainColor }}">
-                {{ $employee->function }}
-            </p>
-            <p class="text-md font-semibold text-slate-500 mt-1">
-                Matricule : {{ $employee->matricule }}
-            </p>
+        {{-- Corps : Identité --}}
+        <div class="py-2">
+            <div class="mb-3">
+                <p class="text-gray-400 text-[10px] font-black uppercase tracking-widest">Nom & Prénoms</p>
+                <p class="text-2xl font-extrabold text-slate-900">{{ $employee->first_name }} {{ $employee->last_name }}</p>
+            </div>
+            
+            <div class="grid grid-cols-1 gap-2">
+                <div>
+                    <p class="text-gray-400 text-[9px] font-black uppercase">Fonction</p>
+                    <p class="text-md font-bold uppercase" style="color: {{ $mainColor }}">
+                        {{ $employee->function ?? 'Collaborateur' }}
+                    </p>
+                </div>
+                <div>
+                    <p class="text-gray-400 text-[9px] font-black uppercase">Matricule</p>
+                    <p class="text-md font-mono font-bold text-slate-700">{{ $employee->matricule }}</p>
+                </div>
+            </div>
         </div>
 
-        <!-- QR Code en bas à droite -->
-        <div class="flex justify-end items-end mt-2">
-            <div class="bg-white p-1">
-                {!! QrCode::size(85)->margin(0)->generate($employee->matricule) !!}
+        {{-- Footer : QR Code --}}
+        <div class="flex justify-end items-end">
+            <div class="p-1 border-2 rounded-lg" style="border-color: {{ $mainColor }}">
+                {!! QrCode::size(65)->margin(0)->generate($employee->matricule ?? '0000') !!}
             </div>
         </div>
     </div>
