@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - {{ Auth::user()->name }}</title>
+    <title>Dashboard - {{ $company->name }}</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-50">
@@ -12,7 +12,7 @@
         <div class="max-w-7xl mx-auto flex justify-between items-center">
             <div>
                 <h1 class="text-2xl font-bold uppercase italic">Gestion des Badges</h1>
-                <p class="text-green-100 text-xs tracking-widest uppercase font-bold">Espace Entreprise</p>
+                <p class="text-green-100 text-xs tracking-widest uppercase font-bold">{{ $company->name }}</p>
             </div>
             <form method="POST" action="{{ route('logout') }}">
                 @csrf
@@ -33,7 +33,7 @@
             
             <div class="flex flex-col md:flex-row items-center gap-4 bg-white p-5 rounded-xl border border-orange-200 shadow-inner">
                 <code id="share-link" class="text-orange-600 font-mono font-bold flex-grow text-lg">
-                    {{ url('/register/' . Auth::user()->company->slug) }}
+                    {{ url('/register/' . $company->slug) }}
                 </code>
                 <button onclick="copyLink()" id="btn-copy" class="w-full md:w-auto bg-orange-600 hover:bg-orange-700 text-white px-8 py-3 rounded-lg transition font-black uppercase shadow-md">
                     Copier le lien
@@ -90,18 +90,23 @@
                         </td>
                         <td class="p-4 text-right">
                             <div class="flex justify-end gap-2">
+                                {{-- Preview Badge --}}
                                 <a href="{{ route('badge.preview', $emp->id) }}" target="_blank" class="bg-blue-100 text-blue-600 p-2 rounded hover:bg-blue-600 hover:text-white transition shadow-sm" title="Voir Badge">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                                     </svg>
                                 </a>
-                                <a href="{{ route('employees.edit', $emp->id) }}" class="bg-gray-100 text-gray-600 p-2 rounded hover:bg-gray-800 hover:text-white transition shadow-sm" title="Modifier">
+
+                                {{-- EDIT : Ajout du paramètre slug --}}
+                                <a href="{{ route('employees.edit', ['slug' => $company->slug, 'employee' => $emp->id]) }}" class="bg-gray-100 text-gray-600 p-2 rounded hover:bg-gray-800 hover:text-white transition shadow-sm" title="Modifier">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                                     </svg>
                                 </a>
-                                <form action="{{ route('employees.destroy', $emp->id) }}" method="POST" onsubmit="return confirm('Supprimer cet employé ?');">
+
+                                {{-- DELETE : Ajout du paramètre slug --}}
+                                <form action="{{ route('employees.destroy', ['slug' => $company->slug, 'employee' => $emp->id]) }}" method="POST" onsubmit="return confirm('Supprimer cet employé ?');">
                                     @csrf @method('DELETE')
                                     <button type="submit" class="bg-red-50 text-red-600 p-2 rounded hover:bg-red-600 hover:text-white transition shadow-sm">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
