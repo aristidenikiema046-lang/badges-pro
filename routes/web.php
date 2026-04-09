@@ -62,6 +62,10 @@ Route::prefix('{slug}/dashboard')->group(function () {
 // 6. ZONE SUPER-ADMIN (YA CONSULTING) - SÉCURISÉE
 Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
     Route::get('/entreprises', [CompanyController::class, 'index'])->name('companies.index');
+    
+    // LIGNE AJOUTÉE POUR RÉGLER L'ERREUR
+    Route::get('/entreprises/{id}', [CompanyController::class, 'show'])->name('companies.show');
+    
     Route::get('/entreprises/{id}/modifier', [CompanyController::class, 'edit'])->name('companies.edit');
     Route::put('/entreprises/{id}', [CompanyController::class, 'update'])->name('companies.update');
     Route::delete('/entreprises/{id}', [CompanyController::class, 'destroy'])->name('companies.destroy');

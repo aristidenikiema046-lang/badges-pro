@@ -10,26 +10,17 @@ use Illuminate\Support\Str;
 
 class CompanyController extends Controller
 {
-    /**
-     * Liste globale des entreprises (Pour le Super-Admin).
-     */
     public function index()
     {
         $companies = Company::latest()->get();
         return view('admin.companies.index', compact('companies'));
     }
 
-    /**
-     * Formulaire de création (Public ou Admin).
-     */
     public function create()
     {
         return view('admin.companies.create');
     }
 
-    /**
-     * Enregistre l'entreprise et redirige vers SON espace de gestion.
-     */
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -47,15 +38,20 @@ class CompanyController extends Controller
             $validated['logo'] = $path;
         }
 
-        // Création du slug unique
         $validated['slug'] = Str::slug($request->name) . '-' . Str::lower(Str::random(5));
         $validated['active'] = true;
 
         $company = Company::create($validated);
 
-        // REDIRECTION VERS LE DASHBOARD DE L'ENTREPRISE CRÉÉE
         return redirect()->route('company.employees', ['slug' => $company->slug])
             ->with('success', "Bienvenue ! Votre espace {$company->name} a été configuré.");
+    }
+
+    // AJOUT DE LA MÉTHODE SHOW POUR RÉGLER LE PROBLÈME
+    public function show($id)
+    {
+        $company = Company::findOrFail($id);
+        return view('admin.companies.show', compact('company'));
     }
 
     public function edit($id)
