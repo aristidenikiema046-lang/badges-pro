@@ -11,7 +11,7 @@ use Illuminate\Support\Str;
 class CompanyController extends Controller
 {
     /**
-     * Affiche la liste des entreprises.
+     * Affiche la liste des entreprises (Dashboard Admin).
      */
     public function index()
     {
@@ -50,17 +50,19 @@ class CompanyController extends Controller
 
         // Génération d'un slug unique
         $validated['slug'] = Str::slug($request->name) . '-' . Str::lower(Str::random(5));
+        
+        // Par défaut, l'entreprise est active à la création
+        $validated['active'] = true;
 
         $company = Company::create($validated);
 
-        return redirect()->route('companies.create')
-            ->with('success', 'Entreprise créée avec succès !')
-            ->with('generated_slug', $company->slug)
-            ->with('company_name', $company->name);
+        // REDIRECTION VERS L'INDEX (DASHBOARD)
+        return redirect()->route('companies.index')
+            ->with('success', "L'entreprise {$company->name} a été créée avec succès !");
     }
 
     /**
-     * Formulaire de modification d'une entreprise.
+     * Formulaire de modification.
      */
     public function edit($id)
     {
@@ -69,7 +71,7 @@ class CompanyController extends Controller
     }
 
     /**
-     * Mettre à jour l'entreprise dans la base de données.
+     * Mise à jour.
      */
     public function update(Request $request, $id)
     {
@@ -83,11 +85,9 @@ class CompanyController extends Controller
             'logo'         => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'badge_style'  => 'required|in:style_1,style_2,style_3,style_4,style_5,style_6',
             'badge_color'  => 'required|string|max:7',
-            'active'       => 'nullable|boolean',
         ]);
 
         if ($request->hasFile('logo')) {
-            // Suppression de l'ancien logo s'il existe
             if ($company->logo) {
                 Storage::disk('public')->delete($company->logo);
             }
@@ -102,16 +102,14 @@ class CompanyController extends Controller
     }
 
     /**
-     * Supprime une entreprise et son logo.
+     * Suppression.
      */
     public function destroy($id)
     {
         $company = Company::findOrFail($id);
-
         if ($company->logo) {
             Storage::disk('public')->delete($company->logo);
         }
-
         $company->delete();
 
         return redirect()->route('companies.index')
@@ -119,7 +117,7 @@ class CompanyController extends Controller
     }
 
     /**
-     * Active ou désactive une entreprise.
+     * Toggle Statut.
      */
     public function toggleStatus($id)
     {
@@ -128,6 +126,6 @@ class CompanyController extends Controller
         $company->save();
 
         $status = $company->active ? 'activée' : 'désactivée';
-        return back()->with('success', "L'entreprise a été {$status} avec succès.");
+        return back()->with('success', "L'entreprise a été {$status}.");
     }
 }
