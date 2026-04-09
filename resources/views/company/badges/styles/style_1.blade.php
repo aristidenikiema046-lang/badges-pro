@@ -26,19 +26,20 @@
             border: 1px solid #f3f4f6;
         }
 
-        /* NOUVEAU Motif de circuits densifié (zone verte), ressemble à l'image 2 */
+         /* Motif de circuits densifié - Fidélité maximale à l'image Paymetrust */
         .circuit-pattern {
             position: absolute;
             left: 0;
             top: 0;
-            width: 40%; /* Légèrement élargi pour accueillir la densité */
+            width: 35%; /* Zone gauche correspondant au modèle */
             height: 100%;
-            opacity: 0.6; /* Un peu plus opaque pour mieux voir les détails */
+            opacity: 0.5;
             z-index: 1;
-            /* SVG direct pour un tracé précis et complexe */
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='250' height='400' viewBox='0 0 120 200'%3E%3Cg fill='none' stroke='%23{{ str_replace('#', '', $mainColor) }}' stroke-width='0.8'%3E%3C!-- Lignes principales denses --%3E%3Cpath d='M0 15h30l10 10v40l10 10h40'/%3E%3Cpath d='M0 50h20l15 15v50l10 10h50'/%3E%3Cpath d='M0 90h15l20 20v60l15 15h30'/%3E%3Cpath d='M0 130h10l25 25v45'/%3E%3Cpath d='M0 170h5l30 30'/%3E%3Cpath d='M20 0v20l10 10'/%3E%3Cpath d='M45 0v10l10 10'/%3E%3C!-- Points de connexion --%3E%3Ccircle cx='30' cy='25' r='1.5' fill='%23{{ str_replace('#', '', $mainColor) }}'/%3E%3Ccircle cx='50' cy='75' r='1.5' fill='%23{{ str_replace('#', '', $mainColor) }}'/%3E%3Ccircle cx='70' cy='125' r='2' fill='%23{{ str_replace('#', '', $mainColor) }}'/%3E%3Ccircle cx='90' cy='165' r='1.5' fill='%23{{ str_replace('#', '', $mainColor) }}'/%3E%3Ccircle cx='55' cy='15' r='1' fill='%23{{ str_replace('#', '', $mainColor) }}'/%3E%3C/g%3E%3C/svg%3E");
+            /* Utilisation de str_replace pour injecter la couleur hex sans le '#' dans le SVG */
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 150'%3E%3Cg fill='none' stroke='%23{{ str_replace('#', '', $mainColor) }}' stroke-width='0.6'%3E%3C!-- Lignes complexes à 45 degrés --%3E%3Cpath d='M-10 20 L20 20 L40 40 L40 70 L60 90 L100 90'/%3E%3Cpath d='M-10 50 L15 50 L35 70 L35 110 L55 130 L100 130'/%3E%3Cpath d='M-10 80 L10 80 L30 100 L30 145'/%3E%3Cpath d='M-10 110 L5 110 L25 130 L25 150'/%3E%3Cpath d='M20 0 L20 15 L35 30'/%3E%3Cpath d='M50 0 L50 40 L70 60'/%3E%3C!-- Points de terminaison (Cercles) --%3E%3Ccircle cx='40' cy='40' r='1.2' fill='%23{{ str_replace('#', '', $mainColor) }}'/%3E%3Ccircle cx='35' cy='70' r='1.2' fill='%23{{ str_replace('#', '', $mainColor) }}'/%3E%3Ccircle cx='60' cy='90' r='1.2' fill='%23{{ str_replace('#', '', $mainColor) }}'/%3E%3Ccircle cx='30' cy='100' r='1.2' fill='%23{{ str_replace('#', '', $mainColor) }}'/%3E%3Ccircle cx='25' cy='130' r='1.2' fill='%23{{ str_replace('#', '', $mainColor) }}'/%3E%3Ccircle cx='70' cy='60' r='1.2' fill='%23{{ str_replace('#', '', $mainColor) }}'/%3E%3C/g%3E%3C/svg%3E");
             background-repeat: no-repeat;
             background-size: cover;
+            background-position: left center;
         }
 
         @media print {
