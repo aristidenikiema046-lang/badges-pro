@@ -14,10 +14,10 @@
                 <h1 class="text-2xl font-bold uppercase italic">Gestion des Badges</h1>
                 <p class="text-green-100 text-xs tracking-widest uppercase font-bold">{{ $company->name }}</p>
             </div>
-            <form method="POST" action="{{ route('logout') }}">
-                @csrf
-                <button type="submit" class="bg-white text-green-700 px-4 py-2 rounded font-black text-sm hover:bg-gray-100 transition uppercase">Déconnexion</button>
-            </form>
+            {{-- Le bouton déconnexion est masqué car seul l'admin utilise une session --}}
+            <div class="text-sm font-bold uppercase tracking-widest text-green-200">
+                Espace Partenaire
+            </div>
         </div>
     </nav>
 
@@ -98,15 +98,15 @@
                                     </svg>
                                 </a>
 
-                                {{-- EDIT : Ajout du paramètre slug --}}
-                                <a href="{{ route('employees.edit', ['slug' => $company->slug, 'employee' => $emp->id]) }}" class="bg-gray-100 text-gray-600 p-2 rounded hover:bg-gray-800 hover:text-white transition shadow-sm" title="Modifier">
+                                {{-- EDIT : Paramètres corrigés avec 'slug' et 'id' --}}
+                                <a href="{{ route('employees.edit', ['slug' => $company->slug, 'id' => $emp->id]) }}" class="bg-gray-100 text-gray-600 p-2 rounded hover:bg-gray-800 hover:text-white transition shadow-sm" title="Modifier">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                                     </svg>
                                 </a>
 
-                                {{-- DELETE : Ajout du paramètre slug --}}
-                                <form action="{{ route('employees.destroy', ['slug' => $company->slug, 'employee' => $emp->id]) }}" method="POST" onsubmit="return confirm('Supprimer cet employé ?');">
+                                {{-- DELETE : Paramètres corrigés avec 'slug' et 'id' --}}
+                                <form action="{{ route('employees.destroy', ['slug' => $company->slug, 'id' => $emp->id]) }}" method="POST" onsubmit="return confirm('Supprimer cet employé ?');">
                                     @csrf @method('DELETE')
                                     <button type="submit" class="bg-red-50 text-red-600 p-2 rounded hover:bg-red-600 hover:text-white transition shadow-sm">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
