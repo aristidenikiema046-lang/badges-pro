@@ -107,7 +107,7 @@ class EmployeeController extends Controller
     }
 
     /**
-     * Enregistre un nouvel employé
+     * Enregistre un nouvel employé et redirige vers le badge généré
      */
     public function store(Request $request)
     {
@@ -126,9 +126,11 @@ class EmployeeController extends Controller
             $validated['photo'] = $request->file('photo')->store('employees/photos', 'public');
         }
 
-        Employee::create($validated);
+        // Création et récupération de l'instance de l'employé
+        $employee = Employee::create($validated);
 
-        return back()->with('success', 'Votre demande de badge a été envoyée !');
+        // Redirection directe vers la preview du badge avec l'ID de l'employé
+        return redirect()->route('badge.preview', $employee->id);
     }
 
     /**
