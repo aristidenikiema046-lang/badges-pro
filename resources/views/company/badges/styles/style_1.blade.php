@@ -19,25 +19,16 @@
             height: 350px;
             font-family: 'sans-serif';
         }
-        /* Style des circuits renforcé */
-        .tech-line {
-            position: absolute;
-            background-color: {{ $mainColor }};
-            opacity: 0.6; /* Opacité augmentée pour plus de contraste */
-            height: 2px;
-            border-radius: 2px;
-            /* Petit effet de lueur pour donner un aspect "électrique" */
-            box-shadow: 0 0 4px {{ $mainColor }};
-        }
         
-        .tech-dot {
+        /* Conteneur du circuit SVG pour qu'il soit identique à l'image */
+        .circuit-bg {
             position: absolute;
-            width: 5px;
-            height: 5px;
-            border-radius: 50%;
-            background-color: {{ $mainColor }};
-            opacity: 0.8;
-            box-shadow: 0 0 6px {{ $mainColor }};
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 100px; /* Largeur de la zone de circuit */
+            pointer-events: none;
+            z-index: 1;
         }
 
         @media print {
@@ -61,29 +52,31 @@
     <div class="badge-container bg-white shadow-2xl overflow-hidden flex relative border-2 mx-auto rounded-[1.5rem]" 
          style="border-color: {{ $mainColor }}">
         
-        <div class="w-[42%] relative flex items-center justify-center bg-slate-100 border-r border-gray-200 overflow-hidden">
+        <div class="w-[42%] relative flex items-center justify-center bg-white border-r border-gray-100 overflow-hidden">
             
-            <div class="absolute inset-0 pointer-events-none">
-                <div class="tech-line w-24 top-12 left-0"></div>
-                <div class="tech-line w-16 top-12 left-24 rotate-45 origin-left"></div>
-                <div class="tech-dot top-[38px] left-[32px]"></div>
-                
-                <div class="tech-line w-32 top-1/2 left-0 -translate-y-1/2"></div>
-                <div class="tech-dot top-1/2 left-[120px] -translate-y-1/2"></div>
-                
-                <div class="tech-line w-20 bottom-16 left-0"></div>
-                <div class="tech-line w-12 bottom-16 left-20 -rotate-45 origin-left"></div>
-                <div class="tech-dot bottom-[22px] left-[138px]"></div>
+            <svg class="circuit-bg" viewBox="0 0 100 350" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <g opacity="0.4" stroke="{{ $mainColor }}" stroke-width="1.5">
+                    <path d="M0 40H40L60 60H80" />
+                    <circle cx="80" cy="60" r="3" fill="{{ $mainColor }}" />
+                    
+                    <path d="M0 120H30L50 140H70" />
+                    <circle cx="70" cy="140" r="3" fill="{{ $mainColor }}" />
+                    
+                    <path d="M0 200H20L40 220V280L60 300H90" />
+                    <circle cx="90" cy="300" r="3" fill="{{ $mainColor }}" />
+                    
+                    <path d="M0 320H50L70 300" />
+                    
+                    <path d="M20 0V30" />
+                    <circle cx="20" cy="30" r="2" fill="{{ $mainColor }}" />
+                </g>
+            </svg>
 
-                <div class="tech-line w-40 bottom-8 left-0"></div>
-                <div class="tech-dot bottom-[30px] left-[155px]"></div>
-            </div>
-
-            <div class="z-10 w-44 h-56 rounded-[1.5rem] overflow-hidden shadow-2xl border-4 border-white bg-white">
+            <div class="z-10 w-44 h-56 rounded-[1.5rem] overflow-hidden shadow-xl border-4 border-white bg-gray-50">
                 @if($employee->photo)
                     <img src="{{ asset('storage/' . $employee->photo) }}" class="w-full h-full object-cover">
                 @else
-                    <div class="w-full h-full flex items-center justify-center bg-gray-100 text-gray-400 font-bold uppercase text-[10px] p-4 text-center">
+                    <div class="w-full h-full flex items-center justify-center text-gray-400 font-bold uppercase text-[10px] p-4 text-center">
                         Photo
                     </div>
                 @endif
