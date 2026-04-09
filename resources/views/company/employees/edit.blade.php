@@ -13,7 +13,8 @@
                 <h1 class="text-xl font-bold uppercase italic">Modifier Collaborateur</h1>
                 <p class="text-green-100 text-[10px] tracking-widest uppercase">Fiche de {{ $employee->first_name }} {{ $employee->last_name }}</p>
             </div>
-            <a href="{{ route('company.employees') }}" class="bg-white text-green-700 px-4 py-2 rounded font-black text-xs hover:bg-gray-100 transition uppercase">Retour</a>
+            {{-- CORRECTION LIGNE 16 : Ajout du slug pour le retour --}}
+            <a href="{{ route('company.employees', $company->slug) }}" class="bg-white text-green-700 px-4 py-2 rounded font-black text-xs hover:bg-gray-100 transition uppercase">Retour</a>
         </div>
     </nav>
 
@@ -30,7 +31,8 @@
 
         <div class="bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden">
             <div class="p-8">
-                <form action="{{ route('employees.update', $employee->id) }}" method="POST" enctype="multipart/form-data" class="space-y-6">
+                {{-- CORRECTION LIGNE 34 : Ajout du slug et de l'id dans un tableau --}}
+                <form action="{{ route('employees.update', [$company->slug, $employee->id]) }}" method="POST" enctype="multipart/form-data" class="space-y-6">
                     @csrf
                     @method('PUT')
 
