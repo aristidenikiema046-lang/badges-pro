@@ -113,12 +113,14 @@
             const style = styleSelect.value;
             const color = encodeURIComponent(colorInput.value);
             
-            // On affiche le loader
             loader.classList.remove('hidden');
             renderContainer.style.opacity = '0.3';
 
-            // URL mise à jour vers la route publique /preview-style/
-            fetch(`/preview-style/${style}?color=${color}`)
+            // Utilisation de la fonction url() de Laravel pour construire le chemin complet
+            // Cela résout le problème du sous-dossier /badges-pro/public/
+            const baseUrl = "{{ url('/preview-style') }}";
+
+            fetch(`${baseUrl}/${style}?color=${color}`)
                 .then(response => {
                     if (!response.ok) throw new Error('Erreur de chargement');
                     return response.text();
@@ -129,17 +131,16 @@
                     loader.classList.add('hidden');
                 })
                 .catch(err => {
-                    console.error(err);
+                    console.error('Erreur Preview:', err);
                     renderContainer.innerHTML = "<p class='text-red-400 mt-20 text-xs text-center font-bold'>Style non disponible ou erreur serveur</p>";
                     loader.classList.add('hidden');
                 });
         }
 
-        // Écouteurs pour mettre à jour lors d'un changement
         styleSelect.addEventListener('change', updateLivePreview);
         colorInput.addEventListener('input', updateLivePreview);
         
-        // Chargement initial au lancement de la page
+        // Lancement automatique au chargement de la page
         document.addEventListener('DOMContentLoaded', updateLivePreview);
     </script>
 </body>
