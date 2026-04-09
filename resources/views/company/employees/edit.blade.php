@@ -13,8 +13,8 @@
                 <h1 class="text-xl font-bold uppercase italic">Modifier Collaborateur</h1>
                 <p class="text-green-100 text-[10px] tracking-widest uppercase">Fiche de {{ $employee->first_name }} {{ $employee->last_name }}</p>
             </div>
-            {{-- CORRECTION LIGNE 16 : Ajout du slug pour le retour --}}
-            <a href="{{ route('company.employees', $company->slug) }}" class="bg-white text-green-700 px-4 py-2 rounded font-black text-xs hover:bg-gray-100 transition uppercase">Retour</a>
+            {{-- MODIFICATION ICI : On utilise directement la variable $company->slug --}}
+            <a href="{{ route('company.employees', ['slug' => $company->slug]) }}" class="bg-white text-green-700 px-4 py-2 rounded font-black text-xs hover:bg-gray-100 transition uppercase">Retour</a>
         </div>
     </nav>
 
@@ -31,31 +31,30 @@
 
         <div class="bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden">
             <div class="p-8">
-                {{-- CORRECTION LIGNE 34 : Ajout du slug et de l'id dans un tableau --}}
-                <form action="{{ route('employees.update', [$company->slug, $employee->id]) }}" method="POST" enctype="multipart/form-data" class="space-y-6">
+                {{-- MODIFICATION ICI : Passage explicite des paramètres --}}
+                <form action="{{ route('employees.update', ['slug' => $company->slug, 'id' => $employee->id]) }}" method="POST" enctype="multipart/form-data" class="space-y-6">
                     @csrf
                     @method('PUT')
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
                             <label class="block text-xs font-black uppercase text-gray-400 mb-2">Prénom</label>
-                            <input type="text" name="first_name" value="{{ old('first_name', $employee->first_name) }}" required class="w-full border-2 border-gray-100 p-3 rounded-xl focus:border-orange-500 outline-none transition font-bold">
+                            <input type="text" name="first_name" value="{{ old('first_name', $employee->first_name) }}" required class="w-full border-2 border-gray-100 p-3 rounded-xl focus:border-orange-500 outline-none transition font-bold text-gray-700">
                         </div>
                         <div>
                             <label class="block text-xs font-black uppercase text-gray-400 mb-2">Nom</label>
-                            <input type="text" name="last_name" value="{{ old('last_name', $employee->last_name) }}" required class="w-full border-2 border-gray-100 p-3 rounded-xl focus:border-orange-500 outline-none transition font-bold">
+                            <input type="text" name="last_name" value="{{ old('last_name', $employee->last_name) }}" required class="w-full border-2 border-gray-100 p-3 rounded-xl focus:border-orange-500 outline-none transition font-bold text-gray-700">
                         </div>
                         <div>
                             <label class="block text-xs font-black uppercase text-gray-400 mb-2">Poste / Fonction</label>
-                            <input type="text" name="function" value="{{ old('function', $employee->function) }}" class="w-full border-2 border-gray-100 p-3 rounded-xl focus:border-orange-500 outline-none transition font-medium">
+                            <input type="text" name="function" value="{{ old('function', $employee->function) }}" class="w-full border-2 border-gray-100 p-3 rounded-xl focus:border-orange-500 outline-none transition font-medium text-gray-700">
                         </div>
                         <div>
                             <label class="block text-xs font-black uppercase text-gray-400 mb-2">Service / Département</label>
-                            <input type="text" name="department" value="{{ old('department', $employee->department) }}" class="w-full border-2 border-gray-100 p-3 rounded-xl focus:border-orange-500 outline-none transition font-medium">
+                            <input type="text" name="department" value="{{ old('department', $employee->department) }}" class="w-full border-2 border-gray-100 p-3 rounded-xl focus:border-orange-500 outline-none transition font-medium text-gray-700">
                         </div>
                     </div>
 
-                    {{-- Gestion de la Photo --}}
                     <div class="bg-orange-50 p-6 rounded-2xl border-2 border-dashed border-orange-200">
                         <label class="block text-xs font-black uppercase text-orange-700 mb-4">Photo d'identité</label>
                         <div class="flex items-center gap-6">
