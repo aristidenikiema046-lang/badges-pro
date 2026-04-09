@@ -6,24 +6,22 @@ use App\Models\Employee;
 use App\Models\Company;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Auth;
 
 class EmployeeController extends Controller
 {
     /**
-     * Liste des employés de l'entreprise (Dashboard Espace Entreprise)
+     * Liste des employés de l'entreprise
      */
     public function index($slug)
     {
-        // On récupère l'entreprise par son slug
         $company = Company::where('slug', $slug)->firstOrFail();
 
-        // On récupère les employés de cette entreprise spécifique
         $employees = Employee::where('company_id', $company->id)
             ->orderBy('created_at', 'desc')
             ->get();
         
-        return view('company.dashboard', compact('employees', 'company'));
+        // CORRECTION ICI : Le chemin correspond à ton dossier
+        return view('company.employees.index', compact('employees', 'company'));
     }
 
     /**
@@ -33,9 +31,8 @@ class EmployeeController extends Controller
     {
         $company = Company::where('slug', $slug)->firstOrFail();
 
-        // Sécurité : Vérifier que l'employé appartient bien à cette entreprise
         if ($employee->company_id !== $company->id) {
-            abort(403, 'Cet employé n\'appartient pas à cette entreprise.');
+            abort(403);
         }
 
         return view('company.employees.edit', compact('employee', 'company'));
@@ -101,21 +98,16 @@ class EmployeeController extends Controller
     }
 
     /**
-     * Formulaire d'inscription public (Lien partagé par l'entreprise)
+     * Formulaire d'inscription public
      */
     public function registerForm($slug)
     {
         $company = Company::where('slug', $slug)->firstOrFail();
-
-        if (!$company->active) {
-            abort(403, 'Cet espace d\'inscription est actuellement suspendu.');
-        }
-
         return view('company.employees.register', compact('company'));
     }
 
     /**
-     * Enregistre un nouvel employé (Formulaire public)
+     * Enregistre un nouvel employé
      */
     public function store(Request $request)
     {
@@ -136,7 +128,7 @@ class EmployeeController extends Controller
 
         Employee::create($validated);
 
-        return back()->with('success', 'Votre demande de badge a été envoyée avec succès !');
+        return back()->with('success', 'Votre demande de badge a été envoyée !');
     }
 
     /**
@@ -145,10 +137,8 @@ class EmployeeController extends Controller
     public function preview($id)
     {
         $employee = Employee::with('company')->findOrFail($id);
-        
         $style = $employee->company->badge_style ?? 'style_1';
 
-        // Helper pour le chemin des images dans la vue
         $getPath = function($path) {
             return empty($path) ? 'https://via.placeholder.com/150' : asset('storage/' . $path);
         };
