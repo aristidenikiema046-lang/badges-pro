@@ -1,4 +1,8 @@
-{{-- On ne garde que la DIV principale du badge --}}
+@php 
+    // Sécurité : si le formulaire n'envoie pas de couleur, on prend celle de l'entreprise ou du noir
+    $mainColor = $mainColor ?? ($employee->company->badge_color ?? '#000000'); 
+@endphp
+
 <div class="badge-card bg-white shadow-xl overflow-hidden flex relative border-2 mx-auto" 
      style="width: 600px; height: 350px; border-radius: 1.5rem; border-color: {{ $mainColor }}">
     
@@ -7,7 +11,6 @@
              style="background-image: url('https://www.transparenttextures.com/patterns/circuit-board.png'); background-color: #f8fafc;">
         </div>
 
-        {{-- Photo de l'employé --}}
         @if($employee->photo)
             <img src="{{ asset('storage/' . $employee->photo) }}" 
                  class="z-10 w-40 h-52 rounded-2xl object-cover shadow-lg border-2 border-white">
@@ -19,12 +22,10 @@
     </div>
 
     <div class="w-3/5 flex flex-col p-6 justify-between">
-        
         <div class="flex items-center gap-3 justify-end border-b pb-3">
             <div class="text-right">
-                {{-- NOM DE L'ENTREPRISE --}}
                 <p class="font-black text-2xl uppercase leading-none" style="color: {{ $mainColor }}">
-                    {{ $employee->company->name ?? 'ENTREPRISE DÉMO' }}
+                    {{ $employee->company->name ?? 'ENTREPRISE' }}
                 </p>
                 <p class="text-[10px] text-gray-400 font-bold tracking-[0.2em]">IDENTITÉ PROFESSIONNELLE</p>
             </div>
@@ -38,7 +39,6 @@
                 <p class="text-gray-400 text-[10px] font-black uppercase tracking-widest">Collaborateur</p>
                 <p class="text-xl font-bold text-slate-800">{{ $employee->first_name }} {{ $employee->last_name }}</p>
             </div>
-
             <div class="grid grid-cols-1 gap-2">
                 <div>
                     <p class="text-gray-400 text-[9px] font-black uppercase">Poste occupé</p>
@@ -54,7 +54,6 @@
         </div>
 
         <div class="flex justify-end items-end">
-            {{-- QR CODE DYNAMIQUE --}}
             <div class="p-1 border rounded-lg" style="border-color: {{ $mainColor }}33">
                 {!! QrCode::size(70)->margin(0)->generate($employee->matricule ?? '0000') !!}
             </div>
