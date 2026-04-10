@@ -25,15 +25,16 @@
             position: relative;
         }
 
-        /* Motif Circuit "Scotché" avec votre SVG */
+            /* Motif Circuit "Scotché" avec votre SVG */
         .circuit-pattern {
             position: absolute;
             left: 0;
             top: 0;
-            width: 100px; /* Largeur fixe de la bande */
+            width: 100px;
             height: 100%;
             background-color: #f8fbff;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 200'%3E%3Cg fill='none' stroke='%23{{ str_replace('#', '', $mainColor) }}' stroke-width='1' opacity='0.4'%3E%3Cpath d='M10 0 v200'/%3E%3Cpath d='M10 20 h20 l10 10 v20'/%3E%3Cpath d='M10 60 h30 l10 10 v30'/%3E%3Cpath d='M10 120 h15 l10 10 v40'/%3E%3Ccircle cx='40' cy='50' r='2' fill='%23{{ str_replace('#', '', $mainColor) }}'/%3E%3Ccircle cx='50' cy='100' r='2' fill='%23{{ str_replace('#', '', $mainColor) }}'/%3E%3C/g%3E%3C/svg%3E");
+            /* Version encodée du SVG pour le CSS */
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 100 373' xmlns='http://www.w3.org/2000/svg'%3E%3Cdefs%3E%3ClinearGradient id='grad' x1='0%25' y1='0%25' x2='0%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%234a90e2'/%3E%3Cstop offset='100%25' stop-color='%23{{ str_replace('#', '', $mainColor) }}'/%3E%3C/linearGradient%3E%3C/defs%3E%3Cg stroke='url(%23grad)' fill='none' stroke-width='1.8'%3E%3Cpath d='M10 0 L10 50 L40 80 L40 150 L10 180 L10 250 L50 280 L50 373'/%3E%3Cpath d='M30 0 L30 40 L60 70 L60 130 L30 160 L30 220 L60 250 L60 373' stroke-width='1.5'/%3E%3Cpath d='M50 0 L50 60 L80 90 L80 140 L50 170 L50 210 L80 240 L80 373' stroke-width='1.2'/%3E%3Cpath d='M20 0 L20 30 L50 30 L50 120 L20 120 L20 373' stroke-width='1.3' opacity='0.7'/%3E%3Cpath d='M70 0 L70 50 L95 50 L95 373' stroke-width='1' opacity='0.5'/%3E%3Ccircle cx='10' cy='50' r='4' stroke='%23{{ str_replace('#', '', $mainColor) }}' fill='none'/%3E%3Ccircle cx='40' cy='80' r='4' stroke='%23{{ str_replace('#', '', $mainColor) }}' fill='none'/%3E%3Ccircle cx='40' cy='150' r='4' stroke='%23{{ str_replace('#', '', $mainColor) }}' fill='none'/%3E%3C/g%3E%3C/svg%3E");
             background-repeat: no-repeat;
             background-size: cover;
             z-index: 1;
