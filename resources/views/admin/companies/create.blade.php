@@ -10,7 +10,8 @@
             transform: scale(0.65); 
             transform-origin: center top;
             width: 100%;
-            min-width: 450px; 
+            /* Adaptation : min-width réduit pour permettre l'affichage sur mobile */
+            min-width: 300px; 
             display: flex;
             justify-content: center;
             transition: all 0.3s ease;
@@ -24,10 +25,17 @@
             justify-content: center;
             align-items: flex-start;
             padding: 20px 0;
+            /* Adaptation : empêche le conteneur de déborder de l'écran */
+            max-width: 100%;
         }
 
         .preview-wrapper::-webkit-scrollbar { height: 4px; }
         .preview-wrapper::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+
+        /* Adaptation : réduction de l'échelle pour les très petits écrans */
+        @media (max-width: 450px) {
+            #style-render-container { transform: scale(0.5); }
+        }
     </style>
 </head>
 <body class="bg-gray-100 p-4 md:p-8 font-sans">

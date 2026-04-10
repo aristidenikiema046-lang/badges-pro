@@ -6,8 +6,9 @@
     <title>Modifier Entreprise - {{ $company->name }}</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="bg-gray-100 p-6 font-sans">
-    <div class="max-w-3xl mx-auto">
+<body class="bg-gray-100 p-4 md:p-6 font-sans">
+    
+    <div class="max-w-3xl mx-auto w-full">
         <div class="mb-6 flex justify-between items-center">
             <a href="{{ route('companies.index') }}" class="text-blue-600 font-bold hover:underline">← Retour à la liste</a>
         </div>
@@ -25,15 +26,15 @@
         @endif
 
         {{-- FORMULAIRE DE MODIFICATION --}}
-        <div class="bg-white rounded-xl shadow-xl border-t-8 border-blue-500 p-8">
-            <div class="flex justify-between items-center mb-8">
+        <div class="bg-white rounded-xl shadow-xl border-t-8 border-blue-500 p-6 md:p-8">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
                 <div>
-                    <h2 class="text-2xl font-bold text-gray-800 uppercase tracking-tight">Modifier l'entreprise</h2>
+                    <h2 class="text-xl md:text-2xl font-bold text-gray-800 uppercase tracking-tight">Modifier l'entreprise</h2>
                     <p class="text-gray-500 text-sm italic">{{ $company->name }}</p>
                 </div>
                 @if($company->logo)
                     <div class="text-center">
-                        <img src="{{ asset('storage/' . $company->logo) }}" class="w-20 h-20 rounded-lg object-contain border-2 border-gray-100 shadow-sm bg-gray-50">
+                        <img src="{{ asset('storage/' . $company->logo) }}" class="w-16 h-16 md:w-20 md:h-20 rounded-lg object-contain border-2 border-gray-100 shadow-sm bg-gray-50 mx-auto">
                         <span class="text-[10px] text-gray-400 font-bold uppercase block mt-1">Logo actuel</span>
                     </div>
                 @endif
@@ -67,15 +68,14 @@
                 <div class="bg-blue-50/50 p-4 rounded-lg border border-blue-100">
                     <label class="block text-sm font-bold text-blue-900 mb-1">Changer le Logo</label>
                     <input type="file" name="logo" class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-600 file:text-white hover:file:bg-blue-700 cursor-pointer">
-                    <p class="text-[11px] text-blue-400 mt-2 font-medium italic">Laissez vide pour conserver le logo actuel (Format recommandé: PNG ou JPG, max 2Mo)</p>
+                    <p class="text-[11px] text-blue-400 mt-2 font-medium italic">Laissez vide pour conserver le logo actuel.</p>
                 </div>
 
-                {{-- SECTION DESIGN (INDISPENSABLE POUR LA COHÉRENCE) --}}
+                {{-- SECTION DESIGN --}}
                 <div class="bg-gray-50 p-6 rounded-xl border-2 border-dashed border-blue-200">
                     <h3 class="text-blue-600 font-bold uppercase text-sm mb-4 tracking-wider">Identité Visuelle des Badges</h3>
                     
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                        {{-- Style --}}
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
                         <div>
                             <label class="block text-sm font-bold text-gray-700 mb-3">Modèle de Badge *</label>
                             <select name="badge_style" required class="w-full border-gray-300 rounded-lg p-3 focus:ring-blue-500 outline-none border bg-white">
@@ -94,22 +94,20 @@
                             </select>
                         </div>
 
-                        {{-- Couleur --}}
                         <div>
                             <label class="block text-sm font-bold text-gray-700 mb-3">Couleur Thématique *</label>
                             <div class="flex items-center gap-4">
                                 <input type="color" name="badge_color" value="{{ old('badge_color', $company->badge_color ?? '#3b82f6') }}" required class="h-12 w-20 p-1 rounded-lg border-gray-300 cursor-pointer shadow-sm bg-white">
-                                <span class="text-[11px] text-gray-500 italic leading-tight">Cette couleur définit l'accent visuel sur tous les badges de cette entreprise.</span>
                             </div>
                         </div>
                     </div>
                 </div>
                 
-                <div class="flex flex-col md:flex-row gap-4 pt-4">
-                    <button type="submit" class="flex-grow bg-blue-600 text-white font-black py-4 rounded-lg hover:bg-blue-700 shadow-lg transition-all uppercase tracking-widest text-lg">
-                        Enregistrer les modifications
+                <div class="flex flex-col sm:flex-row gap-4 pt-4">
+                    <button type="submit" class="w-full sm:flex-grow bg-blue-600 text-white font-black py-4 rounded-lg hover:bg-blue-700 shadow-lg transition-all uppercase tracking-widest text-lg">
+                        Enregistrer
                     </button>
-                    <a href="{{ route('companies.index') }}" class="bg-gray-200 text-gray-700 font-bold py-4 px-8 rounded-lg hover:bg-gray-300 transition shadow-sm uppercase text-sm flex items-center justify-center">
+                    <a href="{{ route('companies.index') }}" class="w-full sm:w-auto bg-gray-200 text-gray-700 font-bold py-4 px-8 rounded-lg hover:bg-gray-300 transition shadow-sm uppercase text-sm flex items-center justify-center">
                         Annuler
                     </a>
                 </div>
