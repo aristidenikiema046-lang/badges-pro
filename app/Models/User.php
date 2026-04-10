@@ -48,6 +48,7 @@ class User extends Authenticatable
      */
     public function company(): BelongsTo
     {
+        // On précise bien la classe Company
         return $this->belongsTo(Company::class);
     }
 

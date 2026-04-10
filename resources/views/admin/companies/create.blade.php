@@ -52,6 +52,7 @@
                 <form action="{{ route('companies.store') }}" method="POST" enctype="multipart/form-data" class="space-y-8">
                     @csrf
 
+                    {{-- Infos Société --}}
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
                             <label class="block text-sm font-bold text-slate-700 mb-2">Nom de l'entreprise *</label>
@@ -68,6 +69,23 @@
                         <input type="file" name="logo" class="w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-bold file:bg-orange-100 file:text-orange-700">
                     </div>
 
+                    {{-- SECTION SÉCURITÉ AJOUTÉE --}}
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 bg-slate-50 p-6 rounded-xl border border-slate-200">
+                        <div class="md:col-span-2">
+                            <h3 class="text-sm font-black uppercase tracking-widest text-slate-400 mb-2">Sécurisation du compte</h3>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold text-slate-700 mb-2">Mot de passe *</label>
+                            <input type="password" name="password" required placeholder="••••••••" class="w-full border-gray-200 rounded-xl p-3 bg-white outline-none focus:ring-2 focus:ring-orange-500 shadow-sm">
+                            <p class="text-[10px] text-slate-400 mt-1 italic">Minimum 8 caractères</p>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold text-slate-700 mb-2">Confirmer le mot de passe *</label>
+                            <input type="password" name="password_confirmation" required placeholder="••••••••" class="w-full border-gray-200 rounded-xl p-3 bg-white outline-none focus:ring-2 focus:ring-orange-500 shadow-sm">
+                        </div>
+                    </div>
+
+                    {{-- Design Badge --}}
                     <div class="border-2 border-orange-100 rounded-2xl p-6 bg-orange-50/30">
                         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
                             <div class="lg:col-span-5 space-y-6">

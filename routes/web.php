@@ -8,7 +8,7 @@ use App\Http\Controllers\BadgeExportController;
 // 1. ACCUEIL
 Route::get('/', function () { return view('welcome'); })->name('home');
 
-// 2. CONFIGURATION ENTREPRISE (PUBLIC)
+// 2. CONFIGURATION ENTREPRISE (PUBLIC - INSCRIPTION AUTONOME)
 Route::get('/inscription-partenaire', [CompanyController::class, 'create'])->name('companies.create');
 Route::post('/inscription-partenaire', [CompanyController::class, 'store'])->name('companies.store');
 
@@ -51,8 +51,9 @@ Route::get('/preview-style/{style}', function ($style) {
     return view('company.badges.styles.' . $style, compact('employee', 'getPath', 'mainColor'));
 })->name('style.preview');
 
-// 5. ZONE GESTION ENTREPRISE (ESPACE DU MANAGER D'ENTREPRISE)
-Route::prefix('{slug}/dashboard')->group(function () {
+// 5. ZONE GESTION ENTREPRISE (SÉCURISÉE PAR AUTHENTIFICATION)
+// On ajoute 'auth' pour que l'entreprise connectée accède à ses propres données
+Route::middleware(['auth'])->prefix('{slug}/dashboard')->group(function () {
     Route::get('/employees', [EmployeeController::class, 'index'])->name('company.employees');
     Route::get('/employees/{id}/edit', [EmployeeController::class, 'edit'])->name('employees.edit')->where('id', '[0-9]+');
     Route::put('/employees/{id}', [EmployeeController::class, 'update'])->name('employees.update')->where('id', '[0-9]+');

@@ -4,8 +4,11 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Company;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 
 class CompanyController extends Controller
@@ -25,12 +28,13 @@ class CompanyController extends Controller
     {
         $validated = $request->validate([
             'name'         => 'required|string|max:255',
-            'email'        => 'required|email|unique:companies,email',
+            'email'        => 'required|email|unique:companies,email|unique:users,email',
             'phone'        => 'nullable|string|max:20',
             'manager_name' => 'nullable|string|max:255',
             'logo'         => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'badge_style'  => 'required|in:style_1,style_2,style_3,style_4,style_5,style_6',
             'badge_color'  => 'required|string|max:7',
+            'password'     => 'required|min:8', 
         ]);
 
         if ($request->hasFile('logo')) {
@@ -41,13 +45,27 @@ class CompanyController extends Controller
         $validated['slug'] = Str::slug($request->name) . '-' . Str::lower(Str::random(5));
         $validated['active'] = true;
 
+        // 1. Création de l'entreprise
         $company = Company::create($validated);
 
+        // 2. Création de l'utilisateur associé (GÉRANT D'ENTREPRISE)
+        // STRICTEMENT 'role' => 'client' pour ne pas donner d'accès admin
+        $user = User::create([
+            'name'       => $company->name,
+            'email'      => $company->email,
+            'password'   => Hash::make($request->password),
+            'company_id' => $company->id,
+            'role'       => 'client', // Sécurité : rôle client forcé ici
+        ]);
+
+        // 3. Connexion automatique immédiate
+        Auth::login($user);
+
+        // 4. Redirection vers son espace personnel (Dashboard Entreprise)
         return redirect()->route('company.employees', ['slug' => $company->slug])
-            ->with('success', "Bienvenue ! Votre espace {$company->name} a été configuré.");
+            ->with('success', "Bienvenue ! Votre espace {$company->name} a été configuré et vous êtes connecté.");
     }
 
-    // AJOUT DE LA MÉTHODE SHOW POUR RÉGLER LE PROBLÈME
     public function show($id)
     {
         $company = Company::findOrFail($id);
