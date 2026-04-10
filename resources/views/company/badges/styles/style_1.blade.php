@@ -25,20 +25,20 @@
             position: relative;
         }
 
+        /* Motif Circuit "Scotché" avec votre SVG */
         .circuit-pattern {
             position: absolute;
             left: 0;
             top: 0;
-            width: 35%;
+            width: 100px; /* Largeur fixe de la bande */
             height: 100%;
             background-color: #f8fbff;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 200'%3E%3Cg fill='none' stroke='%23{{ str_replace('#', '', $mainColor) }}' stroke-width='0.6' opacity='0.3'%3E%3Cpath d='M-5 5 h20 l10 10 v10 l10 10 h70'/%3E%3Cpath d='M-5 45 h30 l15 15 v20 l10 10 h55'/%3E%3Cpath d='M-5 90 h15 l10 10 v30 l10 10 h75'/%3E%3C/g%3E%3C/svg%3E");
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 200'%3E%3Cg fill='none' stroke='%23{{ str_replace('#', '', $mainColor) }}' stroke-width='1' opacity='0.4'%3E%3Cpath d='M10 0 v200'/%3E%3Cpath d='M10 20 h20 l10 10 v20'/%3E%3Cpath d='M10 60 h30 l10 10 v30'/%3E%3Cpath d='M10 120 h15 l10 10 v40'/%3E%3Ccircle cx='40' cy='50' r='2' fill='%23{{ str_replace('#', '', $mainColor) }}'/%3E%3Ccircle cx='50' cy='100' r='2' fill='%23{{ str_replace('#', '', $mainColor) }}'/%3E%3C/g%3E%3C/svg%3E");
             background-repeat: no-repeat;
             background-size: cover;
             z-index: 1;
         }
 
-        /* Photo centrée dans la zone gauche */
         .photo-container {
             width: 200px;
             height: 250px;
@@ -64,7 +64,7 @@
     <div class="badge-card">
         <div class="circuit-pattern"></div>
         
-        <div class="w-[35%] flex items-center justify-center z-10">
+        <div class="w-[35%] flex items-center justify-center z-10 ml-8">
             @if($employee->photo)
                 <img src="{{ asset('storage/' . $employee->photo) }}" class="photo-container">
             @else
@@ -73,7 +73,6 @@
         </div>
 
         <div class="w-[65%] p-10 flex flex-col justify-between z-10">
-            
             <div class="flex items-center justify-end gap-3">
                 <span class="text-2xl font-bold" style="color: {{ $mainColor }}">
                     {{ $employee->company->name ?? 'PAYMETRUST' }}
