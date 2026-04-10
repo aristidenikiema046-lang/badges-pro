@@ -6,6 +6,7 @@ use App\Models\Employee;
 use App\Models\Company;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Auth;
 
 class EmployeeController extends Controller
 {
@@ -14,7 +15,14 @@ class EmployeeController extends Controller
      */
     public function index($slug)
     {
+        $user = Auth::user();
         $company = Company::where('slug', $slug)->firstOrFail();
+
+        // SÉCURITÉ : Empêcher une entreprise de voir les données d'une autre
+        // L'admin peut tout voir, le client ne voit que son slug
+        if ($user->role !== 'admin' && $user->company->slug !== $slug) {
+            abort(403, "Vous n'avez pas l'autorisation d'accéder à ce dashboard.");
+        }
 
         $employees = Employee::where('company_id', $company->id)
             ->orderBy('created_at', 'desc')
@@ -28,10 +36,15 @@ class EmployeeController extends Controller
      */
     public function edit($slug, $id)
     {
+        $user = Auth::user();
         $company = Company::where('slug', $slug)->firstOrFail();
         $employee = Employee::findOrFail($id);
 
-        // FORCER LA COMPARAISON NUMÉRIQUE ICI
+        // SÉCURITÉ : Vérification du propriétaire (Slug et Appartenance de l'employé)
+        if ($user->role !== 'admin' && $user->company->slug !== $slug) {
+            abort(403);
+        }
+
         if ((int)$employee->company_id !== (int)$company->id) {
             abort(403, "L'employé appartient à une autre entreprise.");
         }
@@ -44,8 +57,14 @@ class EmployeeController extends Controller
      */
     public function update(Request $request, $slug, $id)
     {
+        $user = Auth::user();
         $company = Company::where('slug', $slug)->firstOrFail();
         $employee = Employee::findOrFail($id);
+
+        // SÉCURITÉ
+        if ($user->role !== 'admin' && $user->company->slug !== $slug) {
+            abort(403);
+        }
 
         if ((int)$employee->company_id !== (int)$company->id) {
             abort(403);
@@ -59,7 +78,6 @@ class EmployeeController extends Controller
             'photo'      => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
-        // On prépare les données pour l'update
         $data = [
             'first_name' => $validated['first_name'],
             'last_name'  => $validated['last_name'],
@@ -85,8 +103,14 @@ class EmployeeController extends Controller
      */
     public function destroy($slug, $id)
     {
+        $user = Auth::user();
         $company = Company::where('slug', $slug)->firstOrFail();
         $employee = Employee::findOrFail($id);
+
+        // SÉCURITÉ
+        if ($user->role !== 'admin' && $user->company->slug !== $slug) {
+            abort(403);
+        }
 
         if ((int)$employee->company_id !== (int)$company->id) {
             abort(403);
@@ -103,7 +127,7 @@ class EmployeeController extends Controller
     }
 
     /**
-     * Formulaire d'inscription public
+     * Formulaire d'inscription public (Accessible sans auth via le lien de partage)
      */
     public function registerForm($slug)
     {

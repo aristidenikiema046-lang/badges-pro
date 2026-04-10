@@ -12,7 +12,7 @@ use Illuminate\View\View;
 class AuthenticatedSessionController extends Controller
 {
     /**
-     * Display the login view.
+     * Affiche la vue de connexion.
      */
     public function create(): View
     {
@@ -20,20 +20,40 @@ class AuthenticatedSessionController extends Controller
     }
 
     /**
-     * Handle an incoming authentication request.
+     * Gère une demande d'authentification entrante.
      */
     public function store(LoginRequest $request): RedirectResponse
     {
+        // Authentifier l'utilisateur via les règles définies dans LoginRequest
         $request->authenticate();
 
+        // Régénérer la session pour éviter les fixations de session
         $request->session()->regenerate();
 
-        // CORRECTION : On redirige vers la liste des entreprises au lieu de 'dashboard'
-        return redirect()->intended(route('companies.index', absolute: false));
+        $user = Auth::user();
+
+        /**
+         * LOGIQUE DE REDIRECTION DYNAMIQUE
+         * On redirige l'utilisateur selon son rôle défini en base de données.
+         */
+        
+        // 1. Si c'est un Administrateur YA Consulting
+        if ($user->role === 'admin') {
+            return redirect()->intended(route('companies.index'));
+        } 
+        
+        // 2. Si c'est une Entreprise partenaire (Client)
+        // On vérifie qu'il a bien une entreprise liée pour éviter les erreurs sur le slug
+        if ($user->role === 'client' && $user->company) {
+            return redirect()->intended(route('company.employees', ['slug' => $user->company->slug]));
+        }
+
+        // 3. Redirection par défaut (Accueil) si le rôle n'est pas reconnu
+        return redirect()->intended('/');
     }
 
     /**
-     * Destroy an authenticated session.
+     * Détruit une session authentifiée (Déconnexion).
      */
     public function destroy(Request $request): RedirectResponse
     {
