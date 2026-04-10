@@ -1,5 +1,5 @@
 @php 
-    // Bleu profond et sombre par défaut
+    // Couleur principale dynamique ou bleu par défaut
     $mainColor = $employee->company->badge_color ?? '#1e3a8a'; 
     $qrData = "NOM: {$employee->last_name}\n"
             . "PRENOM: {$employee->first_name}\n"
@@ -13,43 +13,53 @@
     <meta charset="utf-8">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* Taille fixe pour éviter le rendu miniature */
+        /* Conteneur principal */
         .badge-card {
-            width: 650px;
-            height: 400px;
-            position: relative;
-            background-color: white;
-            border-radius: 30px;
-            box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1);
+            width: 700px;
+            height: 450px;
+            background: white;
+            border-radius: 20px;
             display: flex;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            margin: 50px auto;
             overflow: hidden;
-            border: 1px solid #f3f4f6;
+            border: 1px solid #e0e0e0;
+            position: relative;
         }
 
-        /* Motif style Circuit Intégré remplissant toute la hauteur */
-        /* Motif style Circuit Intégré Haute Densité - Full Hauteur */
+        /* Motif Circuit Dynamique */
         .circuit-pattern {
             position: absolute;
             left: 0;
             top: 0;
-            width: 40%; /* Légèrement plus large pour la densité */
+            width: 35%;
             height: 100%;
-            opacity: 0.9;
-            z-index: 1;
-        /* SVG enrichi : Lignes triples et multiplication des chemins */
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 200'%3E%3Cg fill='none' stroke='%23{{ str_replace('#', '', $mainColor) }}' stroke-width='0.6'%3E%3C!-- BLOC 1 : HAUT DENSE --%3E%3Cpath d='M-5 5 h20 l10 10 v10 l10 10 h70'/%3E%3Cpath d='M-5 9 h19 l10 10 v10 l10 10 h70'/%3E%3Cpath d='M-5 13 h18 l10 10 v10 l10 10 h70'/%3E%3Ccircle cx='15' cy='5' r='1' fill='%23{{ str_replace('#', '', $mainColor) }}'/%3E%3C!-- BLOC 2 : MILIEU HAUT --%3E%3Cpath d='M-5 45 h30 l15 15 v20 l10 10 h55'/%3E%3Cpath d='M-5 49 h29 l15 15 v20 l10 10 h55'/%3E%3Cpath d='M-5 53 h28 l15 15 v20 l10 10 h55'/%3E%3Crect x='25' y='43' width='2' height='2' fill='%23{{ str_replace('#', '', $mainColor) }}'/%3E%3C!-- BLOC 3 : CENTRAL --%3E%3Cpath d='M-5 90 h15 l10 10 v30 l10 10 h75'/%3E%3Cpath d='M-5 94 h14 l10 10 v30 l10 10 h75'/%3E%3Ccircle cx='10' cy='90' r='1' fill='%23{{ str_replace('#', '', $mainColor) }}'/%3E%3C!-- BLOC 4 : MILIEU BAS --%3E%3Cpath d='M-5 135 h25 l10 10 v15 l10 10 h60'/%3E%3Cpath d='M-5 139 h24 l10 10 v15 l10 10 h60'/%3E%3Crect x='20' y='133' width='2' height='2' fill='%23{{ str_replace('#', '', $mainColor) }}'/%3E%3C!-- BLOC 5 : BAS DENSE --%3E%3Cpath d='M-5 175 h15 l15 15 v10 l10 10 h60'/%3E%3Cpath d='M-5 179 h14 l15 15 v10 l10 10 h60'/%3E%3Cpath d='M-5 183 h13 l15 15 v10 l10 10 h60'/%3E%3C!-- LIGNES DE LIAISON VERTICALES --%3E%3Cpath d='M8 0 v200' opacity='0.3'/%3E%3Cpath d='M22 0 v200' opacity='0.3'/%3E%3Cpath d='M36 0 v200' opacity='0.3'/%3E%3C!-- POINTS DE SOUDURE SUPPLEMENTAIRES --%3E%3Ccircle cx='45' cy='25' r='1' fill='%23{{ str_replace('#', '', $mainColor) }}'/%3E%3Ccircle cx='55' cy='65' r='1' fill='%23{{ str_replace('#', '', $mainColor) }}'/%3E%3Ccircle cx='25' cy='100' r='1' fill='%23{{ str_replace('#', '', $mainColor) }}'/%3E%3C/g%3E%3C/svg%3E");
+            background-color: #f8fbff;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 200'%3E%3Cg fill='none' stroke='%23{{ str_replace('#', '', $mainColor) }}' stroke-width='0.6' opacity='0.3'%3E%3Cpath d='M-5 5 h20 l10 10 v10 l10 10 h70'/%3E%3Cpath d='M-5 45 h30 l15 15 v20 l10 10 h55'/%3E%3Cpath d='M-5 90 h15 l10 10 v30 l10 10 h75'/%3E%3C/g%3E%3C/svg%3E");
             background-repeat: no-repeat;
-            background-size: 100% 100%;
-            background-position: left center;
+            background-size: cover;
+            z-index: 1;
         }
+
+        /* Photo avec ombre */
+        .photo-container {
+            width: 180px;
+            height: 220px;
+            border-radius: 20px;
+            object-fit: cover;
+            z-index: 2;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            border: 3px solid white;
+        }
+
         @media print {
             .no-print { display: none; }
             body { background: white; }
-            .badge-card { box-shadow: none; border: 1px solid #ddd; -webkit-print-color-adjust: exact; }
+            .badge-card { box-shadow: none; border: 1px solid #ddd; }
         }
     </style>
 </head>
-<body class="bg-slate-50 flex flex-col items-center justify-center min-h-screen p-4">
+<body class="bg-slate-100 flex flex-col items-center justify-center min-h-screen p-4">
 
     <button onclick="window.print()" class="no-print mb-8 bg-blue-600 text-white px-8 py-3 rounded-xl font-bold shadow-lg hover:bg-blue-700 transition">
         IMPRIMER LE BADGE
@@ -57,48 +67,42 @@
 
     <div class="badge-card">
         <div class="circuit-pattern"></div>
-
-        <div class="w-[40%] flex items-center justify-center p-10 z-10">
-            <div class="w-full aspect-square rounded-[2rem] overflow-hidden shadow-xl bg-white border-4 border-white">
-                @if($employee->photo)
-                    <img src="{{ asset('storage/' . $employee->photo) }}" class="w-full h-full object-cover">
-                @else
-                    <div class="w-full h-full flex items-center justify-center bg-gray-100 text-gray-400">Photo</div>
-                @endif
-            </div>
+        <div class="w-[35%] flex items-center justify-center z-10">
+            @if($employee->photo)
+                <img src="{{ asset('storage/' . $employee->photo) }}" class="photo-container">
+            @else
+                <div class="photo-container bg-gray-200 flex items-center justify-center text-gray-400">Photo</div>
+            @endif
         </div>
 
-        <div class="w-[55%] flex flex-col p-10 justify-between text-right z-10">
-            
+        <div class="w-[65%] p-10 flex flex-col justify-between z-10">
             <div class="flex items-center justify-end gap-3">
-                <span class="text-2xl font-bold text-slate-800 tracking-tighter">
-                    {{ $employee->company->name ?? 'PAYMETRUST' }}
+                <span class="text-2xl font-black uppercase" style="color: {{ $mainColor }}">
+                    {{ $employee->company->name ?? 'ENTREPRISE' }}
                 </span>
                 @if($employee->company && $employee->company->logo)
                     <img src="{{ asset('storage/' . $employee->company->logo) }}" class="h-10 w-auto">
-                @else
-                    <div class="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center text-white font-bold">P</div>
                 @endif
             </div>
 
             <div class="mt-4">
                 <h1 class="text-4xl font-black text-slate-900 uppercase leading-none">
-                    {{ $employee->last_name }}
+                    {{ strtoupper($employee->last_name) }}
                 </h1>
-                <h1 class="text-3xl font-bold text-slate-900 uppercase">
-                    {{ $employee->first_name }}
+                <h1 class="text-3xl font-bold text-slate-800 uppercase">
+                    {{ ucfirst($employee->first_name) }}
                 </h1>
                 <p class="text-xl font-semibold mt-2" style="color: {{ $mainColor }}">
-                    {{ $employee->function ?? 'Analyste Financier' }}
+                    {{ $employee->function ?? 'Analyste' }}
                 </p>
-                <p class="text-sm font-bold text-slate-400 mt-4">
+                <p class="text-sm font-bold text-slate-400 mt-2">
                     Matricule : <span class="text-slate-600 font-mono">{{ $employee->matricule }}</span>
                 </p>
             </div>
 
             <div class="flex justify-end mt-4">
-                <div class="p-2 bg-white rounded-2xl shadow-sm border border-gray-50">
-                    {!! QrCode::size(90)->margin(0)->generate($qrData) !!}
+                <div class="p-1 bg-white rounded-lg shadow-sm border border-gray-100">
+                    {!! QrCode::size(80)->margin(0)->generate($qrData) !!}
                 </div>
             </div>
         </div>
