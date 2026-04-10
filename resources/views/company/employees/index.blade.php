@@ -14,10 +14,17 @@
                 <h1 class="text-2xl font-bold uppercase italic">Gestion des Badges</h1>
                 <p class="text-green-100 text-xs tracking-widest uppercase font-bold">{{ $company->name }}</p>
             </div>
-            {{-- Le bouton déconnexion est masqué car seul l'admin utilise une session --}}
-            <div class="text-sm font-bold uppercase tracking-widest text-green-200">
-                Espace Partenaire
-            </div>
+            
+            {{-- Bouton de déconnexion à la place de "Espace Partenaire" --}}
+            <form method="POST" action="{{ route('logout') }}">
+                @csrf
+                <button type="submit" class="flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg transition font-black uppercase text-[11px] tracking-widest shadow-md border border-red-500">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                    </svg>
+                    Déconnexion
+                </button>
+            </form>
         </div>
     </nav>
 
@@ -90,7 +97,6 @@
                         </td>
                         <td class="p-4 text-right">
                             <div class="flex justify-end gap-2">
-                                {{-- Preview Badge --}}
                                 <a href="{{ route('badge.preview', $emp->id) }}" target="_blank" class="bg-blue-100 text-blue-600 p-2 rounded hover:bg-blue-600 hover:text-white transition shadow-sm" title="Voir Badge">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -98,14 +104,12 @@
                                     </svg>
                                 </a>
 
-                                {{-- EDIT : Paramètres corrigés avec 'slug' et 'id' --}}
                                 <a href="{{ route('employees.edit', ['slug' => $company->slug, 'id' => $emp->id]) }}" class="bg-gray-100 text-gray-600 p-2 rounded hover:bg-gray-800 hover:text-white transition shadow-sm" title="Modifier">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                                     </svg>
                                 </a>
 
-                                {{-- DELETE : Paramètres corrigés avec 'slug' et 'id' --}}
                                 <form action="{{ route('employees.destroy', ['slug' => $company->slug, 'id' => $emp->id]) }}" method="POST" onsubmit="return confirm('Supprimer cet employé ?');">
                                     @csrf @method('DELETE')
                                     <button type="submit" class="bg-red-50 text-red-600 p-2 rounded hover:bg-red-600 hover:text-white transition shadow-sm">
