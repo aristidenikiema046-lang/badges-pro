@@ -1,34 +1,9 @@
 @php 
-    $mainColor = $employee->company->badge_color ?? '#1e3a8a';
-    $hexColor = str_replace('#', '', $mainColor);
-    
-    // Votre SVG avec transformation (translate 373, scale -1) pour inverser le haut/bas
-    $svgContent = <<<SVG
-<svg viewBox='0 0 100 373' xmlns='http://www.w3.org/2000/svg'>
-    <defs>
-        <linearGradient id='grad' x1='0%' y1='0%' x2='0%' y2='100%'>
-            <stop offset='0%' stop-color='%234a90e2'/>
-            <stop offset='100%' stop-color='%23$hexColor'/>
-        </linearGradient>
-    </defs>
-    <g transform='translate(0, 373) scale(1, -1)' stroke='url(%23grad)' fill='none' stroke-width='1.8'>
-        <path d='M10 0 L10 50 L40 80 L40 150 L10 180 L10 250 L50 280 L50 373' />
-        <path d='M30 0 L30 40 L60 70 L60 130 L30 160 L30 220 L60 250 L60 373' stroke-width='1.5' />
-        <path d='M50 0 L50 60 L80 90 L80 140 L50 170 L50 210 L80 240 L80 373' stroke-width='1.2' />
-        <path d='M20 0 L20 30 L50 30 L50 120 L20 120 L20 373' stroke-width='1.3' opacity='0.7' />
-        <path d='M70 0 L70 50 L95 50 L95 373' stroke-width='1' opacity='0.5' />
-        <g stroke='%23$hexColor' stroke-width='1.5' fill='none'>
-            <circle cx='10' cy='50' r='4'/><circle cx='40' cy='80' r='4'/><circle cx='40' cy='150' r='4'/>
-            <circle cx='30' cy='160' r='4'/><circle cx='50' cy='170' r='4'/><circle cx='50' cy='210' r='4'/>
-            <circle cx='50' cy='280' r='4'/><circle cx='80' cy='240' r='4'/><circle cx='60' cy='250' r='4'/>
-            <circle cx='20' cy='30' r='4'/><circle cx='50' cy='120' r='4'/><circle cx='70' cy='50' r='4'/>
-        </g>
-    </g>
-</svg>
-SVG;
-
-    $encodedSvg = 'data:image/svg+xml,' . rawurlencode($svgContent);
-    $qrData = "NOM: {$employee->last_name}\nPRENOM: {$employee->first_name}\nPOSTE: {$employee->function}\nID: {$employee->matricule}";
+    $mainColor = $employee->company->badge_color ?? '#1e3a8a'; 
+    $qrData = "NOM: {$employee->last_name}\n"
+            . "PRENOM: {$employee->first_name}\n"
+            . "POSTE: {$employee->function}\n"
+            . "ID: {$employee->matricule}";
 @endphp
 
 <!DOCTYPE html>
@@ -50,16 +25,18 @@ SVG;
             position: relative;
         }
 
-        .circuit-pattern {
+            /* Motif Circuit "Scotché" avec votre SVG */
+            .circuit-pattern {
             position: absolute;
             left: 0;
             top: 0;
             width: 100px;
             height: 100%;
             background-color: #f8fbff;
-            background-image: url("{{ $encodedSvg }}");
+            /* Nouveau code SVG intégré */
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 100 373' xmlns='http://www.w3.org/2000/svg'%3E%3Cdefs%3E%3ClinearGradient id='circuitGradient' x1='0%25' y1='0%25' x2='0%25' y2='100%25'%3E%3Cstop offset='0%25' style='stop-color:%234a90e2'/%3E%3Cstop offset='100%25' style='stop-color:%23{{ str_replace('#', '', $mainColor) }}'/%3E%3C/linearGradient%3E%3C/defs%3E%3Cg transform='translate(0, 373) scale(1, -1)'%3E%3Cg stroke='url(%23circuitGradient)' fill='none' stroke-width='1.8'%3E%3Cpath d='M10 0 L10 50 L40 80 L40 150 L10 180 L10 250 L50 280 L50 373'/%3E%3Cpath d='M30 0 L30 40 L60 70 L60 130 L30 160 L30 220 L60 250 L60 373' stroke-width='1.5'/%3E%3Cpath d='M50 0 L50 60 L80 90 L80 140 L50 170 L50 210 L80 240 L80 373' stroke-width='1.2'/%3E%3Cpath d='M20 0 L20 30 L50 30 L50 120 L20 120 L20 373' stroke-width='1.3' opacity='0.7'/%3E%3Cpath d='M70 0 L70 50 L95 50 L95 373' stroke-width='1' opacity='0.5'/%3E%3Cpath d='M10 50 L30 50' stroke-width='1.2'/%3E%3Cpath d='M40 100 L60 100' stroke-width='1.2'/%3E%3Cpath d='M30 200 L50 200' stroke-width='1.2'/%3E%3Cpath d='M20 70 L50 70' stroke-width='1'/%3E%3Cpath d='M60 300 L80 300' stroke-width='1'/%3E%3Cpath d='M10 280 L30 280' stroke-width='1.2'/%3E%3Cpath d='M50 320 L70 320' stroke-width='1.2'/%3E%3Cpath d='M30 350 L60 350' stroke-width='1'/%3E%3Cpath d='M70 250 L90 250' stroke-width='1'/%3E%3Cpath d='M20 300 L80 370' stroke-width='1'/%3E%3Cpath d='M20 300 L95 350' stroke-width='1.2'/%3E%3Cpath d='M20 300 L50 350' stroke-width='1.2'/%3E%3Cg stroke='%23{{ str_replace('#', '', $mainColor) }}' stroke-width='1.5' fill='none'%3E%3Ccircle cx='10' cy='50' r='4'/%3E%3Ccircle cx='40' cy='80' r='4'/%3E%3Ccircle cx='40' cy='150' r='4'/%3E%3Ccircle cx='30' cy='160' r='4'/%3E%3Ccircle cx='50' cy='170' r='4'/%3E%3Ccircle cx='50' cy='210' r='4'/%3E%3Ccircle cx='50' cy='280' r='4'/%3E%3Ccircle cx='80' cy='240' r='4'/%3E%3Ccircle cx='60' cy='250' r='4'/%3E%3Ccircle cx='20' cy='30' r='4'/%3E%3Ccircle cx='50' cy='120' r='4'/%3E%3Ccircle cx='70' cy='50' r='4'/%3E%3Ccircle cx='95' cy='300' r='4'/%3E%3Ccircle cx='95' cy='350' r='4'/%3E%3Ccircle cx='50' cy='350' r='4'/%3E%3Ccircle cx='80' cy='365' r='4'/%3E%3C/g%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
             background-repeat: no-repeat;
-            background-size: cover;
+            background-size: contain; /* Ajuste pour mieux visualiser le circuit complet */
             z-index: 1;
         }
 
@@ -125,5 +102,6 @@ SVG;
             </div>
         </div>
     </div>
+
 </body>
 </html>
