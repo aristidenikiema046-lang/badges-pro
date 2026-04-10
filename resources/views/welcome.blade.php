@@ -20,15 +20,33 @@
         </h1>
 
         <div class="flex flex-col md:flex-row gap-6">
-            <a href="{{ route('companies.create') }}" 
-               class="flex items-center justify-center bg-orange-500 hover:bg-orange-600 text-white font-bold py-4 px-8 rounded-lg shadow-lg transition min-w-[320px] transform hover:scale-105">
-                <span class="mr-2 text-xl">👤+</span> ENREGISTRER LES INFOS ENTREPRISE
-            </a>
+            
+            @auth
+                @if(auth()->user()->isAdmin())
+                    {{-- Bouton pour le Super Admin --}}
+                    <a href="{{ route('companies.index') }}" 
+                       class="flex items-center justify-center bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-4 px-8 rounded-lg shadow-lg transition min-w-[320px] transform hover:scale-105">
+                        <span class="mr-2 text-xl">⚙️</span> ACCÉDER À L'ADMINISTRATION
+                    </a>
+                @else
+                    {{-- Bouton pour l'Entreprise (Client) --}}
+                    <a href="{{ route('company.employees', ['slug' => auth()->user()->company->slug]) }}" 
+                       class="flex items-center justify-center bg-orange-500 hover:bg-orange-600 text-white font-bold py-4 px-8 rounded-lg shadow-lg transition min-w-[320px] transform hover:scale-105">
+                        <span class="mr-2 text-xl">📊</span> MON TABLEAU DE BORD
+                    </a>
+                @endif
+            @else
+                <a href="{{ route('companies.create') }}" 
+                   class="flex items-center justify-center bg-orange-500 hover:bg-orange-600 text-white font-bold py-4 px-8 rounded-lg shadow-lg transition min-w-[320px] transform hover:scale-105">
+                    <span class="mr-2 text-xl">👤+</span> ENREGISTRER MON ENTREPRISE
+                </a>
 
-            <a href="{{ route('companies.index') }}" 
-               class="flex items-center justify-center bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-4 px-8 rounded-lg shadow-lg transition min-w-[320px] transform hover:scale-105">
-                <span class="mr-2 text-xl">⚙️</span> GÉRER LES ENTREPRISES
-            </a>
+                <a href="{{ route('login') }}" 
+                   class="flex items-center justify-center bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-4 px-8 rounded-lg shadow-lg transition min-w-[320px] transform hover:scale-105">
+                    <span class="mr-2 text-xl">🔑</span> CONNEXION PARTENAIRE
+                </a>
+            @endauth
+
         </div>
     </main>
 
