@@ -1,5 +1,4 @@
 @php 
-    // Couleur principale dynamique ou bleu par défaut
     $mainColor = $employee->company->badge_color ?? '#1e3a8a'; 
     $qrData = "NOM: {$employee->last_name}\n"
             . "PRENOM: {$employee->first_name}\n"
@@ -13,7 +12,6 @@
     <meta charset="utf-8">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* Conteneur principal */
         .badge-card {
             width: 700px;
             height: 450px;
@@ -27,7 +25,6 @@
             position: relative;
         }
 
-        /* Motif Circuit Dynamique */
         .circuit-pattern {
             position: absolute;
             left: 0;
@@ -41,15 +38,14 @@
             z-index: 1;
         }
 
-        /* Photo avec ombre */
+        /* Photo centrée dans la zone gauche */
         .photo-container {
-            width: 180px;
-            height: 220px;
-            border-radius: 20px;
+            width: 200px;
+            height: 250px;
+            border-radius: 15px;
             object-fit: cover;
             z-index: 2;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-            border: 3px solid white;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
         }
 
         @media print {
@@ -67,6 +63,7 @@
 
     <div class="badge-card">
         <div class="circuit-pattern"></div>
+        
         <div class="w-[35%] flex items-center justify-center z-10">
             @if($employee->photo)
                 <img src="{{ asset('storage/' . $employee->photo) }}" class="photo-container">
@@ -76,33 +73,31 @@
         </div>
 
         <div class="w-[65%] p-10 flex flex-col justify-between z-10">
+            
             <div class="flex items-center justify-end gap-3">
-                <span class="text-2xl font-black uppercase" style="color: {{ $mainColor }}">
-                    {{ $employee->company->name ?? 'ENTREPRISE' }}
+                <span class="text-2xl font-bold" style="color: {{ $mainColor }}">
+                    {{ $employee->company->name ?? 'PAYMETRUST' }}
                 </span>
                 @if($employee->company && $employee->company->logo)
                     <img src="{{ asset('storage/' . $employee->company->logo) }}" class="h-10 w-auto">
                 @endif
             </div>
 
-            <div class="mt-4">
-                <h1 class="text-4xl font-black text-slate-900 uppercase leading-none">
-                    {{ strtoupper($employee->last_name) }}
+            <div class="flex flex-col justify-center">
+                <h1 class="text-4xl font-bold text-slate-900 uppercase">
+                    {{ strtoupper($employee->last_name) }} {{ strtoupper($employee->first_name) }}
                 </h1>
-                <h1 class="text-3xl font-bold text-slate-800 uppercase">
-                    {{ ucfirst($employee->first_name) }}
-                </h1>
-                <p class="text-xl font-semibold mt-2" style="color: {{ $mainColor }}">
-                    {{ $employee->function ?? 'Analyste' }}
+                <p class="text-xl font-medium mt-1" style="color: {{ $mainColor }}">
+                    {{ $employee->function ?? 'Analyste Financier' }}
                 </p>
-                <p class="text-sm font-bold text-slate-400 mt-2">
-                    Matricule : <span class="text-slate-600 font-mono">{{ $employee->matricule }}</span>
+                <p class="text-lg text-slate-600 mt-2">
+                    Matricule : {{ $employee->matricule }}
                 </p>
             </div>
 
-            <div class="flex justify-end mt-4">
-                <div class="p-1 bg-white rounded-lg shadow-sm border border-gray-100">
-                    {!! QrCode::size(80)->margin(0)->generate($qrData) !!}
+            <div class="flex justify-end">
+                <div class="p-1 border border-slate-200 rounded-lg">
+                    {!! QrCode::size(100)->margin(0)->generate($qrData) !!}
                 </div>
             </div>
         </div>
