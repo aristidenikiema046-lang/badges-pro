@@ -64,13 +64,21 @@ Route::middleware(['auth'])->prefix('{slug}/dashboard')->group(function () {
 Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
     Route::get('/entreprises', [CompanyController::class, 'index'])->name('companies.index');
     
-    // LIGNE AJOUTÉE POUR RÉGLER L'ERREUR
-    Route::get('/entreprises/{id}', [CompanyController::class, 'show'])->name('companies.show');
+    // Ajout de la contrainte where pour sécuriser les IDs
+    Route::get('/entreprises/{id}', [CompanyController::class, 'show'])
+         ->name('companies.show')->where('id', '[0-9]+');
     
-    Route::get('/entreprises/{id}/modifier', [CompanyController::class, 'edit'])->name('companies.edit');
-    Route::put('/entreprises/{id}', [CompanyController::class, 'update'])->name('companies.update');
-    Route::delete('/entreprises/{id}', [CompanyController::class, 'destroy'])->name('companies.destroy');
-    Route::patch('/entreprises/{id}/toggle', [CompanyController::class, 'toggleStatus'])->name('companies.toggle');
+    Route::get('/entreprises/{id}/modifier', [CompanyController::class, 'edit'])
+         ->name('companies.edit')->where('id', '[0-9]+');
+         
+    Route::put('/entreprises/{id}', [CompanyController::class, 'update'])
+         ->name('companies.update')->where('id', '[0-9]+');
+         
+    Route::delete('/entreprises/{id}', [CompanyController::class, 'destroy'])
+         ->name('companies.destroy')->where('id', '[0-9]+');
+         
+    Route::patch('/entreprises/{id}/toggle', [CompanyController::class, 'toggleStatus'])
+         ->name('companies.toggle')->where('id', '[0-9]+');
 });
 
 require __DIR__.'/auth.php';

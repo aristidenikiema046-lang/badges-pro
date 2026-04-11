@@ -13,9 +13,20 @@ use Illuminate\Support\Str;
 
 class CompanyController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $companies = Company::latest()->get();
+        // Recherche ajoutée : filtrage par nom ou email
+        $query = Company::latest();
+
+        if ($request->filled('search')) {
+            $searchTerm = $request->search;
+            $query->where(function($q) use ($searchTerm) {
+                $q->where('name', 'like', '%' . $searchTerm . '%')
+                  ->orWhere('email', 'like', '%' . $searchTerm . '%');
+            });
+        }
+
+        $companies = $query->get();
         return view('admin.companies.index', compact('companies'));
     }
 
@@ -49,19 +60,18 @@ class CompanyController extends Controller
         $company = Company::create($validated);
 
         // 2. Création de l'utilisateur associé (GÉRANT D'ENTREPRISE)
-        // STRICTEMENT 'role' => 'client' pour ne pas donner d'accès admin
         $user = User::create([
             'name'       => $company->name,
             'email'      => $company->email,
             'password'   => Hash::make($request->password),
             'company_id' => $company->id,
-            'role'       => 'client', // Sécurité : rôle client forcé ici
+            'role'       => 'client', 
         ]);
 
         // 3. Connexion automatique immédiate
         Auth::login($user);
 
-        // 4. Redirection vers son espace personnel (Dashboard Entreprise)
+        // 4. Redirection
         return redirect()->route('company.employees', ['slug' => $company->slug])
             ->with('success', "Bienvenue ! Votre espace {$company->name} a été configuré et vous êtes connecté.");
     }
@@ -109,7 +119,16 @@ class CompanyController extends Controller
     public function destroy($id)
     {
         $company = Company::findOrFail($id);
-        if ($company->logo) { Storage::disk('public')->delete($company->logo); }
+        
+        // Suppression de l'utilisateur associé avant l'entreprise
+        if ($company->user) {
+            $company->user()->delete();
+        }
+
+        if ($company->logo) { 
+            Storage::disk('public')->delete($company->logo); 
+        }
+        
         $company->delete();
 
         return redirect()->route('companies.index')->with('success', 'Suppression effectuée.');
