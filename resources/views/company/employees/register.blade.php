@@ -21,7 +21,7 @@
                 @if($company->logo)
                     <img src="{{ asset('storage/' . $company->logo) }}" alt="Logo" class="h-20 w-20 bg-white p-2 rounded-2xl mb-8 object-contain">
                 @endif
-                <h1 class="text-4xl font-black uppercase tracking-tighter">Accès<br>Système</h1>
+                <h1 class="text-4xl font-black uppercase tracking-tighter">Badges<br>Pro</h1>
                 <div class="w-16 h-1 bg-blue-400 mt-6"></div>
                 <p class="mt-8 text-blue-100 text-sm leading-relaxed opacity-80 font-light">
                     Plateforme sécurisée pour l'enregistrement et la gestion des badges professionnels {{ $company->name }}.
@@ -68,7 +68,7 @@
                 </div>
 
                 <button type="submit" class="w-full bg-blue-600 text-white font-black py-4 rounded-xl mt-4 hover:bg-blue-700 transition-all uppercase tracking-[0.2em] text-xs">
-                    Initialiser Accès
+                    Generer mon badge
                 </button>
             </form>
         </div>
