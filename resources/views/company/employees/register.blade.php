@@ -10,7 +10,7 @@
         
         body {
             font-family: 'JetBrains Mono', monospace;
-            background-color: #f8fafc; /* Fond blanc très clair */
+            background-color: #f8fafc;
             background-image: 
                 linear-gradient(rgba(59, 130, 246, 0.05) 1px, transparent 1px),
                 linear-gradient(90deg, rgba(59, 130, 246, 0.05) 1px, transparent 1px);
@@ -30,7 +30,7 @@
         }
         
         .input-blue:focus {
-            border-color: #3b82f6; /* Bleu vif */
+            border-color: #3b82f6;
             box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
             outline: none;
         }
@@ -69,27 +69,27 @@
                 <div class="grid grid-cols-2 gap-4">
                     <div class="space-y-1">
                         <label class="text-[9px] font-bold text-slate-400 uppercase tracking-widest ml-1">Prénom</label>
-                        <input type="text" name="first_name" required class="w-full input-blue p-3 rounded-md text-sm text-blue-900">
+                        <input type="text" name="first_name" value="{{ old('first_name') }}" required class="w-full input-blue p-3 rounded-md text-sm text-blue-900">
                     </div>
                     <div class="space-y-1">
                         <label class="text-[9px] font-bold text-slate-400 uppercase tracking-widest ml-1">Nom</label>
-                        <input type="text" name="last_name" required class="w-full input-blue p-3 rounded-md text-sm text-blue-900">
+                        <input type="text" name="last_name" value="{{ old('last_name') }}" required class="w-full input-blue p-3 rounded-md text-sm text-blue-900">
                     </div>
                 </div>
 
                 <div class="space-y-1">
                     <label class="text-[9px] font-bold text-slate-400 uppercase tracking-widest ml-1">Email</label>
-                    <input type="email" name="email" required class="w-full input-blue p-3 rounded-md text-sm text-blue-900">
+                    <input type="email" name="email" value="{{ old('email') }}" required class="w-full input-blue p-3 rounded-md text-sm text-blue-900">
                 </div>
 
                 <div class="grid grid-cols-2 gap-4">
                     <div class="space-y-1">
                         <label class="text-[9px] font-bold text-slate-400 uppercase tracking-widest ml-1">Poste</label>
-                        <input type="text" name="function" required class="w-full input-blue p-3 rounded-md text-sm text-blue-900">
+                        <input type="text" name="function" value="{{ old('function') }}" required class="w-full input-blue p-3 rounded-md text-sm text-blue-900">
                     </div>
                     <div class="space-y-1">
                         <label class="text-[9px] font-bold text-slate-400 uppercase tracking-widest ml-1">Matricule</label>
-                        <input type="text" name="matricule" required class="w-full input-blue p-3 rounded-md text-sm text-blue-900 uppercase">
+                        <input type="text" name="matricule" value="{{ old('matricule') }}" required class="w-full input-blue p-3 rounded-md text-sm text-blue-900 uppercase">
                     </div>
                 </div>
 
