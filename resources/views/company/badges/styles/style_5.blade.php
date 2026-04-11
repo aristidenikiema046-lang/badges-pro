@@ -43,9 +43,11 @@
             @if($employee->company && $employee->company->logo)
                 <img src="{{ asset('storage/' . $employee->company->logo) }}" class="h-8 w-auto object-contain">
             @endif
-            <h3 class="font-black text-sm uppercase tracking-widest leading-tight" style="color: {{ $mainColor }}">
-                {{ $employee->company->name ?? 'YA CONSULTING' }}
-            </h3>
+            @if(!isset($hideCompanyName) || !$hideCompanyName)
+                <h3 class="font-black text-sm uppercase tracking-widest leading-tight" style="color: {{ $mainColor }}">
+                    {{ $employee->company->name ?? 'YA CONSULTING' }}
+                </h3>
+            @endif
         </div>
 
         {{-- Photo --}}

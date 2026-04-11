@@ -17,6 +17,11 @@
         $selectedStyle = $employee->company->badge_style ?? 'style_1';
         $landscapeStyles = ['style_4', 'style_6']; 
         $isLandscape = in_array($selectedStyle, $landscapeStyles);
+
+        // --- Logique Adaptative pour le Logo ---
+        // Liste des noms d'entreprises dont le logo contient déjà le nom
+        $textLogoCompanies = ['PAYMETRUST', 'AGRPRICE'];
+        $hideCompanyName = in_array(strtoupper($employee->company->name), $textLogoCompanies);
     @endphp
 
     <style>
@@ -67,7 +72,8 @@
             <div class="w-full h-full overflow-hidden rounded-[1.4rem]">
                 @include('company.badges.styles.' . $selectedStyle, [
                     'employee' => $employee,
-                    'getPath' => $getPath
+                    'getPath' => $getPath,
+                    'hideCompanyName' => $hideCompanyName
                 ])
             </div>
         </div>
@@ -87,7 +93,6 @@
     </div>
 
     <script>
-        // Script pour réduire le badge si l'écran est trop petit
         function adjustBadgeScale() {
             const container = document.getElementById('container');
             const badge = document.getElementById('badge-final');

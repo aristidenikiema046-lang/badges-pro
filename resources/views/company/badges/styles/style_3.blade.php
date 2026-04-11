@@ -18,9 +18,12 @@
         @if($employee->company && $employee->company->logo)
             <img src="{{ $getPath($employee->company->logo) }}" class="h-8 sm:h-12 w-auto object-contain">
         @endif
-        <p class="text-[8px] sm:text-[9px] font-black uppercase tracking-[0.2em] text-gray-400 mt-2 truncate max-w-[90%]">
-            {{ $employee->company->name }}
-        </p>
+        
+        @if(!isset($hideCompanyName) || !$hideCompanyName)
+            <p class="text-[8px] sm:text-[9px] font-black uppercase tracking-[0.2em] text-gray-400 mt-2 truncate max-w-[90%]">
+                {{ $employee->company->name }}
+            </p>
+        @endif
     </div>
 
     {{-- Corps central --}}

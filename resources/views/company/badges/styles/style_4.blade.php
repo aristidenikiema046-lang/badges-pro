@@ -72,9 +72,11 @@
             
             <div class="flex items-center justify-end gap-3 border-b border-gray-100 pb-2">
                 <div class="text-right">
-                    <p class="font-black text-sm sm:text-xl uppercase leading-none" style="color: {{ $mainColor }}">
-                        {{ $employee->company->name ?? 'YA CONSULTING' }}
-                    </p>
+                    @if(!isset($hideCompanyName) || !$hideCompanyName)
+                        <p class="font-black text-sm sm:text-xl uppercase leading-none" style="color: {{ $mainColor }}">
+                            {{ $employee->company->name ?? 'YA CONSULTING' }}
+                        </p>
+                    @endif
                     <p class="text-[8px] text-gray-400 font-bold tracking-widest mt-1 uppercase">Carte Pro</p>
                 </div>
                 @if($employee->company && $employee->company->logo)

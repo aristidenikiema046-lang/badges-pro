@@ -67,9 +67,11 @@
         <div class="content-side w-3/5 flex flex-col p-4 sm:p-8 justify-between bg-white relative">
             <div class="flex items-center gap-2 sm:gap-4 justify-end border-b pb-2 sm:pb-4">
                 <div class="text-right">
-                    <p class="font-black text-sm sm:text-2xl uppercase leading-none" style="color: {{ $mainColor }}">
-                        {{ $employee->company->name ?? 'ENTREPRISE' }}
-                    </p>
+                    @if(!isset($hideCompanyName) || !$hideCompanyName)
+                        <p class="font-black text-sm sm:text-2xl uppercase leading-none" style="color: {{ $mainColor }}">
+                            {{ $employee->company->name ?? 'ENTREPRISE' }}
+                        </p>
+                    @endif
                     <p class="text-[8px] text-gray-400 font-bold tracking-[0.2em] mt-1 uppercase">Carte Pro</p>
                 </div>
                 @if($employee->company && $employee->company->logo)

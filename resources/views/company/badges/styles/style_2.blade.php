@@ -19,9 +19,13 @@
                     <img src="{{ asset('storage/' . $employee->company->logo) }}" class="h-6 w-auto object-contain">
                 </div>
             @endif
-            <p class="text-[9px] font-black uppercase tracking-[0.2em] text-white/90 text-center drop-shadow-sm px-2">
-                {{ $employee->company->name ?? 'ENTREPRISE' }}
-            </p>
+            
+            {{-- MODIFICATION : Masquage conditionnel du nom textuel --}}
+            @if(!isset($hideCompanyName) || !$hideCompanyName)
+                <p class="text-[9px] font-black uppercase tracking-[0.2em] text-white/90 text-center drop-shadow-sm px-2">
+                    {{ $employee->company->name ?? 'ENTREPRISE' }}
+                </p>
+            @endif
         </div>
 
         {{-- Photo Profile --}}
