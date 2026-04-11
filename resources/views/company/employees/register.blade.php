@@ -12,12 +12,15 @@
         .blue-side { background: #2563eb; color: white; }
     </style>
 </head>
-<body class="min-h-screen flex items-center justify-center p-4">
+<body class="min-h-screen flex flex-col items-center justify-center p-4">
 
     <div class="w-full max-w-4xl bg-white rounded-3xl shadow-2xl overflow-hidden split-card">
         
         <div class="blue-side p-12 flex flex-col justify-between">
             <div>
+                @if($company->logo)
+                    <img src="{{ asset('storage/' . $company->logo) }}" alt="Logo" class="h-20 w-20 bg-white p-2 rounded-2xl mb-8 object-contain">
+                @endif
                 <h1 class="text-4xl font-black uppercase tracking-tighter">Accès<br>Système</h1>
                 <div class="w-16 h-1 bg-blue-400 mt-6"></div>
                 <p class="mt-8 text-blue-100 text-sm leading-relaxed opacity-80 font-light">
@@ -70,5 +73,10 @@
             </form>
         </div>
     </div>
+
+    <div class="mt-8 text-[10px] text-slate-400 uppercase tracking-widest">
+        © {{ date('Y') }} YaConsulting. Tous droits réservés.
+    </div>
+
 </body>
 </html>
