@@ -1,15 +1,14 @@
 @php 
     $mainColor = $employee->company->badge_color ?? '#1e3a8a'; 
     
-    // Nettoyage des données pour le QR Code afin d'éviter l'erreur ISO-8859-1
-    $cleanForQr = function($text) {
-        return iconv('UTF-8', 'ISO-8859-1//TRANSLIT', $text ?? '');
-    };
+    // On construit les données sans forcer ISO-8859-1. 
+    // On utilise directement l'UTF-8 car la bibliothèque le gère nativement.
+    $qrData = "NOM: {$employee->last_name}\n"
+            . "PRENOM: {$employee->first_name}\n"
+            . "POSTE: {$employee->function}\n"
+            . "ID: {$employee->matricule}";
 
-    $qrData = "NOM: " . $cleanForQr($employee->last_name) . "\n"
-            . "PRENOM: " . $cleanForQr($employee->first_name) . "\n"
-            . "POSTE: " . $cleanForQr($employee->function) . "\n"
-            . "ID: " . $cleanForQr($employee->matricule);
+    // Note: Si vous utilisez la façade QrCode, forcez l'encodage si nécessaire
 @endphp
 
 <!DOCTYPE html>
@@ -104,7 +103,7 @@
 
             <div class="flex justify-end">
                 <div class="p-1 border border-slate-200 rounded-lg">
-                    {!! QrCode::size(100)->margin(0)->generate($qrData) !!}
+                    {!! QrCode::size(100)->margin(0)->encoding('UTF-8')->generate($qrData) !!}
                 </div>
             </div>
         </div>
