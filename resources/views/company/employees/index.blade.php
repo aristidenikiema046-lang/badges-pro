@@ -81,7 +81,16 @@
                             <td class="p-4 font-bold text-sm">{{ $emp->first_name }} {{ $emp->last_name }}<br><span class="text-[9px] text-gray-400 font-mono">MAT: {{ $emp->matricule }}</span></td>
                             <td class="p-4 text-sm">{{ $emp->function }}<br><span class="text-[10px] uppercase text-gray-400">{{ $emp->department }}</span></td>
                             <td class="p-4 text-center"><span class="{{ $emp->is_validated ? 'bg-green-100 text-green-700' : 'bg-orange-100 text-orange-700' }} px-3 py-1 rounded-full text-[10px] font-black uppercase">{{ $emp->is_validated ? 'Validé' : 'Attente' }}</span></td>
-                            <td class="p-4 text-right"><div class="flex justify-end gap-2"><a href="{{ route('badge.preview', $emp->id) }}" target="_blank" class="p-2">👁️</a><a href="{{ route('employees.edit', ['slug' => $company->slug, 'id' => $emp->id]) }}" class="p-2">✏️</a></div></td>
+                            <td class="p-4 text-right">
+                                <div class="flex justify-end gap-2 items-center">
+                                    <a href="{{ route('badge.preview', $emp->id) }}" target="_blank" class="p-2">👁️</a>
+                                    <a href="{{ route('employees.edit', ['slug' => $company->slug, 'id' => $emp->id]) }}" class="p-2">✏️</a>
+                                    <form action="{{ route('employees.destroy', [$company->slug, $emp->id]) }}" method="POST" onsubmit="return confirm('Supprimer cet employé ?');">
+                                        @csrf @method('DELETE')
+                                        <button type="submit" class="p-2 text-red-500 hover:text-red-700">🗑️</button>
+                                    </form>
+                                </div>
+                            </td>
                         </tr>
                         @empty
                         <tr><td colspan="5" class="p-10 text-center text-gray-400 italic">Aucun employé inscrit.</td></tr>
@@ -100,9 +109,13 @@
                             <p class="text-[10px] text-gray-500">{{ $emp->function }}</p>
                         </div>
                     </div>
-                    <div class="flex gap-2">
+                    <div class="flex gap-1 items-center">
                         <a href="{{ route('badge.preview', $emp->id) }}" class="p-2 bg-blue-50 text-blue-600 rounded">👁️</a>
                         <a href="{{ route('employees.edit', ['slug' => $company->slug, 'id' => $emp->id]) }}" class="p-2 bg-gray-100 text-gray-600 rounded">✏️</a>
+                        <form action="{{ route('employees.destroy', [$company->slug, $emp->id]) }}" method="POST" onsubmit="return confirm('Supprimer ?');">
+                            @csrf @method('DELETE')
+                            <button type="submit" class="p-2 bg-red-50 text-red-600 rounded">🗑️</button>
+                        </form>
                     </div>
                 </div>
                 @empty
