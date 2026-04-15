@@ -53,6 +53,15 @@
                             <label class="block text-xs font-black uppercase text-gray-400 mb-2">Service / Département</label>
                             <input type="text" name="department" value="{{ old('department', $employee->department) }}" class="w-full border-2 border-gray-100 p-3 rounded-xl focus:border-orange-500 outline-none transition font-medium text-gray-700">
                         </div>
+                        {{-- Nouveaux champs ajoutés --}}
+                        <div>
+                            <label class="block text-xs font-black uppercase text-gray-400 mb-2">Email</label>
+                            <input type="email" name="email" value="{{ old('email', $employee->email) }}" required class="w-full border-2 border-gray-100 p-3 rounded-xl focus:border-orange-500 outline-none transition font-bold text-gray-700">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-black uppercase text-gray-400 mb-2">Matricule</label>
+                            <input type="text" name="matricule" value="{{ old('matricule', $employee->matricule) }}" required class="w-full border-2 border-gray-100 p-3 rounded-xl focus:border-orange-500 outline-none transition font-bold text-gray-700">
+                        </div>
                     </div>
 
                     <div class="bg-orange-50 p-4 sm:p-6 rounded-2xl border-2 border-dashed border-orange-200">

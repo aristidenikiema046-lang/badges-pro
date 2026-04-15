@@ -73,6 +73,8 @@ class EmployeeController extends Controller
         $validated = $request->validate([
             'first_name' => 'required|string|max:255',
             'last_name'  => 'required|string|max:255',
+            'email'      => 'required|email|unique:employees,email,' . $employee->id,
+            'matricule'  => 'required|string|unique:employees,matricule,' . $employee->id,
             'function'   => 'nullable|string|max:255',
             'department' => 'nullable|string|max:255',
             'photo'      => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
@@ -81,6 +83,8 @@ class EmployeeController extends Controller
         $data = [
             'first_name' => $validated['first_name'],
             'last_name'  => $validated['last_name'],
+            'email'      => $validated['email'],
+            'matricule'  => $validated['matricule'],
             'function'   => $validated['function'],
             'department' => $validated['department'],
         ];
