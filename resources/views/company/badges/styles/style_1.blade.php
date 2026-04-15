@@ -106,7 +106,7 @@
     {{-- VERSO (Visible seulement si l'entreprise est Paymetrust) --}}
     @if(strtoupper($employee->company->name) === 'PAYMETRUST')
     <div class="badge-card">
-        <img src="{{ asset('storage/badges/verso_paymetrust.png') }}" class="w-full h-full object-cover">
+        <img src="{{ asset('storage/badges/verso_paymetrust.png') }}" class="w-full h-full object-cover" alt="Verso">
     </div>
     @endif
 
