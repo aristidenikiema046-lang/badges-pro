@@ -28,11 +28,13 @@
         /* Conteneur de mise à l'échelle pour le responsive */
         .badge-wrapper {
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
             width: 100%;
             overflow: hidden;
             padding: 20px 0;
+            gap: 20px;
         }
 
         .badge-card {
@@ -51,8 +53,8 @@
         @media print {
             .no-print { display: none !important; }
             body { background: white; padding: 0; }
-            .badge-wrapper { padding: 0; }
-            .badge-card { transform: scale(1) !important; box-shadow: none; border: 1px solid #eee; border-radius: 0; }
+            .badge-wrapper { padding: 0; gap: 0; }
+            .badge-card { transform: scale(1) !important; box-shadow: none; border: 1px solid #eee; border-radius: 0; page-break-after: always; }
         }
     </style>
 </head>
@@ -77,6 +79,14 @@
                 ])
             </div>
         </div>
+
+        @if(strtoupper($employee->company->name) === 'PAYMETRUST')
+            <div class="badge-card {{ $isLandscape ? 'landscape-card' : 'portrait-card' }}">
+                <div class="w-full h-full overflow-hidden rounded-[1.4rem]">
+                    <img src="{{ asset('storage/badges/verso_paymetrust.png') }}" class="w-full h-full object-cover" alt="Verso">
+                </div>
+            </div>
+        @endif
     </div>
 
     <div class="mt-8 flex flex-col w-full max-w-sm sm:flex-row gap-4 no-print">
