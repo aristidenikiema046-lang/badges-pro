@@ -18,14 +18,11 @@
         $landscapeStyles = ['style_4', 'style_6']; 
         $isLandscape = in_array($selectedStyle, $landscapeStyles);
 
-        // --- Logique Adaptative pour le Logo ---
-        // Liste des noms d'entreprises dont le logo contient déjà le nom
         $textLogoCompanies = ['PAYMETRUST', 'AGRPRICE'];
         $hideCompanyName = in_array(strtoupper($employee->company->name), $textLogoCompanies);
     @endphp
 
     <style>
-        /* Conteneur de mise à l'échelle pour le responsive */
         .badge-wrapper {
             display: flex;
             flex-direction: column;
@@ -54,7 +51,9 @@
             .no-print { display: none !important; }
             body { background: white; padding: 0; }
             .badge-wrapper { padding: 0; gap: 0; }
-            .badge-card { transform: scale(1) !important; box-shadow: none; border: 1px solid #eee; border-radius: 0; page-break-after: always; }
+            /* Force le saut de page seulement après le recto */
+            #badge-final { transform: scale(1) !important; box-shadow: none; border: 1px solid #eee; border-radius: 0; page-break-after: always; }
+            .verso-card { transform: scale(1) !important; box-shadow: none; border: 1px solid #eee; border-radius: 0; }
         }
     </style>
 </head>
@@ -81,7 +80,7 @@
         </div>
 
         @if(strtoupper($employee->company->name) === 'PAYMETRUST')
-            <div class="badge-card {{ $isLandscape ? 'landscape-card' : 'portrait-card' }}">
+            <div class="badge-card verso-card {{ $isLandscape ? 'landscape-card' : 'portrait-card' }}">
                 <div class="w-full h-full overflow-hidden rounded-[1.4rem]">
                     <img src="{{ asset('storage/badges/verso_paymetrust.png') }}" class="w-full h-full object-cover" alt="Verso">
                 </div>
@@ -105,16 +104,18 @@
     <script>
         function adjustBadgeScale() {
             const container = document.getElementById('container');
-            const badge = document.getElementById('badge-final');
+            const badges = document.querySelectorAll('.badge-card');
             const containerWidth = container.offsetWidth - 40;
-            const badgeWidth = badge.offsetWidth;
-
-            if (badgeWidth > containerWidth) {
-                const scale = containerWidth / badgeWidth;
-                badge.style.transform = `scale(${scale})`;
-            } else {
-                badge.style.transform = `scale(1)`;
-            }
+            
+            badges.forEach(badge => {
+                const badgeWidth = badge.offsetWidth;
+                if (badgeWidth > containerWidth) {
+                    const scale = containerWidth / badgeWidth;
+                    badge.style.transform = `scale(${scale})`;
+                } else {
+                    badge.style.transform = `scale(1)`;
+                }
+            });
         }
 
         window.addEventListener('resize', adjustBadgeScale);
