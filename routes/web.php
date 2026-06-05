@@ -5,8 +5,18 @@ use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\Admin\CompanyController;
 use App\Http\Controllers\BadgeExportController;
 
-// 1. ACCUEIL
-Route::get('/', function () { return view('welcome'); })->name('home');
+// 1. ACCUEIL (Forcer la redirection vers le login pour éviter les conflits de dossier racine)
+Route::get('/', function () { 
+    return redirect()->route('login'); 
+})->name('home');
+
+// Sécurité : Si jamais une déconnexion tente un appel GET égaré
+Route::get('/logout', function () {
+    auth()->logout();
+    request()->session()->invalidate();
+    request()->session()->regenerateToken();
+    return redirect()->route('login');
+});
 
 // 2. CONFIGURATION ENTREPRISE (PUBLIC - INSCRIPTION AUTONOME)
 Route::get('/inscription-partenaire', [CompanyController::class, 'create'])->name('companies.create');
