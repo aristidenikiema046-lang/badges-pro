@@ -49,7 +49,7 @@ class AuthenticatedSessionController extends Controller
         }
 
         // 3. Redirection par défaut (Accueil) si le rôle n'est pas reconnu
-        return redirect()->intended('/');
+        return redirect()->route('login');
     }
 
     /**
@@ -63,6 +63,7 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerateToken();
 
-        return redirect('/');
+        // À REMPLACER : redirect('/') par redirect()->route('login')
+        return redirect()->route('login');
     }
 }
