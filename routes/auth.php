@@ -54,6 +54,17 @@ Route::middleware('auth')->group(function () {
 
     Route::put('password', [PasswordController::class, 'update'])->name('password.update');
 
-    Route::post('logout', [AuthenticatedSessionController::class, 'destroy'])
-        ->name('logout');
+    Route::post('logout', function (\Illuminate\Http\Request $request) {
+        // Déconnecter l'utilisateur proprement
+        \Illuminate\Support\Facades\Auth::guard('web')->logout();
+
+        // Nettoyer et invalider sa session actuelle
+        $request->session()->invalidate();
+
+        // Régénérer le token CSRF pour la sécurité
+        $request->session()->regenerateToken();
+
+        // Forcer la redirection directe vers la page de connexion
+        return redirect()->route('login');
+    })->name('logout');
 });
