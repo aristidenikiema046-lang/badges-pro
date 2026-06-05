@@ -6,7 +6,9 @@ use App\Http\Controllers\Admin\CompanyController;
 use App\Http\Controllers\BadgeExportController;
 
 // 1. ACCUEIL (Forcer la redirection vers le login pour éviter les conflits de dossier racine)
-
+Route::match(['get', 'head'], '/', function () {
+    return redirect()->route('login');
+})->name('home');
 // Sécurité : Si jamais une déconnexion tente un appel GET égaré
 Route::get('/logout', function () {
     auth()->logout();
