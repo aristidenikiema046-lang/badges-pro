@@ -22,9 +22,9 @@ Route::get('/logout', function () {
 Route::get('/inscription-partenaire', [CompanyController::class, 'create'])->name('companies.create');
 Route::post('/inscription-partenaire', [CompanyController::class, 'store'])->name('companies.store');
 
-// 3. INSCRIPTION EMPLOYÉS (SÉCURISÉE AVEC LE SLUG EN PARAMÈTRE POUR ÉVITER LES ERREURS 403)
+// 3. INSCRIPTION EMPLOYÉS (SUPPORT HYBRIDE POUR EVITER L'ERREUR METHOD NOT ALLOWED)
 Route::get('/register/{slug}', [EmployeeController::class, 'registerForm'])->name('inscription.tenant');
-Route::post('/register/{slug}/save', [EmployeeController::class, 'store'])->name('employee.store');
+Route::match(['get', 'post'], '/register/{slug}/save', [EmployeeController::class, 'store'])->name('employee.store');
 
 // 4. BADGES ET EXPORT
 Route::get('/badge/preview/{id}', [EmployeeController::class, 'preview'])->name('badge.preview')->where('id', '[0-9]+');
@@ -81,6 +81,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
     Route::get('/entreprises/{id}/modifier', [CompanyController::class, 'edit'])
          ->name('companies.edit')->where('id', '[0-9]+');
          
+    // Mise à jour et suppression des entreprises
     Route::put('/entreprises/{id}', [CompanyController::class, 'update'])
          ->name('companies.update')->where('id', '[0-9]+');
          

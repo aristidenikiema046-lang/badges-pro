@@ -19,7 +19,6 @@ class EmployeeController extends Controller
         $company = Company::where('slug', $slug)->firstOrFail();
 
         // SÉCURITÉ : Empêcher une entreprise de voir les données d'une autre
-        // L'admin peut tout voir, le client ne voit que son slug
         if ($user->role !== 'admin' && $user->company->slug !== $slug) {
             abort(403, "Vous n'avez pas l'autorisation d'accéder à ce dashboard.");
         }
@@ -40,7 +39,7 @@ class EmployeeController extends Controller
         $company = Company::where('slug', $slug)->firstOrFail();
         $employee = Employee::findOrFail($id);
 
-        // SÉCURITÉ : Vérification du propriétaire (Slug et Appartenance de l'employé)
+        // SÉCURITÉ : Vérification du propriétaire
         if ($user->role !== 'admin' && $user->company->slug !== $slug) {
             abort(403);
         }
@@ -75,7 +74,7 @@ class EmployeeController extends Controller
             'last_name'  => 'required|string|max:255',
             'email'      => 'required|email|unique:employees,email,' . $employee->id,
             'matricule'  => 'required|string|unique:employees,matricule,' . $employee->id,
-            'function'   => 'nullable|string|max:255',
+            'function'   => 'required|string|max:255',
             'department' => 'nullable|string|max:255',
             'photo'      => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ]);
@@ -131,7 +130,7 @@ class EmployeeController extends Controller
     }
 
     /**
-     * Formulaire d'inscription public (Accessible sans auth via le lien de partage)
+     * Formulaire d'inscription public
      */
     public function registerForm($slug)
     {
@@ -140,25 +139,31 @@ class EmployeeController extends Controller
     }
 
     /**
-     * Enregistre un nouvel employé
+     * Enregistre un nouvel employé (Support hybride POST/GET suite aux redirections serveur)
      */
     public function store(Request $request, $slug)
     {
+        // Si le serveur (LiteSpeed/Cloudflare) a forcé une redirection et transformé le POST en GET,
+        // on injecte les paramètres reçus globaux dans l'instance de validation pour éviter le crash.
+        if ($request->isMethod('get')) {
+            $request->merge($request->all());
+        }
+
         // 1. Récupération sécurisée de l'entreprise via le slug reçu dans l'URL
         $company = Company::where('slug', $slug)->firstOrFail();
 
-        // 2. Validation des données du formulaire
+        // 2. Validation des données du formulaire (synchronisée sur les contraintes HTML)
         $validated = $request->validate([
             'first_name' => 'required|string|max:255',
             'last_name'  => 'required|string|max:255',
             'email'      => 'required|email|unique:employees,email',
             'matricule'  => 'required|string|unique:employees,matricule',
-            'function'   => 'nullable|string|max:255',
+            'function'   => 'required|string|max:255',
             'department' => 'nullable|string|max:255',
             'photo'      => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
-        // 3. Forcer l'ID de l'entreprise récupérée depuis l'URL (plus sécurisé que l'input hidden)
+        // 3. Forcer l'ID de l'entreprise récupérée depuis l'URL
         $validated['company_id'] = $company->id;
 
         // 4. Traitement du téléversement de la photo
@@ -169,7 +174,7 @@ class EmployeeController extends Controller
         // 5. Création de l'employé
         $employee = Employee::create($validated);
 
-        // 6. Redirection vers l'aperçu du badge
+        // 6. Redirection relative explicite (évite les conflits d'URLs générées par route() en sous-dossier)
         return redirect()->to('/badges-pro/badge/preview/' . $employee->id);
     }
 
