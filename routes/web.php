@@ -22,9 +22,9 @@ Route::get('/logout', function () {
 Route::get('/inscription-partenaire', [CompanyController::class, 'create'])->name('companies.create');
 Route::post('/inscription-partenaire', [CompanyController::class, 'store'])->name('companies.store');
 
-// 3. INSCRIPTION EMPLOYÉS (SUPPORT HYBRIDE POUR EVITER L'ERREUR METHOD NOT ALLOWED)
+// 3. INSCRIPTION EMPLOYÉS (RESTAURÉ EN POST STRICT - L'AJAX ÉVITE LE CONFLIT SERVEUR)
 Route::get('/register/{slug}', [EmployeeController::class, 'registerForm'])->name('inscription.tenant');
-Route::match(['get', 'post'], '/register/{slug}/save', [EmployeeController::class, 'store'])->name('employee.store');
+Route::post('/register/{slug}/save', [EmployeeController::class, 'store'])->name('employee.store');
 
 // 4. BADGES ET EXPORT
 Route::get('/badge/preview/{id}', [EmployeeController::class, 'preview'])->name('badge.preview')->where('id', '[0-9]+');

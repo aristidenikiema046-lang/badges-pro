@@ -139,20 +139,13 @@ class EmployeeController extends Controller
     }
 
     /**
-     * Enregistre un nouvel employé (Support hybride POST/GET suite aux redirections serveur)
+     * Enregistre un nouvel employé (Support JSON + Base64 anti-blocage serveur)
      */
     public function store(Request $request, $slug)
     {
-        // Si le serveur (LiteSpeed/Cloudflare) a forcé une redirection et transformé le POST en GET,
-        // on injecte les paramètres reçus globaux dans l'instance de validation pour éviter le crash.
-        if ($request->isMethod('get')) {
-            $request->merge($request->all());
-        }
-
-        // 1. Récupération sécurisée de l'entreprise via le slug reçu dans l'URL
         $company = Company::where('slug', $slug)->firstOrFail();
 
-        // 2. Validation des données du formulaire (synchronisée sur les contraintes HTML)
+        // 1. Validation des champs textuels standard
         $validated = $request->validate([
             'first_name' => 'required|string|max:255',
             'last_name'  => 'required|string|max:255',
@@ -160,22 +153,44 @@ class EmployeeController extends Controller
             'matricule'  => 'required|string|unique:employees,matricule',
             'function'   => 'required|string|max:255',
             'department' => 'nullable|string|max:255',
-            'photo'      => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
-        // 3. Forcer l'ID de l'entreprise récupérée depuis l'URL
         $validated['company_id'] = $company->id;
+        $validated['photo'] = null;
 
-        // 4. Traitement du téléversement de la photo
-        if ($request->hasFile('photo')) {
-            $validated['photo'] = $request->file('photo')->store('employees/photos', 'public');
+        // 2. Traitement et décodage de la photo en Base64
+        if ($request->filled('photo_base64')) {
+            try {
+                $base64String = $request->input('photo_base64');
+                
+                // Extraction du type mime et de la chaîne de données pure
+                if (preg_match('/^data:image\/(\w+);base64,/', $base64String, $type)) {
+                    $data = substr($base64String, strpos($base64String, ',') + 1);
+                    $type = strtolower($type[1]); // jpeg, png, jpg
+
+                    if (in_array($type, ['jpeg', 'jpg', 'png'])) {
+                        $decodedData = base64_decode($data);
+                        
+                        if ($decodedData !== false) {
+                            $fileName = 'employees/photos/' . uniqid() . '.' . $type;
+                            Storage::disk('public')->put($fileName, $decodedData);
+                            $validated['photo'] = $fileName;
+                        }
+                    }
+                }
+            } catch (\Exception $e) {
+                // Ignore l'erreur ou écris dans les logs si nécessaire
+            }
         }
 
-        // 5. Création de l'employé
+        // 3. Persistance des données en base
         $employee = Employee::create($validated);
 
-        // 6. Redirection relative explicite (évite les conflits d'URLs générées par route() en sous-dossier)
-        return redirect()->to('/badges-pro/badge/preview/' . $employee->id);
+        // 4. Réponse JSON fluide captée par le script JavaScript pour redirection
+        return response()->json([
+            'success' => true,
+            'redirect' => '/badges-pro/badge/preview/' . $employee->id
+        ]);
     }
 
     /**
