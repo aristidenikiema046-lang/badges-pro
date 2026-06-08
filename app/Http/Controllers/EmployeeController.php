@@ -142,8 +142,12 @@ class EmployeeController extends Controller
     /**
      * Enregistre un nouvel employé
      */
-    public function store(Request $request)
+    public function store(Request $request, $slug)
     {
+        // 1. Récupération sécurisée de l'entreprise via le slug reçu dans l'URL
+        $company = Company::where('slug', $slug)->firstOrFail();
+
+        // 2. Validation des données du formulaire
         $validated = $request->validate([
             'first_name' => 'required|string|max:255',
             'last_name'  => 'required|string|max:255',
@@ -151,16 +155,21 @@ class EmployeeController extends Controller
             'matricule'  => 'required|string|unique:employees,matricule',
             'function'   => 'nullable|string|max:255',
             'department' => 'nullable|string|max:255',
-            'company_id' => 'required|exists:companies,id',
             'photo'      => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
+        // 3. Forcer l'ID de l'entreprise récupérée depuis l'URL (plus sécurisé que l'input hidden)
+        $validated['company_id'] = $company->id;
+
+        // 4. Traitement du téléversement de la photo
         if ($request->hasFile('photo')) {
             $validated['photo'] = $request->file('photo')->store('employees/photos', 'public');
         }
 
+        // 5. Création de l'employé
         $employee = Employee::create($validated);
 
+        // 6. Redirection vers l'aperçu du badge
         return redirect()->route('badge.preview', $employee->id);
     }
 
