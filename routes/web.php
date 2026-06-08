@@ -5,14 +5,17 @@ use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\Admin\CompanyController;
 use App\Http\Controllers\BadgeExportController;
 
-// 1. ACCUEIL PUBLIC (Affiche enfin ta page avec les cartes "Espace Entreprises" et "Admin")
-Route::get('/', function () {
+// 1. ACCUEIL PUBLIC (Affiche la page d'accueil d'atterrissage)
+Route::match(['get', 'head'], '/', function () {
     return view('welcome');
 })->name('home');
 
-// Sécurité : Gérer proprement la méthode HEAD pour la racine (évite l'erreur 405)
-Route::head('/', function () {
-    return response()->noContent();
+// Sécurité : Si jamais une déconnexion tente un appel GET égaré
+Route::get('/logout', function () {
+    auth()->logout();
+    request()->session()->invalidate();
+    request()->session()->regenerateToken();
+    return redirect()->route('login');
 });
 
 // Sécurité : Si jamais une déconnexion tente un appel GET égaré
