@@ -170,7 +170,7 @@ class EmployeeController extends Controller
         $employee = Employee::create($validated);
 
         // 6. Redirection vers l'aperçu du badge
-        return redirect()->route('badge.preview', $employee->id);
+        return redirect()->to('/badges-pro/badge/preview/' . $employee->id);
     }
 
     /**
