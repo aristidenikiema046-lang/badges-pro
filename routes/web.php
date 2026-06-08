@@ -6,17 +6,9 @@ use App\Http\Controllers\Admin\CompanyController;
 use App\Http\Controllers\BadgeExportController;
 
 // 1. ACCUEIL PUBLIC (Affiche la page d'accueil d'atterrissage)
-Route::match(['get', 'head'], '/', function () {
+Route::get('/', function () {
     return view('welcome');
 })->name('home');
-
-// Sécurité : Si jamais une déconnexion tente un appel GET égaré
-Route::get('/logout', function () {
-    auth()->logout();
-    request()->session()->invalidate();
-    request()->session()->regenerateToken();
-    return redirect()->route('login');
-});
 
 // Sécurité : Si jamais une déconnexion tente un appel GET égaré
 Route::get('/logout', function () {
@@ -30,13 +22,13 @@ Route::get('/logout', function () {
 Route::get('/inscription-partenaire', [CompanyController::class, 'create'])->name('companies.create');
 Route::post('/inscription-partenaire', [CompanyController::class, 'store'])->name('companies.store');
 
-// 3. INSCRIPTION EMPLOYÉS (VIA LIEN DE PARTAGE UNIQUE)
+// 3. INSCRIPTION EMPLOYÉS (SÉCURISÉE AVEC LE SLUG EN PARAMÈTRE POUR ÉVITER LES ERREURS 403)
 Route::get('/register/{slug}', [EmployeeController::class, 'registerForm'])->name('inscription.tenant');
-Route::post('/register/save', [EmployeeController::class, 'store'])->name('employee.store');
+Route::post('/register/{slug}/save', [EmployeeController::class, 'store'])->name('employee.store');
 
 // 4. BADGES ET EXPORT
-Route::get('/badge/preview/{id}', [EmployeeController::class, 'preview'])->name('badge.preview');
-Route::get('/badge/export/{id}', [BadgeExportController::class, 'exportSingle'])->name('badge.export.single');
+Route::get('/badge/preview/{id}', [EmployeeController::class, 'preview'])->name('badge.preview')->where('id', '[0-9]+');
+Route::get('/badge/export/{id}', [BadgeExportController::class, 'exportSingle'])->name('badge.export.single')->where('id', '[0-9]+');
 
 // Route d'aperçu dynamique pour la configuration
 Route::get('/preview-style/{style}', function ($style) {
@@ -85,6 +77,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
     Route::get('/entreprises/{id}', [CompanyController::class, 'show'])
          ->name('companies.show')->where('id', '[0-9]+');
     
+    // Modification de la route d'édition pour être cohérent avec le reste du projet français
     Route::get('/entreprises/{id}/modifier', [CompanyController::class, 'edit'])
          ->name('companies.edit')->where('id', '[0-9]+');
          
