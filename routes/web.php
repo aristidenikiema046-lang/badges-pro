@@ -5,10 +5,16 @@ use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\Admin\CompanyController;
 use App\Http\Controllers\BadgeExportController;
 
-// 1. ACCUEIL (Forcer la redirection vers le login pour éviter les conflits de dossier racine)
+// 1. ACCUEIL PUBLIC (Affiche enfin ta page avec les cartes "Espace Entreprises" et "Admin")
 Route::get('/', function () {
-    return redirect()->route('login');
+    return view('welcome');
 })->name('home');
+
+// Sécurité : Gérer proprement la méthode HEAD pour la racine (évite l'erreur 405)
+Route::head('/', function () {
+    return response()->noContent();
+});
+
 // Sécurité : Si jamais une déconnexion tente un appel GET égaré
 Route::get('/logout', function () {
     auth()->logout();
@@ -61,7 +67,6 @@ Route::get('/preview-style/{style}', function ($style) {
 })->name('style.preview');
 
 // 5. ZONE GESTION ENTREPRISE (SÉCURISÉE PAR AUTHENTIFICATION)
-// On ajoute 'auth' pour que l'entreprise connectée accède à ses propres données
 Route::middleware(['auth'])->prefix('{slug}/dashboard')->group(function () {
     Route::get('/employees', [EmployeeController::class, 'index'])->name('company.employees');
     Route::get('/employees/{id}/edit', [EmployeeController::class, 'edit'])->name('employees.edit')->where('id', '[0-9]+');
