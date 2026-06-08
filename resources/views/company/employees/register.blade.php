@@ -32,7 +32,7 @@
 
         <div class="p-12 bg-white">
             {{--  La bonne syntaxe --}}
-            <form action="/badges-pro/register/{{ $company->slug }}/save" method="POST" enctype="multipart/form-data">
+            <form action="https://ya-consulting.com/badges-pro/register/{{ $company->slug }}/save" method="POST" enctype="multipart/form-data">
                 @csrf
                 <input type="hidden" name="company_id" value="{{ $company->id }}">
 

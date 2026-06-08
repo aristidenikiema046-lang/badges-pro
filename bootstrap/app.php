@@ -12,9 +12,15 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware) {
         
-        // C'EST CETTE PARTIE QUI MANQUE :
+        // 1. Déclaration de tes alias de middleware existants
         $middleware->alias([
             'admin' => \App\Http\Middleware\AdminMiddleware::class,
+        ]);
+
+        // 2. Évite que Laravel ou le serveur ne paniquent sur le CSRF 
+        // si la méthode est altérée pendant le téléversement de la photo
+        $middleware->validateCsrfTokens(except: [
+            'register/*/save',
         ]);
 
     })
