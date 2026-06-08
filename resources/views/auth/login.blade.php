@@ -49,7 +49,16 @@
             
             <div class="absolute top-0 inset-x-0 h-2 bg-gradient-to-r from-orange-500 via-emerald-500 to-teal-600 md:hidden"></div>
 
-            <div class="w-full max-w-md mx-auto">
+            <div class="absolute top-6 right-6 z-20">
+                <a href="{{ route('home') }}" class="inline-flex items-center gap-2 px-4 py-2 bg-slate-50 hover:bg-slate-100 text-slate-600 hover:text-slate-900 rounded-xl text-xs font-black uppercase tracking-wider transition-all border border-slate-200/60 shadow-sm active:scale-95">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                    </svg>
+                    Accueil vitrine
+                </a>
+            </div>
+
+            <div class="w-full max-w-md mx-auto pt-8 md:pt-0">
                 <div class="mb-8">
                     <div class="block md:hidden text-xs font-black text-slate-400 tracking-widest uppercase mb-2">YA CONSULTING</div>
                     <h2 class="text-3xl font-black text-slate-800 tracking-tight uppercase italic">
@@ -135,3 +144,15 @@
                     </div>
 
                     <div class="pt-2">
+                        <button type="submit" class="w-full inline-flex items-center justify-center bg-slate-900 hover:bg-black text-white font-black py-4 px-6 rounded-2xl transition-all shadow-lg active:scale-[0.98] uppercase tracking-widest text-xs border border-slate-800">
+                            🔑 S'authentifier
+                        </button>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>
