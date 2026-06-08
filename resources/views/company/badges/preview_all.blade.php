@@ -51,7 +51,6 @@
             .no-print { display: none !important; }
             body { background: white; padding: 0; }
             .badge-wrapper { padding: 0; gap: 0; }
-            /* Force le saut de page seulement après le recto */
             #badge-final { transform: scale(1) !important; box-shadow: none; border: 1px solid #eee; border-radius: 0; page-break-after: always; }
             .verso-card { transform: scale(1) !important; box-shadow: none; border: 1px solid #eee; border-radius: 0; }
         }
@@ -92,12 +91,13 @@
         <button onclick="window.print()" 
                 class="flex-1 text-white px-6 py-3 rounded-2xl font-bold hover:opacity-90 transition shadow-lg flex items-center justify-center gap-2" 
                 style="background-color: {{ $employee->company->badge_color }}">
-            Imprimer
+            🖨️ Imprimer
         </button>
-        <a href="{{ route('badge.export.single', ['id' => $employee->id, 'style' => $selectedStyle, 'format' => 'pdf']) }}" 
+        
+        <a href="{{ route('badge.export.single', ['id' => $employee->id]) }}?style={{ $selectedStyle }}&format=pdf" 
            class="flex-1 bg-white border-2 px-6 py-3 rounded-2xl font-bold text-slate-700 hover:bg-slate-50 transition flex items-center justify-center gap-2"
            style="border-color: {{ $employee->company->badge_color }}60">
-            PDF
+            📄 Télécharger PDF
         </a>
     </div>
 
