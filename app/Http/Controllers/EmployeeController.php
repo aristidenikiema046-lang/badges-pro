@@ -179,17 +179,17 @@ class EmployeeController extends Controller
                     }
                 }
             } catch (\Exception $e) {
-                // Ignore l'erreur ou écris dans les logs si nécessaire
+                // Sourdine logique
             }
         }
 
         // 3. Persistance des données en base
         $employee = Employee::create($validated);
 
-        // 4. Réponse JSON fluide captée par le script JavaScript pour redirection
+        // 4. Réponse JSON intégrant le segment /public exigé par ton arborescence cPanel
         return response()->json([
             'success' => true,
-            'redirect' => '/badges-pro/badge/preview/' . $employee->id
+            'redirect' => '/badges-pro/public/badge/preview/' . $employee->id
         ]);
     }
 

@@ -103,11 +103,10 @@
             const fileInput = document.getElementById('photo');
             let base64Photo = null;
 
-            // Conversion sécurisée de l'image en Base64
+            // Encodage Base64
             if (fileInput.files.length > 0) {
                 const file = fileInput.files[0];
                 
-                // Vérification rapide de la taille côté client (Max 2Mo pour correspondre à Laravel)
                 if (file.size > 2048 * 1024) {
                     errorBox.innerText = "La photo est trop lourde. Taille maximale autorisée : 2 Mo.";
                     errorBox.classList.remove('hidden');
@@ -123,7 +122,6 @@
                 });
             }
 
-            // Construction propre de l'objet de données
             const payload = {
                 _token: document.querySelector('input[name="_token"]').value,
                 first_name: document.getElementById('first_name').value,
@@ -136,7 +134,6 @@
             };
 
             try {
-                // Résolution dynamique et absolue de l'URL par le moteur Blade de Laravel
                 const targetUrl = "{{ route('employee.store', ['slug' => $company->slug]) }}";
 
                 const response = await fetch(targetUrl, {
@@ -151,11 +148,10 @@
                 const result = await response.json();
 
                 if (response.ok && result.redirect) {
-                    // Redirection globale explicite combinant l'origine et le chemin retourné
+                    // Combine l'origine courante avec le chemin complet retourné par Laravel
                     window.location.href = window.location.origin + result.redirect;
                 } else {
-                    // Capture des erreurs de validation (ex: email déjà pris, matricule existant)
-                    throw new Error(result.message || "Une erreur de validation est survenue. Veuillez vérifier vos informations.");
+                    throw new Error(result.message || "Une erreur de validation est survenue.");
                 }
             } catch (error) {
                 errorBox.innerText = error.message;
