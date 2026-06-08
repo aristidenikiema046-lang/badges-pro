@@ -1,9 +1,23 @@
-<x-guest-layout>
-    <div class="min-h-screen flex flex-col md:flex-row bg-slate-50 font-sans">
+<!DOCTYPE html>
+<html lang="fr" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connexion - YA Consulting</title>
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .bg-waves {
+            background-image: url('https://www.transparenttextures.com/patterns/cubes.png');
+            background-color: #0f172a; /* Slate 900 */
+        }
+    </style>
+</head>
+<body class="bg-slate-50 min-h-screen font-sans antialiased">
+
+    <div class="min-h-screen flex flex-col md:flex-row w-full">
         
-        <div class="hidden md:flex md:w-1/2 bg-gradient-to-br from-slate-900 via-slate-800 to-emerald-950 text-white p-12 flex-col justify-between relative overflow-hidden">
-            <div class="absolute inset-0 opacity-10 mix-blend-overlay pointer-events-none" style="background-image: url('https://www.transparenttextures.com/patterns/cubes.png');"></div>
-            
+        <div class="hidden md:flex md:w-1/2 bg-waves text-white p-12 flex-col justify-between relative overflow-hidden">
             <div class="absolute -right-10 -bottom-10 w-64 h-64 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"></div>
             <div class="absolute -left-10 top-1/3 w-48 h-48 bg-orange-500/10 rounded-full blur-2xl pointer-events-none"></div>
 
@@ -11,15 +25,15 @@
                 <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 text-[10px] font-bold tracking-widest uppercase mb-6">
                     🛡️ Espace Sécurisé
                 </div>
-                <h1 class="text-3xl font-black tracking-tighter uppercase italic">
-                    YA CONSULTING <span class="text-emerald-500 text-sm not-italic font-medium block tracking-widest mt-1 text-slate-400">BADGES PRO PLATFORM</span>
+                <h1 class="text-2xl font-black tracking-tighter uppercase italic">
+                    YA CONSULTING <span class="text-emerald-500 text-xs not-italic font-medium block tracking-widest mt-1 text-slate-400">BADGES PRO PLATFORM</span>
                 </h1>
             </div>
 
             <div class="my-auto relative z-10 max-w-md">
-                <div class="w-16 h-1 bg-gradient-to-r from-orange-500 to-emerald-500 rounded-full mb-6"></div>
-                <h2 class="text-3xl md:text-4xl font-black tracking-tight leading-none uppercase italic mb-4">
-                    Gérez vos <span class="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-emerald-400">badges professionnels</span> en quelques clics.
+                <div class="h-1 w-16 bg-gradient-to-r from-orange-500 to-emerald-500 rounded-full mb-6"></div>
+                <h2 class="text-3xl lg:text-4xl font-black tracking-tight leading-none uppercase italic mb-4">
+                    GÉREZ VOS <span class="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-emerald-400">BADGES PROFESSIONNELS</span> EN QUELQUES CLICS.
                 </h2>
                 <p class="text-slate-400 font-medium text-sm leading-relaxed">
                     Accédez à votre tableau de bord centralisé pour piloter les autorisations, configurer les visuels et suivre l'enregistrement de vos effectifs.
@@ -31,13 +45,14 @@
             </div>
         </div>
 
-        <div class="w-full md:w-1/2 flex items-center justify-center p-6 sm:p-12 md:p-16 bg-white relative">
+        <div class="w-full md:w-1/2 flex items-center justify-center p-6 sm:p-12 lg:p-20 bg-white relative min-h-screen md:min-h-auto">
             
             <div class="absolute top-0 inset-x-0 h-2 bg-gradient-to-r from-orange-500 via-emerald-500 to-teal-600 md:hidden"></div>
 
-            <div class="w-full max-w-md">
+            <div class="w-full max-w-md mx-auto">
                 <div class="mb-8">
-                    <h2 class="text-2xl font-black text-slate-800 tracking-tight uppercase italic md:text-3xl">
+                    <div class="block md:hidden text-xs font-black text-slate-400 tracking-widest uppercase mb-2">YA CONSULTING</div>
+                    <h2 class="text-3xl font-black text-slate-800 tracking-tight uppercase italic">
                         Connexion <span class="text-emerald-600">Partenaire</span>
                     </h2>
                     <p class="text-slate-500 text-sm font-medium mt-1">
@@ -45,7 +60,11 @@
                     </p>
                 </div>
 
-                <x-auth-session-status class="mb-4 p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-700 text-sm font-semibold" :status="session('status')" />
+                @if (session('status'))
+                    <div class="mb-4 p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-700 text-sm font-semibold">
+                        {{ session('status') }}
+                    </div>
+                @endif
 
                 <form method="POST" action="{{ route('login') }}" class="space-y-5">
                     @csrf
@@ -68,9 +87,11 @@
                                    autofocus 
                                    autocomplete="username"
                                    placeholder="partenaire@ya-consulting.com"
-                                   class="block w-full pl-11 pr-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl text-slate-800 font-medium placeholder-slate-400 transition-all focus:bg-white focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 outline-none text-sm" />
+                                   class="block w-full pl-11 pr-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl text-slate-800 font-medium placeholder-slate-400 transition-all focus:bg-white focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 outline-none text-sm shadow-inner" />
                         </div>
-                        <x-input-error :messages="$errors->get('email')" class="mt-2 text-xs font-bold text-red-600 uppercase italic tracking-wide" />
+                        @if($errors->has('email'))
+                            <p class="mt-2 text-xs font-bold text-red-600 uppercase italic tracking-wide">{{ $errors->first('email') }}</p>
+                        @endif
                     </div>
 
                     <div>
@@ -96,9 +117,11 @@
                                    required 
                                    autocomplete="current-password"
                                    placeholder="••••••••••••"
-                                   class="block w-full pl-11 pr-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl text-slate-800 font-medium placeholder-slate-400 transition-all focus:bg-white focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 outline-none text-sm" />
+                                   class="block w-full pl-11 pr-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl text-slate-800 font-medium placeholder-slate-400 transition-all focus:bg-white focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 outline-none text-sm shadow-inner" />
                         </div>
-                        <x-input-error :messages="$errors->get('password')" class="mt-2 text-xs font-bold text-red-600 uppercase italic tracking-wide" />
+                        @if($errors->has('password'))
+                            <p class="mt-2 text-xs font-bold text-red-600 uppercase italic tracking-wide">{{ $errors->first('password') }}</p>
+                        @endif
                     </div>
 
                     <div class="flex items-center justify-between pt-1">
@@ -107,27 +130,8 @@
                                    type="checkbox" 
                                    name="remember"
                                    class="w-4 h-4 rounded border-slate-300 text-emerald-600 bg-slate-50 focus:ring-emerald-500/20 cursor-pointer transition-all">
-                            <span class="ms-2 text-xs font-bold text-slate-500 uppercase tracking-wide">{{ __('Se souvenir de moi') }}</span>
+                            <span class="ms-2 text-xs font-bold text-slate-500 uppercase tracking-wide">Se souvenir de moi</span>
                         </label>
                     </div>
 
                     <div class="pt-2">
-                        <button type="submit" class="w-full inline-flex items-center justify-center bg-gradient-to-r from-slate-900 to-slate-800 hover:from-black hover:to-slate-900 text-white font-black py-4 px-6 rounded-2xl transition-all shadow-xl hover:shadow-slate-900/10 active:scale-[0.98] uppercase tracking-widest text-sm border border-slate-800">
-                            🔑 S'authentifier
-                        </button>
-                    </div>
-                </form>
-
-                <div class="mt-8 text-center">
-                    <a href="{{ route('home') }}" class="inline-flex items-center gap-1.5 text-xs font-black text-slate-400 hover:text-slate-600 uppercase tracking-widest transition-colors">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-                        </svg>
-                        Retour à la vitrine
-                    </a>
-                </div>
-
-            </div>
-        </div>
-    </div>
-</x-guest-layout>
