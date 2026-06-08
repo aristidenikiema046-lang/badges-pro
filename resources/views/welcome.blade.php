@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Accueil - YA Consulting Badges</title>
+    <title>Accueil - Badges Pro Platform</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
@@ -23,111 +23,81 @@
     <div class="absolute top-[-10%] left-[-10%] w-[50vw] h-[50vw] bg-emerald-500/10 rounded-full blur-[120px] pointer-events-none"></div>
     <div class="absolute bottom-[10%] right-[-10%] w-[45vw] h-[45vw] bg-orange-500/10 rounded-full blur-[120px] pointer-events-none"></div>
 
-    <main class="flex-grow flex flex-col items-center justify-center px-6 py-16 md:py-24 w-full max-w-7xl mx-auto relative z-10">
+    <nav class="w-full max-w-7xl mx-auto px-6 py-6 flex justify-between items-center relative z-20">
+        <div class="text-xs font-black tracking-widest uppercase italic text-slate-400">
+            YA CONSULTING
+        </div>
         
-        <header class="text-center mb-16 md:mb-24 max-w-2xl">
-            <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[10px] font-bold tracking-widest uppercase mb-6 shadow-sm">
+        <div class="flex items-center gap-4">
+            @auth
+                <a href="{{ auth()->user()->role === 'admin' ? route('companies.index') : (auth()->user()->company ? route('company.employees', ['slug' => auth()->user()->company->slug]) : '#') }}" 
+                   class="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white font-black text-xs uppercase tracking-wider rounded-xl transition-all active:scale-95 shadow-lg shadow-emerald-500/20">
+                    📊 Mon Espace
+                </a>
+                <form method="POST" action="{{ route('logout') }}" class="inline">
+                    @csrf
+                    <button type="submit" class="px-3 py-2 text-slate-400 hover:text-red-400 font-bold text-xs uppercase tracking-wider transition-colors">
+                        Déconnexion
+                    </button>
+                </form>
+            @else
+                <a href="{{ route('login') }}" class="px-4 py-2 text-slate-300 hover:text-white font-black text-xs uppercase tracking-wider transition-colors">
+                    🔑 Connexion
+                </a>
+                <a href="{{ route('companies.create') }}" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white border border-slate-700 font-black text-xs uppercase tracking-wider rounded-xl transition-all active:scale-95">
+                    👤 S'enregistrer
+                </a>
+            @endauth
+        </div>
+    </nav>
+
+    <main class="flex-grow flex flex-col items-center justify-center px-6 py-8 w-full max-w-4xl mx-auto relative z-10 text-center my-auto">
+        
+        <header class="mb-10 max-w-2xl">
+            <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[10px] font-bold tracking-widest uppercase mb-4 shadow-sm">
                 ⚡ Badges Pro Platform v1.0
             </div>
-            <h1 class="text-4xl md:text-6xl font-black text-white mb-6 tracking-tighter uppercase italic leading-none">
-                PLATEFORME <span class="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-emerald-400">YA CONSULTING</span>
+            <h1 class="text-4xl md:text-6xl font-black text-white mb-4 tracking-tighter uppercase italic leading-none">
+                PLATEFORME <span class="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-emerald-400">BADGES PRO</span>
             </h1>
-            <div class="h-1 w-24 bg-gradient-to-r from-orange-500 to-emerald-500 mx-auto rounded-full mb-6"></div>
-            <p class="text-slate-400 font-medium uppercase tracking-widest text-xs md:text-sm max-w-md mx-auto leading-relaxed">
-                Système centralisé de gestion, de configuration et d'enregistrement des badges professionnels.
+            <div class="h-1 w-24 bg-gradient-to-r from-orange-500 to-emerald-500 mx-auto rounded-full mb-4"></div>
+            <p class="text-slate-400 font-medium uppercase tracking-widest text-[10px] md:text-xs max-w-md mx-auto leading-relaxed">
+                Système centralisé de gestion, de configuration et d'enregistrement des accès professionnels.
             </p>
         </header>
 
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12 w-full max-w-5xl">
-            
-            <div class="glass-card p-8 md:p-12 rounded-[2.5rem] border border-slate-700/40 shadow-2xl transition-all duration-300 hover:border-orange-500/40 hover:shadow-orange-500/5 group">
-                <div class="w-16 h-16 bg-orange-500/10 border border-orange-500/20 text-orange-400 rounded-2xl flex items-center justify-center mx-auto mb-8 shadow-inner transition-transform group-hover:scale-110">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <div class="w-full max-w-xl">
+            <div class="glass-card p-8 md:p-10 rounded-[2.5rem] border border-slate-700/40 shadow-2xl transition-all duration-300 hover:border-emerald-500/30 group">
+                <div class="w-14 h-14 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-inner">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-10V4m-5 10v4" />
                     </svg>
                 </div>
-                <h2 class="text-2xl font-black text-white mb-4 uppercase italic tracking-tight text-center">Espace Entreprises</h2>
-                <p class="text-slate-400 text-sm text-center mb-8 max-w-xs mx-auto leading-relaxed">
-                    Enregistrez votre structure, configurez vos designs de badges et pilotez vos effectifs en temps réel.
+                
+                <h2 class="text-xl md:text-2xl font-black text-white mb-3 uppercase italic tracking-tight">Accès au Portail</h2>
+                <p class="text-slate-400 text-xs md:text-sm mb-8 max-w-xs mx-auto leading-relaxed">
+                    Pilotez vos effectifs, configurez vos visuels de badges et gérez vos autorisations sur une interface unique.
                 </p>
                 
-                <div class="flex flex-col gap-4">
+                <div class="flex flex-col sm:flex-row gap-4 justify-center">
                     @auth
-                        @if(auth()->user()->company)
-                            <a href="{{ route('company.employees', ['slug' => auth()->user()->company->slug]) }}" 
-                               class="w-full inline-flex items-center justify-center bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-black py-4.5 px-6 rounded-2xl transition-all shadow-lg shadow-orange-500/10 active:scale-[0.98] uppercase tracking-widest text-xs border border-orange-400/20">
-                                📊 Accéder au Dashboard
-                            </a>
-                        @else
-                            <div class="p-4 bg-slate-800/80 border border-slate-700/60 rounded-2xl text-center">
-                                <p class="text-xs text-slate-400 font-bold uppercase italic">Connecté : Administrateur Central</p>
-                            </div>
-                        @endif
-                    @else
-                        <a href="{{ route('companies.create') }}" 
-                           class="w-full bg-slate-100 hover:bg-white text-slate-950 font-black py-4.5 px-6 rounded-2xl transition-all shadow-md active:scale-[0.98] text-center uppercase tracking-widest text-xs">
-                            👤+ Enregistrer mon entreprise
+                        <a href="{{ auth()->user()->role === 'admin' ? route('companies.index') : (auth()->user()->company ? route('company.employees', ['slug' => auth()->user()->company->slug]) : '#') }}" 
+                           class="w-full inline-flex items-center justify-center bg-gradient-to-r from-orange-500 to-emerald-500 hover:from-orange-600 hover:to-emerald-600 text-white font-black py-4 px-6 rounded-2xl transition-all shadow-lg active:scale-[0.98] uppercase tracking-widest text-xs border border-white/10">
+                            📊 Accéder à mon Tableau de bord
                         </a>
-                        <a href="{{ route('login') }}" 
-                           class="w-full border border-orange-500/40 hover:border-orange-500 bg-orange-500/5 hover:bg-orange-500 text-orange-400 hover:text-white font-black py-4.5 px-6 rounded-2xl transition-all active:scale-[0.98] text-center uppercase tracking-widest text-xs">
-                            🔑 Connexion Partenaire
-                        </a>
-                    @endauth
-                </div>
-            </div>
-
-            <div class="glass-card p-8 md:p-12 rounded-[2.5rem] border border-slate-700/40 shadow-2xl transition-all duration-300 hover:border-emerald-500/40 hover:shadow-emerald-500/5 group">
-                <div class="w-16 h-16 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 rounded-2xl flex items-center justify-center mx-auto mb-8 shadow-inner transition-transform group-hover:scale-110">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                    </svg>
-                </div>
-                <h2 class="text-2xl font-black text-white mb-4 uppercase italic tracking-tight text-center">Admin Centrale</h2>
-                <p class="text-slate-400 text-sm text-center mb-8 max-w-xs mx-auto leading-relaxed">
-                    Outils de supervision générale, validation des comptes partenaires et audit de sécurité du système.
-                </p>
-                
-                <div class="flex flex-col gap-4">
-                    @auth
-                        @if(auth()->user()->role === 'admin')
-                            <a href="{{ route('companies.index') }}" 
-                               class="w-full bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-black py-4.5 px-6 rounded-2xl transition-all shadow-lg shadow-emerald-500/10 active:scale-[0.98] flex items-center justify-center gap-2 uppercase tracking-widest text-xs border border-emerald-500/20">
-                                ⚙️ Gérer la plateforme
-                            </a>
-                        @else
-                            <div class="p-4 bg-slate-800/80 border border-slate-700/60 rounded-2xl text-center">
-                                <p class="text-xs text-slate-400 font-bold uppercase italic">Connecté : Espace Entreprise</p>
-                            </div>
-                        @endif
                     @else
                         <a href="{{ route('login') }}" 
-                           class="w-full bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-black py-4.5 px-6 rounded-2xl transition-all shadow-lg shadow-emerald-500/10 active:scale-[0.98] text-center uppercase tracking-widest text-xs border border-emerald-500/20">
-                            🛡️ Connexion Super Admin
+                           class="w-full bg-gradient-to-r from-orange-500 to-emerald-500 hover:from-orange-600 hover:to-emerald-600 text-white font-black py-4 px-6 rounded-2xl transition-all shadow-lg shadow-emerald-500/5 active:scale-[0.98] text-center uppercase tracking-widest text-xs border border-white/10">
+                            🔑 Entrer sur la plateforme
                         </a>
-                        <p class="text-[10px] text-slate-500 font-bold uppercase tracking-widest text-center mt-2">
-                            🔒 Accès strictement restreint
-                        </p>
                     @endauth
                 </div>
             </div>
         </div>
 
-        @auth
-            <div class="mt-16 text-center">
-                <form method="POST" action="{{ route('logout') }}">
-                    @csrf
-                    <button type="submit" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-slate-800/40 hover:bg-red-500/10 text-slate-400 hover:text-red-400 border border-slate-700/40 hover:border-red-500/20 transition-all font-black uppercase text-[10px] tracking-widest active:scale-95">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                        </svg>
-                        Se déconnecter de la session
-                    </button>
-                </form>
-            </div>
-        @endauth
     </main>
 
-    <footer class="bg-slate-950/60 border-t border-slate-800 text-slate-500 py-8 text-xs relative z-10">
+    <footer class="bg-slate-950/60 border-t border-slate-800 text-slate-500 py-6 text-xs relative z-10 mt-auto">
         <div class="max-w-5xl mx-auto px-6 flex flex-col sm:flex-row justify-between items-center gap-4">
             <p class="font-medium">&copy; {{ date('Y') }} <span class="text-slate-300 font-bold uppercase tracking-wider">YA Consulting</span>. Tous droits réservés.</p>
             <div class="flex gap-6 font-bold uppercase tracking-widest text-[10px]">
