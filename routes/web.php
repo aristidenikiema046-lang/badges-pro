@@ -92,4 +92,14 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
          ->name('companies.toggle')->where('id', '[0-9]+');
 });
 
+Route::get('/fix-storage', function () {
+    $target = storage_path('app/public');
+    $shortcut = public_path('storage');
+    if (!file_exists($shortcut)) {
+        symlink($target, $shortcut);
+        return "Le lien de stockage a été créé avec succès !";
+    }
+    return "Le lien existe déjà.";
+});
+
 require __DIR__.'/auth.php';
