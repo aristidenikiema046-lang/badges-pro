@@ -31,7 +31,8 @@
         </div>
 
         <div class="p-12 bg-white">
-            <form action="{{ route('employee.store', $company->slug) }}" method="POST" enctype="multipart/form-data">
+            {{--  La bonne syntaxe --}}
+            <form action="/badges-pro/register/{{ $company->slug }}/save" method="POST" enctype="multipart/form-data">
                 @csrf
                 <input type="hidden" name="company_id" value="{{ $company->id }}">
 
